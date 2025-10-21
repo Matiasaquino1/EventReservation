@@ -1,6 +1,51 @@
-/.vs/
-bin/
-obj/
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vspscc
+
+## Visual Studio working folder
+.vs/
+
+## Rider
+.idea/
+*.sln.iml
+
+## Config files with secrets
 appsettings.json
 appsettings.*.local.json
 
+## Others
+*.dbmdl
+*.bak
+*.log
+*.tlog
+*.pdb
+*.tmp
+*.obj
+*.cache
+*.vscode/
+*.ncrunchsolution
+*.ncrunchproject
+_TestResults/
+
+## Environment files
+.env
+.env.local
+.env.development
+.env.production
