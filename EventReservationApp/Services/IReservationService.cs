@@ -12,7 +12,9 @@ namespace EventReservations.Services
         Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId);
         Task<IEnumerable<Reservation>> GetAdminReservationsAsync(string status, int? eventId);
         Task<Reservation> UpdateReservationAsync(Reservation createdReservation);
-        // Agrega más métodos como GetReservationAsync, UpdateAsync, etc.
+        Task<Reservation> DeleteReservation(int id);
+        Task<Reservation> GetReservationAsync(int id);
+        Task<IEnumerable<Reservation>> GetAllReservationsAsync(string? status = null, int? eventId = null);
     }
 
     public class ReservationService : IReservationService
@@ -51,6 +53,20 @@ namespace EventReservations.Services
         }
 
         // Agrega más métodos si los necesitas, e.g.:
-        // public async Task<Reservation> GetReservationAsync(int id) { return await _reservationRepository.GetByIdAsync(id); }
+        public async Task<Reservation> GetReservationAsync(int id) 
+        { 
+            return await _reservationRepository.GetByIdAsync(id); 
+        }
+
+        public Task<Reservation> DeleteReservation(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Reservation>> GetAllReservationsAsync(string? status = null, int? eventId = null)
+        {
+            return await _reservationRepository.GetAllAsync(status, eventId);
+        }
+
     }
 }

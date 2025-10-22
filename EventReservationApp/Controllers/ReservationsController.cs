@@ -1,4 +1,6 @@
-﻿using EventReservations.Models;  // Para los modelos
+﻿using AutoMapper;
+using EventReservations.Dto;
+using EventReservations.Models;  // Para los modelos
 using EventReservations.Services;  // Para IReservationService
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +14,19 @@ namespace EventReservationApp.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly IReservationService _reservationService;
-        private readonly IPaymentService _paymentService;  // Para crear PaymentIntent
+        private readonly IPaymentService _paymentService;
+        private readonly IMapper _mapper;
+        private readonly ILogger<ReservationsController> _logger;
 
-        public ReservationsController(IReservationService reservationService, IPaymentService paymentService)
+        public ReservationsController(IReservationService reservationService,
+                                      IPaymentService paymentService,
+                                      IMapper mapper,
+                                      ILogger<ReservationsController> logger)
         {
             _reservationService = reservationService;
             _paymentService = paymentService;
+            _mapper = mapper;
+            _logger = logger;
         }
 
         // POST /api/reservations
@@ -36,6 +45,24 @@ namespace EventReservationApp.Controllers
                 return StatusCode(500, "No se pudo crear la reserva.");
 
             return CreatedAtAction(nameof(GetUserReservations), new { userId = reservation.UserId }, createdReservation);
+        }
+
+        // GET: api/reservations  (solo admin)
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllReservations([FromQuery] string? status, [FromQuery] int? eventId)
+        {
+            try
+            {
+                var reservations = await _reservationService.GetAllReservationsAsync(status, eventId);
+                var dtos = reservations.Select(r => _mapper.Map<ReservationDto>(r));
+                return Ok(dtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error GetAllReservations");
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         [HttpPost("create-with-payment")]
@@ -94,21 +121,6 @@ namespace EventReservationApp.Controllers
         }
 
 
-        // POST /api/events/{eventId}/reservations (crea reserva pendiente + PaymentIntent)
-        //[HttpPost("events/{eventId}/reservations")]
-        //[Authorize(Roles = "User")]  // Asume que solo usuarios pueden reservar
-        //public async Task<ActionResult<Reservation>> CreateReservation(int eventId, [FromBody] Reservation reservation)
-        //{
-        //    reservation.EventId = eventId;  // Asocia el evento
-        //    reservation.Status = "Pending";  // Establece como pendiente
-        //    var createdReservation = await _reservationService.CreateReservationAsync(reservation);
-
-        //    // Crea PaymentIntent con Stripe
-        //    var paymentIntent = await _paymentService.CreatePaymentIntentAsync(createdReservation.Id, reservation.TotalAmount);  // Asume método en IPaymentService
-        //    createdReservation.PaymentIntentId = paymentIntent.Id;  // Guarda el ID si es necesario
-        //    return CreatedAtAction(nameof(GetReservation), new { id = createdReservation.Id }, createdReservation);
-        //}
-
 
         // GET /api/users/{userId}/reservations
         [HttpGet("users/{userId}/reservations")]
@@ -119,15 +131,15 @@ namespace EventReservationApp.Controllers
             return Ok(reservations);
         }
 
-        // GET /api/reservations/{id}
-        //[HttpGet("{id}")]
-        //[Authorize]
-        //public async Task<ActionResult<Reservation>> GetReservation(int id)
-        //{
-        //    var reservation = await _reservationService.GetReservationAsync(id);  // Asume este método
-        //    if (reservation == null) return NotFound();
-        //    return Ok(reservation);
-        //}
+        //GET /api/reservations/{id}
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<ActionResult<Reservation>> GetReservation(int id)
+        {
+            var reservation = await _reservationService.GetReservationAsync(id);  // Asume este método
+            if (reservation == null) return NotFound();
+            return Ok(reservation);
+        }
 
         // PUT /api/reservations/{id}/cancel
         [HttpPut("{id}/cancel")]

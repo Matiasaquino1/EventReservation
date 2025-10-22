@@ -1,8 +1,7 @@
 ﻿using EventReservations.Models;
 using EventReservations.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Stripe;
 using System.Threading.Tasks;
+using Stripe;
 
 namespace EventReservations.Services
 {
@@ -12,18 +11,23 @@ namespace EventReservations.Services
         Task<Payment> GetPaymentAsync(int id);
         Task ProcessPaymentAsync(int reservationId, decimal amount);
         Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount);
-        //Task ProcessWebhookAsync(Stripe.Event stripeEvent);
+        Task ProcessWebhookAsync(Stripe.Event stripeEvent);
+        Task<Payment?> GetPaymentByReservationIdAsync(int reservationId);
+        Task<IEnumerable<Payment>> GetPaymentsByUserIdAsync(int userId);
+        Task<IEnumerable<Payment>> GetAllPaymentsAsync();
     }
 
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly IConfiguration _configuration;
+        private readonly IReservationRepository _reservationRepository; 
 
-        public PaymentService(IPaymentRepository paymentRepository, IConfiguration configuration)
+        public PaymentService(IPaymentRepository paymentRepository, IConfiguration configuration, IReservationRepository reservationRepository)
         {
             _paymentRepository = paymentRepository;
             _configuration = configuration;
+            _reservationRepository = reservationRepository;
         }
         public async Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount)
         {
@@ -31,16 +35,84 @@ namespace EventReservations.Services
             var service = new PaymentIntentService();
             return await service.CreateAsync(options);  // Usa tu clave de Stripe
         }
-        //public async Task ProcessWebhookAsync(Stripe.Event stripeEvent)
-        //{
-        //    if (stripeEvent.Type == "payment_intent.succeeded")
-        //    {
-        //        var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-        //        // Lógica: Actualiza Reservation y Payment en la DB
-        //        await _paymentRepository.UpdatePaymentStatusAsync(paymentIntent.Id, "Succeeded");  // Asume método en repository
-        //    }
-        //    // Agrega más lógica según el evento
-        //}
+
+        public async Task ProcessWebhookAsync(Stripe.Event stripeEvent)
+        {
+            if (stripeEvent == null)
+                throw new ArgumentNullException(nameof(stripeEvent), "El evento recibido desde Stripe es nulo.");
+
+            try
+            {
+                switch (stripeEvent.Type)
+                {
+                    case "payment_intent.succeeded":
+                        {
+                            var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                            if (paymentIntent == null)
+                                throw new InvalidOperationException("No se pudo obtener el PaymentIntent del evento.");
+
+                            var payment = await _paymentRepository.GetByStripeIntentIdAsync(paymentIntent.Id);
+                            if (payment == null)
+                                throw new KeyNotFoundException($"No se encontró un pago con PaymentIntentId: {paymentIntent.Id}");
+
+                            // Actualizar estado del pago
+                            payment.Status = "Succeeded";
+                            await _paymentRepository.UpdateAsync(payment);
+
+                            // Actualizar estado de la reserva asociada
+                            var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
+                            if (reservation != null)
+                            {
+                                reservation.Status = "Confirmed";
+                                await _reservationRepository.UpdateAsync(reservation);
+                            }
+
+                            Console.WriteLine($"✅ Pago exitoso procesado: {paymentIntent.Id}");
+                            break;
+                        }
+
+                    case "payment_intent.payment_failed":
+                        {
+                            var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                            var payment = await _paymentRepository.GetByStripeIntentIdAsync(paymentIntent.Id);
+
+                            if (payment != null)
+                            {
+                                payment.Status = "Failed";
+                                await _paymentRepository.UpdateAsync(payment);
+                            }
+
+                            Console.WriteLine($"❌ Pago fallido: {paymentIntent?.Id}");
+                            break;
+                        }
+
+                    case "payment_intent.canceled":
+                        {
+                            var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                            var payment = await _paymentRepository.GetByStripeIntentIdAsync(paymentIntent.Id);
+
+                            if (payment != null)
+                            {
+                                payment.Status = "Canceled";
+                                await _paymentRepository.UpdateAsync(payment);
+                            }
+
+                            Console.WriteLine($"⚠️ Pago cancelado: {paymentIntent?.Id}");
+                            break;
+                        }
+
+                    default:
+                        Console.WriteLine($"ℹ️ Evento no manejado: {stripeEvent.Type}");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❗Error procesando webhook de Stripe: {ex.Message}");
+                throw; // O manejar con un logger según tu configuración
+            }
+        }
+
 
 
         public async Task<Payment> ProcessPaymentAsync(int reservationId, decimal amount, string currency, string paymentMethodId)
@@ -90,5 +162,21 @@ namespace EventReservations.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<Payment?> GetPaymentByReservationIdAsync(int reservationId)
+        {
+            return await _paymentRepository.GetByReservationIdAsync(reservationId);
+        }
+
+        public async Task<IEnumerable<Payment>> GetPaymentsByUserIdAsync(int userId)
+        {
+            return await _paymentRepository.GetPaymentsByUserIdAsync(userId);
+        }
+
+        public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
+        {
+            return await _paymentRepository.GetAllAsync();
+        }
+
     }
 }

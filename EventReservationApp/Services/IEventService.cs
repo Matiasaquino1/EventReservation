@@ -7,29 +7,28 @@ namespace EventReservations.Services
     {
         Task<Event> CreateEventAsync(Event eventModel);
         Task<Event> GetEventAsync(int id);
-        Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability);
         Task<Event> UpdateEventAsync(Event eventModel);
         Task DeleteEventAsync(int id);
+        Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability);
         Task<Event> ForceConfirmEventAsync(int id);
-        // Agrega más métodos como UpdateAsync, DeleteAsync, etc., si los necesitas
+        Task<IEnumerable<Event>> GetAllAsync();
     }
 
     public class EventService : IEventService
     {
-        private readonly IEventRepository _eventRepository;  // Inyecta el repositorio
-
+        private readonly IEventRepository _eventRepository;  
         public EventService(IEventRepository eventRepository)
         {
             _eventRepository = eventRepository;
         }
         public async Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability)
         {
-            // Lógica de negocio: e.g., validaciones
+            // validaciones
             return await _eventRepository.GetEventsWithFiltersAsync(date, location, availability);
         }
         public async Task<Event> ForceConfirmEventAsync(int id)
         {
-            // Lógica de negocio adicional si es necesario
+            // logica negociocf
             return await _eventRepository.ForceConfirmEventAsync(id);
         }
 
@@ -54,7 +53,10 @@ namespace EventReservations.Services
             await _eventRepository.DeleteAsync(id);  // Asume que IEventRepository tiene DeleteAsync
         }
 
-        // Agrega más métodos si los tienes, e.g.:
+        public async Task<IEnumerable<Event>> GetAllAsync()
+        {
+            return await _eventRepository.GetAllAsync();
+        }
 
     }
 }

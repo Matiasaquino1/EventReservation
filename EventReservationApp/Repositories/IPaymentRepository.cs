@@ -12,5 +12,8 @@ namespace EventReservations.Repositories
         Task<Payment> UpdatePaymentStatusAsync(String id, string v);
         Task DeleteAsync(int id);
         Task<IEnumerable<Payment>> GetAllAsync();
+        Task<Payment?> GetByStripeIntentIdAsync(string stripePaymentIntentId);
+        Task<IEnumerable<Payment>> GetPaymentsByUserIdAsync(int userId);
+        Task<Payment?> GetByReservationIdAsync(int reservationId);
     }
 }

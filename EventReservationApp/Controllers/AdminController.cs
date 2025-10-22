@@ -15,7 +15,7 @@ namespace EventReservationApp.Controllers
     [Authorize(Roles = "Admin")]  // Solo para admins
     public class AdminController : ControllerBase
     {
-        private readonly IReservationService _reservationService;  // O el service que necesites
+        private readonly IReservationService _reservationService; 
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
 

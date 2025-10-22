@@ -16,11 +16,15 @@ namespace EventReservationApp.Controllers
     {
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
+        private readonly IReservationService _reservationService;
+        private readonly IPaymentService _paymentService;
 
-        public EventsController(IEventService eventService, IMapper mapper)
+        public EventsController(IEventService eventService, IMapper mapper, IReservationService reservationService, IPaymentService paymentService)
         {
             _eventService = eventService;
             _mapper = mapper;
+            _reservationService = reservationService;
+            _paymentService = paymentService;
         }
 
 
@@ -80,6 +84,28 @@ namespace EventReservationApp.Controllers
         {
             await _eventService.DeleteEventAsync(id);  // Asume este método en IEventService
             return NoContent();
+        }
+
+        // GET: api/admin/summary
+        [HttpGet("summary")]
+        public async Task<IActionResult> GetSummary()
+        {
+            var events = await _eventService.GetAllAsync();
+            var reservations = await _reservationService.GetAllReservationsAsync(null, null);
+            var payments = await _paymentService.GetAllPaymentsAsync();
+
+            var totalEvents = events.Count();
+            var totalReservations = reservations.Count();
+            var totalPayments = payments.Count();
+            var totalRevenue = payments.Sum(p => p.Amount);
+
+            return Ok(new
+            {
+                totalEvents,
+                totalReservations,
+                totalPayments,
+                totalRevenue
+            });
         }
     }
 }

@@ -58,9 +58,14 @@ namespace EventReservations.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<IEnumerable<Reservation>> GetAllAsync()
+
+        public async Task<IEnumerable<Reservation>> GetAllAsync(string? status = null, int? eventId = null)
         {
-            return await _context.Reservations.ToListAsync();
+            var q = _context.Reservations.AsQueryable();
+            if (!string.IsNullOrEmpty(status)) q = q.Where(r => r.Status == status);
+            if (eventId.HasValue) q = q.Where(r => r.EventId == eventId.Value);
+            return await q.ToListAsync();
         }
+
     }
 }
