@@ -3,15 +3,59 @@
   "WorkspaceRootPath": "D:\\EventReservationApp\\EventReservationApp\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\reservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\reservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\controllers\\reservationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:controllers\\reservationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\paymentrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\paymentrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\registerrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\registerrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\adminreservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\adminreservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\repositories\\eventrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:repositories\\eventrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\migrations\\20251022065136_baseline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:migrations\\20251022065136_baseline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\models\\event.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:models\\event.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\eventdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\eventdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\services\\ipaymentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:services\\ipaymentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\controllers\\reservationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:controllers\\reservationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\controllers\\paymentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -20,10 +64,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\controllers\\eventscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:controllers\\eventscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -74,22 +114,6 @@
       "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:repositories\\ieventrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\repositories\\eventrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:repositories\\eventrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\paymentrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\paymentrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\models\\event.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:models\\event.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -102,20 +126,8 @@
       "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\adminreservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\adminreservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\reservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\reservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\createdreservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\createdreservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\services\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -142,16 +154,8 @@
       "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:eventreservations.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\registerrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\registerrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\services\\ijwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:services\\ijwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\dto\\eventdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|solutionrelative:dto\\eventdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0BD376F7-6B25-4067-B23D-D4C67DEF14A5}|EventReservations.csproj|d:\\eventreservationapp\\eventreservationapp\\repositories\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -165,120 +169,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Microsoft.Common.CurrentVersion.targets",
-              "DocumentMoniker": "D:\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
-              "RelativeDocumentMoniker": "..\\..\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
-              "ToolTip": "D:\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
-              "RelativeToolTip": "..\\..\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
-              "ViewState": "AgIAAPkUAAAAAAAAAAAYwBEVAAAEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
-              "WhenOpened": "2025-10-22T01:18:14.784Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "IPaymentService.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Services\\IPaymentService.cs",
-              "RelativeDocumentMoniker": "Services\\IPaymentService.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Services\\IPaymentService.cs",
-              "RelativeToolTip": "Services\\IPaymentService.cs",
-              "ViewState": "AgIAAF8AAAAAAAAAAADwvwUAAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T23:31:31.762Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "IReservationService.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Services\\IReservationService.cs",
-              "RelativeDocumentMoniker": "Services\\IReservationService.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Services\\IReservationService.cs",
-              "RelativeToolTip": "Services\\IReservationService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEMAAAA7AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T23:30:27.23Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "IEventService.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Services\\IEventService.cs",
-              "RelativeDocumentMoniker": "Services\\IEventService.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Services\\IEventService.cs",
-              "RelativeToolTip": "Services\\IEventService.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAowB4AAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T23:29:24.976Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\appsettings.json",
-              "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAADAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-15T00:14:51.705Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "appsettings.Example.json",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\appsettings.Example.json",
-              "RelativeDocumentMoniker": "appsettings.Example.json",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\appsettings.Example.json",
-              "RelativeToolTip": "appsettings.Example.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-20T23:43:14.375Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "appsettings.Development.json",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\appsettings.Development.json",
-              "RelativeDocumentMoniker": "appsettings.Development.json",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\appsettings.Development.json",
-              "RelativeToolTip": "appsettings.Development.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-15T06:00:09.63Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "AdminController.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\AdminController.cs",
-              "RelativeDocumentMoniker": "Controllers\\AdminController.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\AdminController.cs",
-              "RelativeToolTip": "Controllers\\AdminController.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAACkAAAA6AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-17T07:30:43.605Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\AuthController.cs",
-              "RelativeToolTip": "Controllers\\AuthController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T23:37:55.114Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 15,
               "Title": "EventsController.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\EventsController.cs",
               "RelativeDocumentMoniker": "Controllers\\EventsController.cs",
@@ -290,7 +185,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 14,
               "Title": "PaymentsController.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\PaymentsController.cs",
               "RelativeDocumentMoniker": "Controllers\\PaymentsController.cs",
@@ -302,139 +197,44 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ReservationsController.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\ReservationsController.cs",
-              "RelativeDocumentMoniker": "Controllers\\ReservationsController.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\ReservationsController.cs",
-              "RelativeToolTip": "Controllers\\ReservationsController.cs",
-              "ViewState": "AgIAAG0AAAAAAAAAAAAgwDEAAAAuAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T03:59:46.272Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAlAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T21:34:35.465Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "ReservationRepository.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\ReservationRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\ReservationRepository.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\ReservationRepository.cs",
-              "RelativeToolTip": "Repositories\\ReservationRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T02:20:28.358Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "IReservationRepository.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IReservationRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\IReservationRepository.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IReservationRepository.cs",
-              "RelativeToolTip": "Repositories\\IReservationRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T02:19:12.637Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "IPaymentRepository.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IPaymentRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\IPaymentRepository.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IPaymentRepository.cs",
-              "RelativeToolTip": "Repositories\\IPaymentRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T02:18:10.422Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "PaymentRepository.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\PaymentRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\PaymentRepository.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\PaymentRepository.cs",
-              "RelativeToolTip": "Repositories\\PaymentRepository.cs",
-              "ViewState": "AgIAACUAAAAAAAAAAAAcwCEAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T02:20:14.568Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "IEventRepository.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IEventRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\IEventRepository.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IEventRepository.cs",
-              "RelativeToolTip": "Repositories\\IEventRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T02:18:46.954Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "EventRepository.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\EventRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\EventRepository.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\EventRepository.cs",
-              "RelativeToolTip": "Repositories\\EventRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T02:20:00.74Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 11,
               "Title": "UserRepository.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\UserRepository.cs",
               "RelativeDocumentMoniker": "Repositories\\UserRepository.cs",
               "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\UserRepository.cs",
               "RelativeToolTip": "Repositories\\UserRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAoAAAAAAAAAAADwvxoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-15T02:19:45.176Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "PaymentRequestDto.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\PaymentRequestDto.cs",
-              "RelativeDocumentMoniker": "Dto\\PaymentRequestDto.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Dto\\PaymentRequestDto.cs",
-              "RelativeToolTip": "Dto\\PaymentRequestDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 5,
+              "Title": "EventRepository.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\EventRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\EventRepository.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\EventRepository.cs",
+              "RelativeToolTip": "Repositories\\EventRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T05:21:04.479Z"
+              "WhenOpened": "2025-10-15T02:20:00.74Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
-              "Title": "Reservation.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Models\\Reservation.cs",
-              "RelativeDocumentMoniker": "Models\\Reservation.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Models\\Reservation.cs",
-              "RelativeToolTip": "Models\\Reservation.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 10,
+              "Title": "EventDto.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\EventDto.cs",
+              "RelativeDocumentMoniker": "Dto\\EventDto.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Dto\\EventDto.cs",
+              "RelativeToolTip": "Dto\\EventDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T22:17:22.432Z"
+              "WhenOpened": "2025-10-17T07:50:48.442Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 9,
               "Title": "Event.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Models\\Event.cs",
               "RelativeDocumentMoniker": "Models\\Event.cs",
@@ -446,7 +246,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 8,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T22:29:01.369Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ReservationsController.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\ReservationsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ReservationsController.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\ReservationsController.cs",
+              "RelativeToolTip": "Controllers\\ReservationsController.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAgwHwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T03:59:46.272Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "AdminReservationDto.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\AdminReservationDto.cs",
               "RelativeDocumentMoniker": "Dto\\AdminReservationDto.cs",
@@ -454,23 +279,255 @@
               "RelativeToolTip": "Dto\\AdminReservationDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-17T07:53:39.333Z"
+              "WhenOpened": "2025-10-17T07:53:39.333Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 0,
               "Title": "ReservationDto.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\ReservationDto.cs",
               "RelativeDocumentMoniker": "Dto\\ReservationDto.cs",
               "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Dto\\ReservationDto.cs",
               "RelativeToolTip": "Dto\\ReservationDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-17T07:51:51.15Z"
+              "WhenOpened": "2025-10-17T07:51:51.15Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RegisterRequestDto.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\RegisterRequestDto.cs",
+              "RelativeDocumentMoniker": "Dto\\RegisterRequestDto.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Dto\\RegisterRequestDto.cs",
+              "RelativeToolTip": "Dto\\RegisterRequestDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-16T02:31:59.95Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PaymentRequestDto.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\PaymentRequestDto.cs",
+              "RelativeDocumentMoniker": "Dto\\PaymentRequestDto.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Dto\\PaymentRequestDto.cs",
+              "RelativeToolTip": "Dto\\PaymentRequestDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T05:21:04.479Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "Controllers\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T23:37:55.114Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AdminController.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "Controllers\\AdminController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAACkAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-17T07:30:43.605Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "appsettings.Development.json",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\appsettings.Development.json",
+              "RelativeToolTip": "appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-15T06:00:09.63Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "20251022065136_Baseline.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Migrations\\20251022065136_Baseline.cs",
+              "RelativeDocumentMoniker": "Migrations\\20251022065136_Baseline.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Migrations\\20251022065136_Baseline.cs",
+              "RelativeToolTip": "Migrations\\20251022065136_Baseline.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAiwA0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-22T06:51:48.21Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "appsettings.Example.json",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\appsettings.Example.json",
+              "RelativeDocumentMoniker": "appsettings.Example.json",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\appsettings.Example.json",
+              "RelativeToolTip": "appsettings.Example.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-20T23:43:14.375Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-15T00:14:51.705Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "IEventService.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Services\\IEventService.cs",
+              "RelativeDocumentMoniker": "Services\\IEventService.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Services\\IEventService.cs",
+              "RelativeToolTip": "Services\\IEventService.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAowB4AAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T23:29:24.976Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "IReservationService.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Services\\IReservationService.cs",
+              "RelativeDocumentMoniker": "Services\\IReservationService.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Services\\IReservationService.cs",
+              "RelativeToolTip": "Services\\IReservationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEMAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T23:30:27.23Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "IPaymentService.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Services\\IPaymentService.cs",
+              "RelativeDocumentMoniker": "Services\\IPaymentService.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Services\\IPaymentService.cs",
+              "RelativeToolTip": "Services\\IPaymentService.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAxwCEAAABvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T23:31:31.762Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Microsoft.Common.CurrentVersion.targets",
+              "DocumentMoniker": "D:\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "RelativeDocumentMoniker": "..\\..\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ToolTip": "D:\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "RelativeToolTip": "..\\..\\VStudio\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ViewState": "AgIAAPkUAAAAAAAAAAAYwBEVAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2025-10-22T01:18:14.784Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T21:34:35.465Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "ReservationRepository.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\ReservationRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\ReservationRepository.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\ReservationRepository.cs",
+              "RelativeToolTip": "Repositories\\ReservationRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T02:20:28.358Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "IReservationRepository.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IReservationRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\IReservationRepository.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IReservationRepository.cs",
+              "RelativeToolTip": "Repositories\\IReservationRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T02:19:12.637Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "IPaymentRepository.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IPaymentRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\IPaymentRepository.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IPaymentRepository.cs",
+              "RelativeToolTip": "Repositories\\IPaymentRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T02:18:10.422Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "PaymentRepository.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\PaymentRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\PaymentRepository.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\PaymentRepository.cs",
+              "RelativeToolTip": "Repositories\\PaymentRepository.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAcwCEAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T02:20:14.568Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 27,
+              "Title": "IEventRepository.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IEventRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\IEventRepository.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IEventRepository.cs",
+              "RelativeToolTip": "Repositories\\IEventRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T02:18:46.954Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "Reservation.cs",
+              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Models\\Reservation.cs",
+              "RelativeDocumentMoniker": "Models\\Reservation.cs",
+              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Models\\Reservation.cs",
+              "RelativeToolTip": "Models\\Reservation.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T22:17:22.432Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
               "Title": "CreatedReservationDto.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\CreatedReservationDto.cs",
               "RelativeDocumentMoniker": "Dto\\CreatedReservationDto.cs",
@@ -483,18 +540,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 28,
-              "Title": "ApplicationDbContext.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Data\\ApplicationDbContext.cs",
-              "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Data\\ApplicationDbContext.cs",
-              "RelativeToolTip": "Data\\ApplicationDbContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T22:29:01.369Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 22,
               "Title": "User.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Models\\User.cs",
               "RelativeDocumentMoniker": "Models\\User.cs",
@@ -506,7 +551,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 30,
               "Title": "Payment.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Models\\Payment.cs",
               "RelativeDocumentMoniker": "Models\\Payment.cs",
@@ -518,7 +563,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 32,
               "Title": "IUserService.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Services\\IUserService.cs",
               "RelativeDocumentMoniker": "Services\\IUserService.cs",
@@ -530,7 +575,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 33,
               "Title": "CreateEventDto.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\CreateEventDto.cs",
               "RelativeDocumentMoniker": "Dto\\CreateEventDto.cs",
@@ -542,7 +587,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 34,
               "Title": "LoginResponseDto.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\LoginResponseDto.cs",
               "RelativeDocumentMoniker": "Dto\\LoginResponseDto.cs",
@@ -554,7 +599,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 35,
               "Title": "LoginRequestDto.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\LoginRequestDto.cs",
               "RelativeDocumentMoniker": "Dto\\LoginRequestDto.cs",
@@ -566,7 +611,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 36,
               "Title": "MappingProfile.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Profiles\\MappingProfile.cs",
               "RelativeDocumentMoniker": "Profiles\\MappingProfile.cs",
@@ -578,7 +623,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 37,
               "Title": "EventReservations.csproj",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\EventReservations.csproj",
               "RelativeDocumentMoniker": "EventReservations.csproj",
@@ -590,19 +635,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
-              "Title": "RegisterRequestDto.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\RegisterRequestDto.cs",
-              "RelativeDocumentMoniker": "Dto\\RegisterRequestDto.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Dto\\RegisterRequestDto.cs",
-              "RelativeToolTip": "Dto\\RegisterRequestDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-16T02:31:59.95Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 38,
               "Title": "IJwtService.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Services\\IJwtService.cs",
               "RelativeDocumentMoniker": "Services\\IJwtService.cs",
@@ -614,19 +647,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
-              "Title": "EventDto.cs",
-              "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Dto\\EventDto.cs",
-              "RelativeDocumentMoniker": "Dto\\EventDto.cs",
-              "ToolTip": "D:\\EventReservationApp\\EventReservationApp\\Dto\\EventDto.cs",
-              "RelativeToolTip": "Dto\\EventDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-17T07:50:48.442Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 39,
               "Title": "IUserRepository.cs",
               "DocumentMoniker": "D:\\EventReservationApp\\EventReservationApp\\Repositories\\IUserRepository.cs",
               "RelativeDocumentMoniker": "Repositories\\IUserRepository.cs",

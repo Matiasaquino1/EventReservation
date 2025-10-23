@@ -2,9 +2,10 @@
 {
     public class ReservationDto
     {
-        public int Id { get; set; }
+        public int Id { get; set; }  // Corresponde a ReservationId en el modelo
+        public int UserId { get; set; }
         public int EventId { get; set; }
-        public string Status { get; set; }
+        public string? Status { get; set; }
         public DateTime ReservationDate { get; set; }
     }
 }

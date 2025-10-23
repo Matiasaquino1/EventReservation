@@ -32,19 +32,22 @@ namespace EventReservationApp.Controllers
         // POST /api/reservations
         [HttpPost]
         [Authorize(Roles = "User")]
-        public async Task<ActionResult<Reservation>> CreateReservation([FromBody] Reservation reservation)
+        public async Task<ActionResult<ReservationDto>> CreateReservation([FromBody] ReservationDto reservationDto)
         {
-            if (reservation == null)
+            if (reservationDto == null)
                 return BadRequest("Datos de reserva inválidos.");
 
+            var reservation = _mapper.Map<Reservation>(reservationDto);
             reservation.Status = "Pending";
             reservation.ReservationDate = DateTime.UtcNow;
 
-            var createdReservation = await _reservationService.CreateReservationAsync(reservation);
-            if (createdReservation == null)
+            var created = await _reservationService.CreateReservationAsync(reservation);
+            if (created == null)
                 return StatusCode(500, "No se pudo crear la reserva.");
 
-            return CreatedAtAction(nameof(GetUserReservations), new { userId = reservation.UserId }, createdReservation);
+            var createdDto = _mapper.Map<ReservationDto>(created);
+
+            return CreatedAtAction(nameof(GetUserReservations), new { userId = createdDto.UserId }, createdDto);
         }
 
         // GET: api/reservations  (solo admin)
@@ -65,48 +68,40 @@ namespace EventReservationApp.Controllers
             }
         }
 
+
         [HttpPost("create-with-payment")]
         [Authorize(Roles = "User")]
-        public async Task<ActionResult> CreateReservationWithPayment([FromBody] Reservation reservation)
+        public async Task<ActionResult> CreateReservationWithPayment([FromBody] ReservationDto reservationDto)
         {
-            if (reservation == null)
+            if (reservationDto == null)
                 return BadRequest("Datos de reserva inválidos.");
 
+            var reservation = _mapper.Map<Reservation>(reservationDto);
             reservation.Status = "Pending";
             reservation.ReservationDate = DateTime.UtcNow;
 
-            // 1️⃣ Crear la reserva en tu base de datos
             var createdReservation = await _reservationService.CreateReservationAsync(reservation);
             if (createdReservation == null)
                 return StatusCode(500, "Error al crear la reserva.");
 
             try
             {
-                // 2️⃣ Generar el pago con Stripe (PaymentIntent)
                 var payment = await _paymentService.ProcessPaymentAsync(
                     createdReservation.ReservationId,
-                    amount: 50.00m, // <-- reemplazá por el monto real de tu evento si lo tenés en BD
+                    amount: 50.00m,
                     currency: "usd",
-                    paymentMethodId: "pm_card_visa" // o el que venga desde el frontend
+                    paymentMethodId: "pm_card_visa"
                 );
 
-                // 3️⃣ Si el pago fue exitoso, actualizar el estado de la reserva
-                if (payment.Status == "succeeded")
-                {
-                    createdReservation.Status = "Confirmed";
-                    await _reservationService.UpdateReservationAsync(createdReservation);
-                }
-                else
-                {
-                    createdReservation.Status = "PaymentFailed";
-                    await _reservationService.UpdateReservationAsync(createdReservation);
-                }
+                createdReservation.Status = payment.Status == "succeeded" ? "Confirmed" : "PaymentFailed";
+                await _reservationService.UpdateReservationAsync(createdReservation);
 
-                // 4️⃣ Devolver todo junto (reserva + pago)
+                var reservationResponse = _mapper.Map<ReservationDto>(createdReservation);
+
                 return Ok(new
                 {
                     message = "Reserva y pago procesados correctamente.",
-                    reservation = createdReservation,
+                    reservation = reservationResponse,
                     payment
                 });
             }
@@ -124,21 +119,24 @@ namespace EventReservationApp.Controllers
 
         // GET /api/users/{userId}/reservations
         [HttpGet("users/{userId}/reservations")]
-        [Authorize]  // Cualquier usuario autenticado, o restringe a userId == usuario actual
-        public async Task<ActionResult<IEnumerable<Reservation>>> GetUserReservations(int userId)
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<ReservationDto>>> GetUserReservations(int userId)
         {
-            var reservations = await _reservationService.GetReservationsByUserAsync(userId);  // Asume este método en IReservationService
-            return Ok(reservations);
+            var reservations = await _reservationService.GetReservationsByUserAsync(userId);
+            var dtos = _mapper.Map<IEnumerable<ReservationDto>>(reservations);
+            return Ok(dtos);
         }
 
         //GET /api/reservations/{id}
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<ActionResult<Reservation>> GetReservation(int id)
+        public async Task<ActionResult<ReservationDto>> GetReservation(int id)
         {
-            var reservation = await _reservationService.GetReservationAsync(id);  // Asume este método
+            var reservation = await _reservationService.GetReservationAsync(id);
             if (reservation == null) return NotFound();
-            return Ok(reservation);
+
+            var dto = _mapper.Map<ReservationDto>(reservation);
+            return Ok(dto);
         }
 
         // PUT /api/reservations/{id}/cancel
@@ -146,9 +144,11 @@ namespace EventReservationApp.Controllers
         [Authorize]
         public async Task<IActionResult> CancelReservation(int id)
         {
-            var updatedReservation = await _reservationService.CancelReservationAsync(id);  // Asume este método en IReservationService
-            if (updatedReservation == null) return NotFound();
-            return Ok(updatedReservation);
+            var updated = await _reservationService.CancelReservationAsync(id);
+            if (updated == null) return NotFound();
+
+            var dto = _mapper.Map<ReservationDto>(updated);
+            return Ok(dto);
         }
 
     }

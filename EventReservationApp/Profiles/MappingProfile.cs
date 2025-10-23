@@ -14,7 +14,10 @@ namespace EventReservations.Profiles
             CreateMap<UpdateEventDto, Event>();  // De DTO a modelo
             CreateMap<Event, UpdateEventDto>().ReverseMap();  // Bidireccional si es necesario
             // Mapeos para Reservations
-            CreateMap<Reservation, ReservationDto>();
+            CreateMap<Reservation, ReservationDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ReservationId))
+                .ReverseMap()
+                .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.Id));
             CreateMap<CreatedReservationDto, Reservation>();
             CreateMap<Reservation, AdminReservationDto>();  // Si necesitas mapear a DTO admin
             // Mapeos para Payments (si tienes más DTOs)
