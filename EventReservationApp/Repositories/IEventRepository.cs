@@ -11,5 +11,6 @@ namespace EventReservations.Repositories
         Task<Event> UpdateAsync(Event eventModel);
         Task DeleteAsync(int id);
         Task<IEnumerable<Event>> GetAllAsync();
+
     }
 }

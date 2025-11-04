@@ -41,7 +41,8 @@ namespace EventReservationApp.Controllers
         [HttpPost("events/{id}/force-confirm")]
         public async Task<IActionResult> ForceConfirmEvent(int id)
         {
-            var eventModel = await _eventService.ForceConfirmEventAsync(id);  // Asume este método para lógica personalizada
+            var eventModel = await _eventService.ForceConfirmEventAsync(id); // Asume este método para lógica personalizada
+            eventModel.CreatedAt = DateTime.UtcNow;
             if (eventModel == null) return NotFound();
             return Ok(eventModel);
         }

@@ -1,5 +1,6 @@
 ﻿using EventReservations.Models;
 using EventReservations.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace EventReservations.Services
 {
@@ -12,6 +13,8 @@ namespace EventReservations.Services
         Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability);
         Task<Event> ForceConfirmEventAsync(int id);
         Task<IEnumerable<Event>> GetAllAsync();
+        Task<Event?> GetEventByIdAsync(int id);
+
     }
 
     public class EventService : IEventService
@@ -26,15 +29,24 @@ namespace EventReservations.Services
             // validaciones
             return await _eventRepository.GetEventsWithFiltersAsync(date, location, availability);
         }
-        public async Task<Event> ForceConfirmEventAsync(int id)
+
+        public async Task<Event?> ForceConfirmEventAsync(int eventId)
         {
-            // logica negociocf
-            return await _eventRepository.ForceConfirmEventAsync(id);
+            var ev = await _eventRepository.ForceConfirmEventAsync(eventId);
+
+            if (ev != null)
+            {
+                ev.Status = "Confirmed";
+                await _eventRepository.UpdateAsync(ev);
+            }
+
+            return ev;
         }
+
 
         public async Task<Event> CreateEventAsync(Event eventModel)
         {
-            // Aquí puedes agregar lógica de negocio adicional, como validaciones
+            
             return await _eventRepository.AddAsync(eventModel);  // Usa el repositorio
         }
 
@@ -56,6 +68,10 @@ namespace EventReservations.Services
         public async Task<IEnumerable<Event>> GetAllAsync()
         {
             return await _eventRepository.GetAllAsync();
+        }
+        public async Task<Event?> GetEventByIdAsync(int id)
+        {
+            return await _eventRepository.GetByIdAsync(id);
         }
 
     }

@@ -1,4 +1,4 @@
-﻿
+﻿using EventReservations.Data;
 using EventReservations.Models;
 using Microsoft.EntityFrameworkCore;
 

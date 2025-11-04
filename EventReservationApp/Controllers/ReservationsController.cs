@@ -118,7 +118,7 @@ namespace EventReservationApp.Controllers
 
 
         // GET /api/users/{userId}/reservations
-        [HttpGet("users/{userId}/reservations")]
+        [HttpGet("users/{userId}")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<ReservationDto>>> GetUserReservations(int userId)
         {

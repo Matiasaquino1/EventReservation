@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using EventReservations.Data;
 using Stripe;
 using System.Reflection;
 using System.Security.Claims;
@@ -74,8 +75,26 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
+if (app.Environment.IsEnvironment("Testing"))
+{
+    app.Use(async (context, next) =>
+    {
+        // Autenticado siempre con Rol = User para testing
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, "testuser"),
+            new Claim(ClaimTypes.Role, "User")
+        };
+        var identity = new ClaimsIdentity(claims, "TestAuth");
+        context.User = new ClaimsPrincipal(identity);
+        await next();
+    });
+}
+
 app.UseHttpsRedirection();
 app.UseAuthentication(); // importante: antes de UseAuthorization
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+public partial class Program { }

@@ -45,7 +45,6 @@ namespace EventReservations.Controllers
                     request.PaymentMethodId
                 );
 
-                // Mapear a DTO para la respuesta
                 var paymentDto = _mapper.Map<PaymentRequestDto>(payment);
 
                 return Ok(new
@@ -77,11 +76,21 @@ namespace EventReservations.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Webhook()
         {
-            string json;
+            string json = string.Empty;
+
             try
             {
                 using var reader = new StreamReader(HttpContext.Request.Body);
                 json = await reader.ReadToEndAsync();
+                _logger.LogInformation("Webhook recibido: {Json}", json);
+
+
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    _logger.LogWarning("Webhook recibido sin contenido en el body.");
+                    return BadRequest(new { error = "El body del webhook está vacío." });
+                }
+
                 var stripeSignature = Request.Headers["Stripe-Signature"].FirstOrDefault();
                 var webhookSecret = _configuration["Stripe:WebhookSecret"];
 
@@ -89,30 +98,63 @@ namespace EventReservations.Controllers
 
                 if (!string.IsNullOrEmpty(webhookSecret) && !string.IsNullOrEmpty(stripeSignature))
                 {
+                    // Validación real con Stripe
                     stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, webhookSecret);
+                    _logger.LogInformation("Webhook verificado correctamente (modo producción): {Type}", stripeEvent.Type);
                 }
                 else
                 {
-                    // Fallback: deserializar sin verificar firma (solo para dev, no recomendado en prod)
-                    stripeEvent = JsonConvert.DeserializeObject<Stripe.Event>(json);
+                    // Para desarrollo: parse manual y seguro
+                    _logger.LogWarning("Procesando webhook sin verificación de firma (modo desarrollo).");
+
+                    dynamic temp = JsonConvert.DeserializeObject<dynamic>(json);
+
+                    if (temp == null || temp.type == null)
+                    {
+                        _logger.LogWarning("Webhook inválido: JSON sin campo 'type'.");
+                        return BadRequest(new { error = "JSON inválido o incompleto." });
+                    }
+
+                    var eventData = new Stripe.EventData();
+                    if (temp?.data != null)
+                    {
+                        eventData.Object = temp.data.@object;
+                    }
+
+                    stripeEvent = new Stripe.Event
+                    {
+                        Id = temp?.id ?? Guid.NewGuid().ToString(),
+                        Type = temp?.type,
+                        Data = eventData,
+                        Created = DateTime.UtcNow,
+                        Livemode = false
+                    };
                 }
 
+                // Procesar el evento en mi servicio.
                 await _paymentService.ProcessWebhookAsync(stripeEvent);
 
-                return Ok();
+                _logger.LogInformation("Webhook procesado correctamente: {Type}", stripeEvent.Type);
+                return Ok(new { received = true });
             }
             catch (StripeException sex)
             {
-                _logger.LogWarning(sex, "Stripe webhook error");
+                _logger.LogWarning(sex, "Error validando firma o formato del webhook de Stripe");
                 return BadRequest(new { error = sex.Message });
+            }
+            catch (JsonException jex)
+            {
+                _logger.LogError(jex, "Error al deserializar el JSON del webhook");
+                return BadRequest(new { error = "Formato JSON inválido." });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error procesando webhook de Stripe");
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "Error interno del servidor." });
             }
         }
 
+        //Historial del usuario autenticado o admin
         [HttpGet("history")]
         [Authorize]
         public async Task<IActionResult> GetHistory()
@@ -145,22 +187,6 @@ namespace EventReservations.Controllers
         }
 
 
-        // POST: api/payments/webhook
-        //[HttpPost("webhook")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> Webhook()
-        //{
-        //    var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-        //    var stripeEvent = EventUtility.ConstructEvent(json, new Dictionary<string, string>(), new StripeOptions().ApiKey);
-
-        //    if (stripeEvent.Type == "checkout.session.completed" || stripeEvent.Type == "payment_intent.succeeded")
-        //    {
-        //        await _paymentService.ProcessWebhookAsync(stripeEvent);
-        //        return Ok();
-        //    }
-
-        //    return BadRequest();
-        //}
     }
 }
 

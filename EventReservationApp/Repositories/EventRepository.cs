@@ -1,5 +1,6 @@
 ﻿using EventReservations.Models;
 using Microsoft.EntityFrameworkCore;
+using EventReservations.Data;
 
 namespace EventReservations.Repositories
 {
@@ -13,7 +14,7 @@ namespace EventReservations.Repositories
         public async Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability)
         {
             var query = _context.Events.AsQueryable();
-            if (date.HasValue) query = query.Where(e => e.DateTime.Date == date.Value.Date);
+            if (date.HasValue) query = query.Where(e => e.CreatedAt.Date == date.Value.Date);
             if (!string.IsNullOrEmpty(location)) query = query.Where(e => e.Location.Contains(location));
             if (availability.HasValue) query = query.Where(e => e.TicketsAvailable >= availability.Value);
             return await query.ToListAsync();
@@ -55,5 +56,6 @@ namespace EventReservations.Repositories
         {
             throw new NotImplementedException();
         }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using EventReservations.Models;
+using EventReservations.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventReservations.Repositories

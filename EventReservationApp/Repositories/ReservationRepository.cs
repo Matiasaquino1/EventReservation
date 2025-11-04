@@ -1,5 +1,7 @@
-﻿using EventReservations.Models;
+﻿using EventReservations.Data;
+using EventReservations.Models;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace EventReservations.Repositories
 {
@@ -17,6 +19,7 @@ namespace EventReservations.Repositories
             {
                 reservation.Status = "Cancelled";
                 _context.Reservations.Update(reservation);
+                reservation.ReservationDate = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
             return reservation;
