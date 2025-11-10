@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using EventReservations.Dto;
-using EventReservations.Models;  // Para los modelos
+using EventReservations.Dto;  // Para ReservationDto
+using EventReservations.Models;  // Para Reservation
 using EventReservations.Services;  // Para IReservationService
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +29,15 @@ namespace EventReservationApp.Controllers
             _logger = logger;
         }
 
-        // POST /api/reservations
+        /// <summary>
+        /// Crea una nueva reserva para un usuario autenticado.
+        /// </summary>
+        /// <param name="reservationDto">Datos de la reserva (incluye UserId, EventId, etc.).</param>
+        /// <returns>Reserva creada.</returns>
+        /// <response code="201">Reserva creada exitosamente.</response>
+        /// <response code="400">Datos inválidos.</response>
+        /// <response code="401">No autorizado (requiere rol User).</response>
+        /// <response code="500">Error interno al crear la reserva.</response>
         [HttpPost]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<ReservationDto>> CreateReservation([FromBody] ReservationDto reservationDto)
@@ -50,7 +58,15 @@ namespace EventReservationApp.Controllers
             return CreatedAtAction(nameof(GetUserReservations), new { userId = createdDto.UserId }, createdDto);
         }
 
-        // GET: api/reservations  (solo admin)
+        /// <summary>
+        /// Obtiene todas las reservas con filtros opcionales (solo para Admin).
+        /// </summary>
+        /// <param name="status">Filtrar por estado de reserva (opcional).</param>
+        /// <param name="eventId">Filtrar por ID de evento (opcional).</param>
+        /// <returns>Lista de reservas.</returns>
+        /// <response code="200">Reservas obtenidas.</response>
+        /// <response code="401">No autorizado (requiere rol Admin).</response>
+        /// <response code="500">Error interno.</response>
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllReservations([FromQuery] string? status, [FromQuery] int? eventId)
@@ -58,7 +74,7 @@ namespace EventReservationApp.Controllers
             try
             {
                 var reservations = await _reservationService.GetAllReservationsAsync(status, eventId);
-                var dtos = reservations.Select(r => _mapper.Map<ReservationDto>(r));
+                var dtos = _mapper.Map<IEnumerable<ReservationDto>>(reservations); 
                 return Ok(dtos);
             }
             catch (Exception ex)
@@ -68,7 +84,15 @@ namespace EventReservationApp.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Crea una reserva y procesa el pago automáticamente con Stripe.
+        /// </summary>
+        /// <param name="reservationDto">Datos de la reserva (nota: amount y paymentMethodId podrían agregarse al DTO para flexibilidad).</param>
+        /// <returns>Reserva y resultado del pago.</returns>
+        /// <response code="200">Reserva y pago procesados.</response>
+        /// <response code="400">Datos inválidos o error en pago.</response>
+        /// <response code="401">No autorizado (requiere rol User).</response>
+        /// <response code="500">Error interno.</response>
         [HttpPost("create-with-payment")]
         [Authorize(Roles = "User")]
         public async Task<ActionResult> CreateReservationWithPayment([FromBody] ReservationDto reservationDto)
@@ -86,11 +110,12 @@ namespace EventReservationApp.Controllers
 
             try
             {
+                // Sugerencia: Recibir amount y paymentMethodId del DTO en lugar de hardcodear
                 var payment = await _paymentService.ProcessPaymentAsync(
                     createdReservation.ReservationId,
-                    amount: 50.00m,
+                    amount: 50.00m,  // Cambiar a reservationDto.Amount si lo agregas
                     currency: "usd",
-                    paymentMethodId: "pm_card_visa"
+                    paymentMethodId: "pm_card_visa"  // Cambiar a reservationDto.PaymentMethodId si lo agregas
                 );
 
                 createdReservation.Status = payment.Status == "succeeded" ? "Confirmed" : "PaymentFailed";
@@ -115,9 +140,13 @@ namespace EventReservationApp.Controllers
             }
         }
 
-
-
-        // GET /api/users/{userId}/reservations
+        /// <summary>
+        /// Obtiene todas las reservas de un usuario específico.
+        /// </summary>
+        /// <param name="userId">ID del usuario.</param>
+        /// <returns>Lista de reservas del usuario.</returns>
+        /// <response code="200">Reservas obtenidas.</response>
+        /// <response code="401">No autorizado.</response>
         [HttpGet("users/{userId}")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<ReservationDto>>> GetUserReservations(int userId)
@@ -127,7 +156,14 @@ namespace EventReservationApp.Controllers
             return Ok(dtos);
         }
 
-        //GET /api/reservations/{id}
+        /// <summary>
+        /// Obtiene una reserva por ID.
+        /// </summary>
+        /// <param name="id">ID de la reserva.</param>
+        /// <returns>Detalles de la reserva.</returns>
+        /// <response code="200">Reserva encontrada.</response>
+        /// <response code="404">Reserva no encontrada.</response>
+        /// <response code="401">No autorizado.</response>
         [HttpGet("{id}")]
         [Authorize]
         public async Task<ActionResult<ReservationDto>> GetReservation(int id)
@@ -139,7 +175,14 @@ namespace EventReservationApp.Controllers
             return Ok(dto);
         }
 
-        // PUT /api/reservations/{id}/cancel
+        /// <summary>
+        /// Cancela una reserva existente.
+        /// </summary>
+        /// <param name="id">ID de la reserva a cancelar.</param>
+        /// <returns>Reserva cancelada.</returns>
+        /// <response code="200">Reserva cancelada.</response>
+        /// <response code="404">Reserva no encontrada.</response>
+        /// <response code="401">No autorizado.</response>
         [HttpPut("{id}/cancel")]
         [Authorize]
         public async Task<IActionResult> CancelReservation(int id)
@@ -150,6 +193,5 @@ namespace EventReservationApp.Controllers
             var dto = _mapper.Map<ReservationDto>(updated);
             return Ok(dto);
         }
-
     }
 }

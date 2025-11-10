@@ -26,9 +26,14 @@ namespace EventReservationApp.Controllers
             _reservationService = reservationService;
             _paymentService = paymentService;
         }
-
-
-        // GET /api/events (con filtros: fecha, lugar, disponibilidad)
+        /// <summary>
+        /// Obtiene una lista de eventos con filtros opcionales.
+        /// </summary>
+        /// <param name="date">Filtrar por fecha (opcional).</param>
+        /// <param name="location">Filtrar por ubicación (opcional).</param>
+        /// <param name="availability">Filtrar por disponibilidad de entradas (opcional).</param>
+        /// <returns>Lista de eventos.</returns>
+        // GET /api/events
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventDto>>> GetEvents([FromQuery] DateTime? date = null, [FromQuery] string location = null, [FromQuery] int? availability = null)
         {
@@ -37,7 +42,13 @@ namespace EventReservationApp.Controllers
             return Ok(eventDtos);
         }
 
-        // GET /api/events/{id}
+        /// <summary>
+        /// Obtiene un evento por ID.
+        /// </summary>
+        /// <param name="id">ID del evento.</param>
+        /// <returns>Detalles del evento.</returns>
+        /// <response code="200">Evento encontrado.</response>
+        /// <response code="404">Evento no encontrado.</response>
         [HttpGet("{id}")]
         public async Task<ActionResult<EventDto>> GetEvent(int id)
         {
@@ -47,6 +58,13 @@ namespace EventReservationApp.Controllers
             return Ok(eventDto);
         }
 
+        /// <summary>
+        /// Crea un nuevo evento (requiere rol Organizer o Admin).
+        /// </summary>
+        /// <param name="createDto">Datos del evento a crear.</param>
+        /// <returns>Evento creado.</returns>
+        /// <response code="201">Evento creado exitosamente.</response>
+        /// <response code="401">No autorizado.</response>
         // POST /api/events (rol Organizer/Admin)
         [HttpPost]
         [Authorize(Roles = "Organizer,Admin")]
@@ -64,7 +82,14 @@ namespace EventReservationApp.Controllers
             return _eventService;
         }
 
-        // PUT /api/events/{id} (rol Organizer/Admin)
+        /// <summary>
+        /// Actualiza un evento existente (requiere rol Organizer o Admin).
+        /// </summary>
+        /// <param name="id">ID del evento.</param>
+        /// <param name="updateDto">Datos actualizados del evento.</param>
+        /// <returns>Evento actualizado.</returns>
+        /// <response code="200">Evento actualizado.</response>
+        /// <response code="404">Evento no encontrado.</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "Organizer,Admin")]
         public async Task<ActionResult<EventDto>> UpdateEvent(int id, [FromBody] UpdateEventDto updateDto)
@@ -77,7 +102,12 @@ namespace EventReservationApp.Controllers
             return Ok(eventDto);
         }
 
-        // DELETE /api/events/{id} (rol Admin)
+        /// <summary>
+        /// Elimina un evento (requiere rol Admin).
+        /// </summary>
+        /// <param name="id">ID del evento.</param>
+        /// <response code="204">Evento eliminado.</response>
+        /// <response code="401">No autorizado.</response>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteEvent(int id)
@@ -85,6 +115,7 @@ namespace EventReservationApp.Controllers
             await _eventService.DeleteEventAsync(id);  // Asume este método en IEventService
             return NoContent();
         }
+
 
         // GET: api/admin/summary
         [HttpGet("summary")]
