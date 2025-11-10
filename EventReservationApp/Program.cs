@@ -55,7 +55,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ClockSkew = TimeSpan.Zero,
-        RoleClaimType = ClaimTypes.Role // <-- importante para roles
+        RoleClaimType = ClaimTypes.Role 
     };
 });
 
@@ -75,11 +75,20 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
+app.UseExceptionHandler("/error");
+app.UseStatusCodePages();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 if (app.Environment.IsEnvironment("Testing"))
 {
     app.Use(async (context, next) =>
     {
-        // Autenticado siempre con Rol = User para testing
+        // Rol = User para testing
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, "testuser"),
@@ -92,9 +101,11 @@ if (app.Environment.IsEnvironment("Testing"))
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication(); // importante: antes de UseAuthorization
+app.UseAuthentication(); 
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
 
 public partial class Program { }
