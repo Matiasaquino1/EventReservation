@@ -7,9 +7,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;  // Para listas
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging; 
+using System.ComponentModel.DataAnnotations; // Para validaciones (si agrego)
 
 namespace EventReservationApp.Controllers
 {
+    /// <summary>
+    /// Controlador para gestionar eventos, incluyendo creación, actualización, eliminación y consultas.
+    /// Utiliza servicios para manejar lógica de negocio y AutoMapper para mapeos.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class EventsController : ControllerBase
@@ -18,68 +24,107 @@ namespace EventReservationApp.Controllers
         private readonly IMapper _mapper;
         private readonly IReservationService _reservationService;
         private readonly IPaymentService _paymentService;
+        private readonly ILogger<EventsController> _logger; 
 
-        public EventsController(IEventService eventService, IMapper mapper, IReservationService reservationService, IPaymentService paymentService)
+        public EventsController(IEventService eventService, IMapper mapper, IReservationService reservationService, IPaymentService paymentService, ILogger<EventsController> logger)
         {
             _eventService = eventService;
             _mapper = mapper;
             _reservationService = reservationService;
             _paymentService = paymentService;
+            _logger = logger;
         }
+
         /// <summary>
         /// Obtiene una lista de eventos con filtros opcionales.
         /// </summary>
         /// <param name="date">Filtrar por fecha (opcional).</param>
         /// <param name="location">Filtrar por ubicación (opcional).</param>
         /// <param name="availability">Filtrar por disponibilidad de entradas (opcional).</param>
-        /// <returns>Lista de eventos.</returns>
-        // GET /api/events
+        /// <returns>Lista de eventos en formato DTO.</returns>
+        /// <response code="200">Eventos obtenidos correctamente.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<EventDto>), 200)]
+        [ProducesResponseType(typeof(object), 500)]
         public async Task<ActionResult<IEnumerable<EventDto>>> GetEvents([FromQuery] DateTime? date = null, [FromQuery] string location = null, [FromQuery] int? availability = null)
         {
-            var events = await _eventService.GetEventsWithFiltersAsync(date, location, availability);
-            var eventDtos = _mapper.Map<IEnumerable<EventDto>>(events);  // Mapea a DTOs
-            return Ok(eventDtos);
+            try
+            {
+                var events = await _eventService.GetEventsWithFiltersAsync(date, location, availability);
+                var eventDtos = _mapper.Map<IEnumerable<EventDto>>(events);
+                _logger.LogInformation("Eventos obtenidos: {Count} registros", events.Count());
+                return Ok(eventDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error obteniendo eventos con filtros");
+                return StatusCode(500, new { error = "Error interno del servidor." });
+            }
         }
 
         /// <summary>
         /// Obtiene un evento por ID.
         /// </summary>
         /// <param name="id">ID del evento.</param>
-        /// <returns>Detalles del evento.</returns>
+        /// <returns>Detalles del evento en formato DTO.</returns>
         /// <response code="200">Evento encontrado.</response>
         /// <response code="404">Evento no encontrado.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpGet("{id}")]
-        public async Task<ActionResult<EventDto>> GetEvent(int id)
+        [ProducesResponseType(typeof(EventDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(object), 500)]
+        public async Task<ActionResult<EventDto>> GetEvent([FromRoute] int id)
         {
-            var eventModel = await _eventService.GetEventAsync(id);
-            if (eventModel == null) return NotFound();
-            var eventDto = _mapper.Map<EventDto>(eventModel);  // Mapea a DTO
-            return Ok(eventDto);
+            try
+            {
+                var eventModel = await _eventService.GetEventAsync(id);
+                if (eventModel == null)
+                {
+                    _logger.LogWarning("Evento no encontrado: {Id}", id);
+                    return NotFound(new { error = "Evento no encontrado." });
+                }
+                var eventDto = _mapper.Map<EventDto>(eventModel);
+                return Ok(eventDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error obteniendo evento {Id}", id);
+                return StatusCode(500, new { error = "Error interno del servidor." });
+            }
         }
 
         /// <summary>
         /// Crea un nuevo evento (requiere rol Organizer o Admin).
         /// </summary>
         /// <param name="createDto">Datos del evento a crear.</param>
-        /// <returns>Evento creado.</returns>
+        /// <returns>Evento creado en formato DTO.</returns>
         /// <response code="201">Evento creado exitosamente.</response>
+        /// <response code="400">Datos inválidos.</response>
         /// <response code="401">No autorizado.</response>
-        // POST /api/events (rol Organizer/Admin)
+        /// <response code="500">Error interno del servidor.</response>
         [HttpPost]
         [Authorize(Roles = "Organizer,Admin")]
+        [ProducesResponseType(typeof(EventDto), 201)]
+        [ProducesResponseType(typeof(object), 400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(object), 500)]
         public async Task<ActionResult<EventDto>> CreateEvent([FromBody] CreateEventDto createDto)
         {
-            var eventModel = _mapper.Map<Event>(createDto);  // Mapea DTO a modelo
-            var createdEvent = await _eventService.CreateEventAsync(eventModel);
-            var eventDto = _mapper.Map<EventDto>(createdEvent);  // Mapea modelo a DTO
-            return CreatedAtAction(nameof(GetEvent), new { id = eventDto.EventId }, eventDto);
-        }
-
-
-        public IEventService Get_eventService()
-        {
-            return _eventService;
+            try
+            {
+                var eventModel = _mapper.Map<Event>(createDto);
+                var createdEvent = await _eventService.CreateEventAsync(eventModel);
+                var eventDto = _mapper.Map<EventDto>(createdEvent);
+                _logger.LogInformation("Evento creado: {Id}", eventDto.EventId);
+                return CreatedAtAction(nameof(GetEvent), new { id = eventDto.EventId }, eventDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creando evento");
+                return StatusCode(500, new { error = "Error interno del servidor." });
+            }
         }
 
         /// <summary>
@@ -87,19 +132,38 @@ namespace EventReservationApp.Controllers
         /// </summary>
         /// <param name="id">ID del evento.</param>
         /// <param name="updateDto">Datos actualizados del evento.</param>
-        /// <returns>Evento actualizado.</returns>
+        /// <returns>Evento actualizado en formato DTO.</returns>
         /// <response code="200">Evento actualizado.</response>
         /// <response code="404">Evento no encontrado.</response>
+        /// <response code="401">No autorizado.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "Organizer,Admin")]
-        public async Task<ActionResult<EventDto>> UpdateEvent(int id, [FromBody] UpdateEventDto updateDto)
+        [ProducesResponseType(typeof(EventDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(object), 500)]
+        public async Task<ActionResult<EventDto>> UpdateEvent([FromRoute] int id, [FromBody] UpdateEventDto updateDto)
         {
-            updateDto.Id = id;  // Asegura el ID
-            var eventModel = _mapper.Map<Event>(updateDto);  // Mapea DTO a modelo
-            var updatedEvent = await _eventService.UpdateEventAsync(eventModel);
-            if (updatedEvent == null) return NotFound();
-            var eventDto = _mapper.Map<EventDto>(updatedEvent);  // Mapea a DTO
-            return Ok(eventDto);
+            try
+            {
+                updateDto.Id = id;  // Asegura el ID
+                var eventModel = _mapper.Map<Event>(updateDto);
+                var updatedEvent = await _eventService.UpdateEventAsync(eventModel);
+                if (updatedEvent == null)
+                {
+                    _logger.LogWarning("Evento no encontrado para actualización: {Id}", id);
+                    return NotFound(new { error = "Evento no encontrado." });
+                }
+                var eventDto = _mapper.Map<EventDto>(updatedEvent);
+                _logger.LogInformation("Evento actualizado: {Id}", id);
+                return Ok(eventDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error actualizando evento {Id}", id);
+                return StatusCode(500, new { error = "Error interno del servidor." });
+            }
         }
 
         /// <summary>
@@ -108,35 +172,68 @@ namespace EventReservationApp.Controllers
         /// <param name="id">ID del evento.</param>
         /// <response code="204">Evento eliminado.</response>
         /// <response code="401">No autorizado.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteEvent(int id)
+        [ProducesResponseType(204)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(object), 500)]
+        public async Task<IActionResult> DeleteEvent([FromRoute] int id)
         {
-            await _eventService.DeleteEventAsync(id);  // Asume este método en IEventService
-            return NoContent();
+            try
+            {
+                await _eventService.DeleteEventAsync(id);
+                _logger.LogInformation("Evento eliminado: {Id}", id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error eliminando evento {Id}", id);
+                return StatusCode(500, new { error = "Error interno del servidor." });
+            }
         }
 
-
-        // GET: api/admin/summary
+        /// <summary>
+        /// Obtiene un resumen de estadísticas generales (requiere rol Admin).
+        /// </summary>
+        /// <returns>Objeto con totales de eventos, reservas, pagos y revenue.</returns>
+        /// <response code="200">Resumen obtenido correctamente.</response>
+        /// <response code="401">No autorizado.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpGet("summary")]
+        [Authorize(Roles = "Admin")] 
+        [ProducesResponseType(typeof(object), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(object), 500)]
         public async Task<IActionResult> GetSummary()
         {
-            var events = await _eventService.GetAllAsync();
-            var reservations = await _reservationService.GetAllReservationsAsync(null, null);
-            var payments = await _paymentService.GetAllPaymentsAsync();
-
-            var totalEvents = events.Count();
-            var totalReservations = reservations.Count();
-            var totalPayments = payments.Count();
-            var totalRevenue = payments.Sum(p => p.Amount);
-
-            return Ok(new
+            try
             {
-                totalEvents,
-                totalReservations,
-                totalPayments,
-                totalRevenue
-            });
+                var events = await _eventService.GetAllAsync();
+                var reservations = await _reservationService.GetAllReservationsAsync(null, null);
+                var payments = await _paymentService.GetAllPaymentsAsync();
+
+                var totalEvents = events.Count();
+                var totalReservations = reservations.Count();
+                var totalPayments = payments.Count();
+                var totalRevenue = payments.Sum(p => p.Amount);
+
+                _logger.LogInformation("Resumen obtenido: Eventos={TotalEvents}, Reservas={TotalReservations}", totalEvents, totalReservations);
+                return Ok(new
+                {
+                    totalEvents,
+                    totalReservations,
+                    totalPayments,
+                    totalRevenue
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error obteniendo resumen");
+                return StatusCode(500, new { error = "Error interno del servidor." });
+            }
         }
+
+        
     }
 }

@@ -8,9 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using System.Security.Claims;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations; // Para validación
 
 namespace EventReservations.Controllers
 {
+    /// <summary>
+    /// Controlador para gestionar pagos y transacciones relacionadas con reservas de eventos.
+    /// Utiliza Stripe para procesar pagos y webhooks.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class PaymentsController : ControllerBase
@@ -32,8 +37,18 @@ namespace EventReservations.Controllers
             _logger = logger;
         }
 
-        // POST: api/payments/process
+        /// <summary>
+        /// Procesa un pago para una reserva específica utilizando Stripe.
+        /// </summary>
+        /// <param name="request">Datos del pago, incluyendo ReservationId, Amount, Currency y PaymentMethodId.</param>
+        /// <returns>Un objeto con mensaje de éxito y detalles del pago procesado.</returns>
+        /// <response code="200">Pago procesado correctamente.</response>
+        /// <response code="400">Error en la solicitud o en Stripe.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpPost("process")]
+        [ProducesResponseType(typeof(object), 200)]
+        [ProducesResponseType(typeof(object), 400)]
+        [ProducesResponseType(typeof(object), 500)]
         public async Task<IActionResult> ProcessPayment([FromBody] PaymentRequestDto request)
         {
             try
@@ -45,7 +60,8 @@ namespace EventReservations.Controllers
                     request.PaymentMethodId
                 );
 
-                var paymentDto = _mapper.Map<PaymentRequestDto>(payment);
+                // Cambiado: Mapear a PaymentDto (DTO de salida) en lugar de PaymentRequestDto
+                var paymentDto = _mapper.Map<PaymentDto>(payment);
 
                 return Ok(new
                 {
@@ -55,25 +71,57 @@ namespace EventReservations.Controllers
             }
             catch (StripeException ex)
             {
-                return BadRequest(new { error = ex.StripeError.Message });
+                _logger.LogWarning(ex, "Error procesando pago con Stripe");
+                return BadRequest(new { error = "Error en el procesamiento del pago. Verifique los datos." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = ex.Message });     
+                _logger.LogError(ex, "Error interno procesando pago");
+                return StatusCode(500, new { error = "Error interno del servidor." });
             }
         }
 
-        // POST: api/payments/create-payment-intent
+        /// <summary>
+        /// Crea un Payment Intent en Stripe para iniciar un pago.
+        /// Requiere autenticación.
+        /// </summary>
+        /// <param name="request">Datos para crear el intent, incluyendo Amount y Currency.</param>
+        /// <returns>El clientSecret del Payment Intent.</returns>
+        /// <response code="200">Payment Intent creado correctamente.</response>
+        /// <response code="400">Datos inválidos.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpPost("create-payment-intent")]
-        [Authorize] 
-        public async Task<IActionResult> CreatePaymentIntent([FromBody] decimal amount)
+        [Authorize]
+        [ProducesResponseType(typeof(object), 200)]
+        [ProducesResponseType(typeof(object), 400)]
+        [ProducesResponseType(typeof(object), 500)]
+        public async Task<IActionResult> CreatePaymentIntent([FromBody] CreatePaymentIntentDto request)
         {
-            var paymentIntent = await _paymentService.CreatePaymentIntentAsync(amount);
-            return Ok(new { clientSecret = paymentIntent.ClientSecret });
+            try
+            {
+                var paymentIntent = await _paymentService.CreatePaymentIntentAsync(request.Amount, request.Currency);
+                return Ok(new { clientSecret = paymentIntent.ClientSecret });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creando Payment Intent");
+                return StatusCode(500, new { error = "Error interno del servidor." });
+            }
         }
 
+        /// <summary>
+        /// Maneja webhooks de Stripe para eventos de pago.
+        /// No requiere autenticación para permitir recepción externa.
+        /// </summary>
+        /// <returns>Confirmación de recepción del webhook.</returns>
+        /// <response code="200">Webhook procesado correctamente.</response>
+        /// <response code="400">Error en la solicitud o validación.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpPost("webhook")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(object), 200)]
+        [ProducesResponseType(typeof(object), 400)]
+        [ProducesResponseType(typeof(object), 500)]
         public async Task<IActionResult> Webhook()
         {
             string json = string.Empty;
@@ -83,7 +131,6 @@ namespace EventReservations.Controllers
                 using var reader = new StreamReader(HttpContext.Request.Body);
                 json = await reader.ReadToEndAsync();
                 _logger.LogInformation("Webhook recibido: {Json}", json);
-
 
                 if (string.IsNullOrWhiteSpace(json))
                 {
@@ -131,7 +178,7 @@ namespace EventReservations.Controllers
                     };
                 }
 
-                // Procesar el evento en mi servicio.
+                // Procesar el evento en mi servicio (agregado: check para evitar duplicados si es necesario)
                 await _paymentService.ProcessWebhookAsync(stripeEvent);
 
                 _logger.LogInformation("Webhook procesado correctamente: {Type}", stripeEvent.Type);
@@ -140,7 +187,7 @@ namespace EventReservations.Controllers
             catch (StripeException sex)
             {
                 _logger.LogWarning(sex, "Error validando firma o formato del webhook de Stripe");
-                return BadRequest(new { error = sex.Message });
+                return BadRequest(new { error = "Error en la validación del webhook." });
             }
             catch (JsonException jex)
             {
@@ -154,9 +201,19 @@ namespace EventReservations.Controllers
             }
         }
 
-        //Historial del usuario autenticado o admin
+        /// <summary>
+        /// Obtiene el historial de pagos. Para usuarios normales, devuelve sus propios pagos; para admins, todos los pagos.
+        /// Requiere autenticación.
+        /// </summary>
+        /// <returns>Lista de pagos en formato DTO.</returns>
+        /// <response code="200">Historial obtenido correctamente.</response>
+        /// <response code="401">Usuario no autorizado.</response>
+        /// <response code="500">Error interno del servidor.</response>
         [HttpGet("history")]
         [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<PaymentDto>), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(object), 500)]
         public async Task<IActionResult> GetHistory()
         {
             try
@@ -176,18 +233,19 @@ namespace EventReservations.Controllers
                     payments = await _paymentService.GetPaymentsByUserIdAsync(userId);
                 }
 
-                var dtos = payments.Select(p => _mapper.Map<PaymentRequestDto>(p));
+                // Cambiado: Mapear a PaymentDto (DTO de salida)
+                var dtos = payments.Select(p => _mapper.Map<PaymentDto>(p));
                 return Ok(dtos);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error GetHistory payments");
-                return StatusCode(500, new { error = ex.Message });
+                _logger.LogError(ex, "Error obteniendo historial de pagos");
+                return StatusCode(500, new { error = "Error interno del servidor." });
             }
         }
-
-
     }
+
+
 }
 
 

@@ -10,7 +10,7 @@ namespace EventReservations.Services
         Task<Payment> ProcessPaymentAsync(int reservationId, decimal amount, string currency, string paymentMethodId);
         Task<Payment> GetPaymentAsync(int id);
         Task ProcessPaymentAsync(int reservationId, decimal amount);
-        Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount);
+        Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency);
         Task ProcessWebhookAsync(Stripe.Event stripeEvent);
         Task<Payment?> GetPaymentByReservationIdAsync(int reservationId);
         Task<IEnumerable<Payment>> GetPaymentsByUserIdAsync(int userId);
