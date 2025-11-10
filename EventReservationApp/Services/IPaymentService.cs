@@ -29,12 +29,36 @@ namespace EventReservations.Services
             _configuration = configuration;
             _reservationRepository = reservationRepository;
         }
-        public async Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount)
+
+        /// <summary>
+        /// Crea un PaymentIntent en Stripe.
+        /// </summary>
+        /// <param name="amount">Monto del pago (en unidades decimales, por ejemplo 10.50).</param>
+        /// <param name="currency">Código de moneda (por defecto "usd").</param>
+        /// <returns>El PaymentIntent creado en Stripe.</returns>
+        /// <exception cref="ArgumentException">Se lanza si el monto es inválido o la moneda está vacía.</exception>
+        public async Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency = "usd")
         {
-            var options = new PaymentIntentCreateOptions { Amount = (long)(amount * 100), Currency = "usd" };  // Ejemplo
+            if (amount <= 0)
+                throw new ArgumentException("El monto debe ser mayor a cero.", nameof(amount));
+
+            if (string.IsNullOrWhiteSpace(currency))
+                throw new ArgumentException("La moneda no puede estar vacía.", nameof(currency));
+
+            var options = new PaymentIntentCreateOptions
+            {
+                Amount = (long)(amount * 100), // Stripe usa centavos
+                Currency = currency.ToLower(),
+                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                {
+                    Enabled = true // Habilita métodos automáticos (tarjeta, etc.)
+                }
+            };
+
             var service = new PaymentIntentService();
-            return await service.CreateAsync(options);  // Usa tu clave de Stripe
+            return await service.CreateAsync(options);
         }
+
 
         public async Task ProcessWebhookAsync(Stripe.Event stripeEvent)
         {
@@ -177,6 +201,7 @@ namespace EventReservations.Services
         {
             return await _paymentRepository.GetAllAsync();
         }
+
 
     }
 }

@@ -5,10 +5,11 @@ using System.Net;
 namespace EventReservations.Controllers
 {
     [ApiController]
-    [Route("error")]
+    [Route("[controller]")]
     public class ErrorController : ControllerBase
     {
-        [Route("")]
+        [Route("/error")]
+        [HttpGet]
         public IActionResult HandleError()
         {
             var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
