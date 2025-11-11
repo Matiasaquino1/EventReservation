@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging; 
 using System.ComponentModel.DataAnnotations; // Para validaciones (si agrego)
 
-namespace EventReservationApp.Controllers
+namespace EventReservations.Controllers
 {
     /// <summary>
     /// Controlador para gestionar eventos, incluyendo creación, actualización, eliminación y consultas.
@@ -24,9 +24,14 @@ namespace EventReservationApp.Controllers
         private readonly IMapper _mapper;
         private readonly IReservationService _reservationService;
         private readonly IPaymentService _paymentService;
-        private readonly ILogger<EventsController> _logger; 
+        private readonly ILogger<EventsController> _logger;
 
-        public EventsController(IEventService eventService, IMapper mapper, IReservationService reservationService, IPaymentService paymentService, ILogger<EventsController> logger)
+        public EventsController(
+            IEventService eventService,
+            IMapper mapper,
+            IReservationService reservationService,
+            IPaymentService paymentService,
+            ILogger<EventsController> logger)
         {
             _eventService = eventService;
             _mapper = mapper;
@@ -46,21 +51,16 @@ namespace EventReservationApp.Controllers
         /// <response code="500">Error interno del servidor.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EventDto>), 200)]
-        [ProducesResponseType(typeof(object), 500)]
-        public async Task<ActionResult<IEnumerable<EventDto>>> GetEvents([FromQuery] DateTime? date = null, [FromQuery] string location = null, [FromQuery] int? availability = null)
+        public async Task<ActionResult<IEnumerable<EventDto>>> GetEvents(
+            [FromQuery] DateTime? date = null,
+            [FromQuery] string? location = null,
+            [FromQuery] int? availability = null)
         {
-            try
-            {
-                var events = await _eventService.GetEventsWithFiltersAsync(date, location, availability);
-                var eventDtos = _mapper.Map<IEnumerable<EventDto>>(events);
-                _logger.LogInformation("Eventos obtenidos: {Count} registros", events.Count());
-                return Ok(eventDtos);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error obteniendo eventos con filtros");
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
+            var events = await _eventService.GetEventsWithFiltersAsync(date, location, availability);
+            var eventDtos = _mapper.Map<IEnumerable<EventDto>>(events);
+
+            _logger.LogInformation("Eventos obtenidos: {Count} registros", events.Count());
+            return Ok(eventDtos);
         }
 
         /// <summary>
@@ -74,25 +74,17 @@ namespace EventReservationApp.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(EventDto), 200)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(typeof(object), 500)]
         public async Task<ActionResult<EventDto>> GetEvent([FromRoute] int id)
         {
-            try
+            var eventModel = await _eventService.GetEventAsync(id);
+            if (eventModel == null)
             {
-                var eventModel = await _eventService.GetEventAsync(id);
-                if (eventModel == null)
-                {
-                    _logger.LogWarning("Evento no encontrado: {Id}", id);
-                    return NotFound(new { error = "Evento no encontrado." });
-                }
-                var eventDto = _mapper.Map<EventDto>(eventModel);
-                return Ok(eventDto);
+                _logger.LogWarning("Evento no encontrado: {Id}", id);
+                return NotFound(new { error = "Evento no encontrado." });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error obteniendo evento {Id}", id);
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
+
+            var eventDto = _mapper.Map<EventDto>(eventModel);
+            return Ok(eventDto);
         }
 
         /// <summary>
@@ -108,23 +100,14 @@ namespace EventReservationApp.Controllers
         [Authorize(Roles = "Organizer,Admin")]
         [ProducesResponseType(typeof(EventDto), 201)]
         [ProducesResponseType(typeof(object), 400)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(typeof(object), 500)]
         public async Task<ActionResult<EventDto>> CreateEvent([FromBody] CreateEventDto createDto)
         {
-            try
-            {
-                var eventModel = _mapper.Map<Event>(createDto);
-                var createdEvent = await _eventService.CreateEventAsync(eventModel);
-                var eventDto = _mapper.Map<EventDto>(createdEvent);
-                _logger.LogInformation("Evento creado: {Id}", eventDto.EventId);
-                return CreatedAtAction(nameof(GetEvent), new { id = eventDto.EventId }, eventDto);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creando evento");
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
+            var eventModel = _mapper.Map<Event>(createDto);
+            var createdEvent = await _eventService.CreateEventAsync(eventModel);
+            var eventDto = _mapper.Map<EventDto>(createdEvent);
+
+            _logger.LogInformation("Evento creado: {Id}", eventDto.EventId);
+            return CreatedAtAction(nameof(GetEvent), new { id = eventDto.EventId }, eventDto);
         }
 
         /// <summary>
@@ -141,29 +124,21 @@ namespace EventReservationApp.Controllers
         [Authorize(Roles = "Organizer,Admin")]
         [ProducesResponseType(typeof(EventDto), 200)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(typeof(object), 500)]
         public async Task<ActionResult<EventDto>> UpdateEvent([FromRoute] int id, [FromBody] UpdateEventDto updateDto)
         {
-            try
+            updateDto.Id = id;
+            var eventModel = _mapper.Map<Event>(updateDto);
+            var updatedEvent = await _eventService.UpdateEventAsync(eventModel);
+
+            if (updatedEvent == null)
             {
-                updateDto.Id = id;  // Asegura el ID
-                var eventModel = _mapper.Map<Event>(updateDto);
-                var updatedEvent = await _eventService.UpdateEventAsync(eventModel);
-                if (updatedEvent == null)
-                {
-                    _logger.LogWarning("Evento no encontrado para actualización: {Id}", id);
-                    return NotFound(new { error = "Evento no encontrado." });
-                }
-                var eventDto = _mapper.Map<EventDto>(updatedEvent);
-                _logger.LogInformation("Evento actualizado: {Id}", id);
-                return Ok(eventDto);
+                _logger.LogWarning("Evento no encontrado para actualización: {Id}", id);
+                return NotFound(new { error = "Evento no encontrado." });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error actualizando evento {Id}", id);
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
+
+            var eventDto = _mapper.Map<EventDto>(updatedEvent);
+            _logger.LogInformation("Evento actualizado: {Id}", id);
+            return Ok(eventDto);
         }
 
         /// <summary>
@@ -176,21 +151,11 @@ namespace EventReservationApp.Controllers
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(204)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(typeof(object), 500)]
         public async Task<IActionResult> DeleteEvent([FromRoute] int id)
         {
-            try
-            {
-                await _eventService.DeleteEventAsync(id);
-                _logger.LogInformation("Evento eliminado: {Id}", id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error eliminando evento {Id}", id);
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
+            await _eventService.DeleteEventAsync(id);
+            _logger.LogInformation("Evento eliminado: {Id}", id);
+            return NoContent();
         }
 
         /// <summary>
@@ -201,39 +166,26 @@ namespace EventReservationApp.Controllers
         /// <response code="401">No autorizado.</response>
         /// <response code="500">Error interno del servidor.</response>
         [HttpGet("summary")]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(object), 200)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(typeof(object), 500)]
         public async Task<IActionResult> GetSummary()
         {
-            try
-            {
-                var events = await _eventService.GetAllAsync();
-                var reservations = await _reservationService.GetAllReservationsAsync(null, null);
-                var payments = await _paymentService.GetAllPaymentsAsync();
+            var events = await _eventService.GetAllAsync();
+            var reservations = await _reservationService.GetAllReservationsAsync(null, null);
+            var payments = await _paymentService.GetAllPaymentsAsync();
 
-                var totalEvents = events.Count();
-                var totalReservations = reservations.Count();
-                var totalPayments = payments.Count();
-                var totalRevenue = payments.Sum(p => p.Amount);
-
-                _logger.LogInformation("Resumen obtenido: Eventos={TotalEvents}, Reservas={TotalReservations}", totalEvents, totalReservations);
-                return Ok(new
-                {
-                    totalEvents,
-                    totalReservations,
-                    totalPayments,
-                    totalRevenue
-                });
-            }
-            catch (Exception ex)
+            var summary = new
             {
-                _logger.LogError(ex, "Error obteniendo resumen");
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
+                totalEvents = events.Count(),
+                totalReservations = reservations.Count(),
+                totalPayments = payments.Count(),
+                totalRevenue = payments.Sum(p => p.Amount)
+            };
+
+            _logger.LogInformation("Resumen obtenido correctamente: Eventos={TotalEvents}, Reservas={TotalReservations}",
+                summary.totalEvents, summary.totalReservations);
+
+            return Ok(summary);
         }
-
-        
     }
 }
