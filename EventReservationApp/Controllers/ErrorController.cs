@@ -8,26 +8,38 @@ namespace EventReservations.Controllers
     [Route("[controller]")]
     public class ErrorController : ControllerBase
     {
+        private readonly IWebHostEnvironment _env;
+        private readonly ILogger<ErrorController> _logger;
+
+        public ErrorController(IWebHostEnvironment env, ILogger<ErrorController> logger)
+        {
+            _env = env;
+            _logger = logger;
+        }
+
         [Route("/error")]
         [HttpGet]
+        [HttpPost]
         public IActionResult HandleError()
         {
             var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
             var exception = context?.Error;
 
-            var response = new
+            _logger.LogError(exception, "Error no controlado en la aplicación.");
+
+            bool showDetails = _env.IsDevelopment();
+
+            var errorResponse = new
             {
+                statusCode = (int)HttpStatusCode.InternalServerError,
                 message = "Ocurrió un error inesperado.",
-                detail = exception?.Message,
-                stackTrace = exception?.StackTrace
+                detail = showDetails ? exception?.Message : null,
+                stackTrace = showDetails ? exception?.StackTrace : null
             };
 
-            return Problem(
-                detail: response.detail,
-                title: response.message,
-                statusCode: (int)HttpStatusCode.InternalServerError
-            );
+            return StatusCode(errorResponse.statusCode, errorResponse);
         }
     }
 }
+
 
