@@ -89,6 +89,22 @@ try
     // Stripe
     StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
+    //Cors config 
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowFrontend", policy =>
+        {
+            policy.WithOrigins(
+                "http://localhost:5173",   // frontend local (React/Vite)
+                "http://localhost:4200"    // opcional: Angular
+                                           // "https://tudominio.com" // 
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+        });
+    });
+
     builder.Services.AddAuthorization();
     builder.Services.AddControllers();
 
