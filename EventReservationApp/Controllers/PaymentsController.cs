@@ -21,17 +21,20 @@ namespace EventReservations.Controllers
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
+        private readonly IReservationService _reservationService;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly ILogger<PaymentsController> _logger;
 
         public PaymentsController(
             IPaymentService paymentService,
+            IReservationService reservationService,
             IMapper mapper,
             IConfiguration configuration,
             ILogger<PaymentsController> logger)
         {
             _paymentService = paymentService;
+            _reservationService = reservationService;
             _mapper = mapper;
             _configuration = configuration;
             _logger = logger;
@@ -59,10 +62,12 @@ namespace EventReservations.Controllers
                     request.Currency,
                     request.PaymentMethodId
                 );
-
-                // Cambiado: Mapear a PaymentDto (DTO de salida) en lugar de PaymentRequestDto
+                if (payment.Status == "Succeeded")
+                { 
+                    await _reservationService.ConfirmPaymentAndDecrementTicketsAsync(request.ReservationId);
+                    _logger.LogInformation("Pago confirmado y entradas decrementadas para reserva {ReservationId}", request.ReservationId);
+                }
                 var paymentDto = _mapper.Map<PaymentDto>(payment);
-
                 return Ok(new
                 {
                     message = "Pago procesado correctamente",
@@ -100,7 +105,8 @@ namespace EventReservations.Controllers
             try
             {
                 var paymentIntent = await _paymentService.CreatePaymentIntentAsync(request.Amount, request.Currency);
-                return Ok(new { clientSecret = paymentIntent.ClientSecret });
+                return Ok(new { clientSecret = paymentIntent.ClientSecret});
+              
             }
             catch (Exception ex)
             {
@@ -145,7 +151,6 @@ namespace EventReservations.Controllers
 
                 if (!string.IsNullOrEmpty(webhookSecret) && !string.IsNullOrEmpty(stripeSignature))
                 {
-                    // Validación real con Stripe
                     stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, webhookSecret);
                     _logger.LogInformation("Webhook verificado correctamente (modo producción): {Type}", stripeEvent.Type);
                 }
@@ -178,11 +183,12 @@ namespace EventReservations.Controllers
                     };
                 }
 
-                // Procesar el evento en mi servicio (agregado: check para evitar duplicados si es necesario)
+                // Procesar el evento en mi servicio, agregado: check para evitar duplicados si es necesario
                 await _paymentService.ProcessWebhookAsync(stripeEvent);
 
                 _logger.LogInformation("Webhook procesado correctamente: {Type}", stripeEvent.Type);
                 return Ok(new { received = true });
+                
             }
             catch (StripeException sex)
             {

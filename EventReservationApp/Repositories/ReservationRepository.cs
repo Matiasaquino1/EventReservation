@@ -2,6 +2,9 @@
 using EventReservations.Models;
 using Microsoft.EntityFrameworkCore;
 using EventReservations.Dto;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace EventReservations.Repositories
@@ -65,6 +68,12 @@ namespace EventReservations.Repositories
             return (data, totalRecords);
         }
 
+        public async Task<IEnumerable<Reservation>> GetReservationsByUserAndEventAsync(int userId, int eventId)
+        {
+            return await _context.Reservations
+                .Where(r => r.UserId == userId && r.EventId == eventId)
+                .ToListAsync();  
+        }
 
         public async Task<Reservation> GetByIdAsync(int id)
         {
