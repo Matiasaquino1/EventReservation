@@ -37,26 +37,12 @@ namespace EventReservationApp.Controllers
         /// Obtiene una lista de reservas con filtros opcionales para administración.
         /// </summary>
         [HttpGet("reservations")]
-        [Authorize(Roles = "Admin")]
-        [ProducesResponseType(typeof(object), 200)]
-        public async Task<IActionResult> GetAdminReservations(
-            [FromQuery] string? status = null,
-            [FromQuery] int? eventId = null,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10,
-            [FromQuery] string sort = "desc")
+        public async Task<ActionResult<PagedResponseDto<AdminReservationDto>>> GetAdminReservations(
+            [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string sort = "desc", [FromQuery] string status = null, [FromQuery] int? eventId = null)
         {
-            var result = await _reservationService.GetAdminReservationsAsync(status, eventId, page, pageSize, sort);
-            var adminDtos = _mapper.Map<IEnumerable<AdminReservationDto>>(result.Data);
-
-            return Ok(new
-            {
-                page,
-                pageSize,
-                totalRecords = result.TotalRecords,
-                totalPages = (int)Math.Ceiling(result.TotalRecords / (double)pageSize),
-                data = adminDtos
-            });
+            var paged = await _reservationService.GetPagedReservationsAsync(page, pageSize, sort, status, eventId);
+            var dtos = _mapper.Map<IEnumerable<AdminReservationDto>>(paged.Data);
+            return Ok(new PagedResponseDto<AdminReservationDto> { Data = dtos, Page = paged.Page, PageSize = paged.PageSize, TotalCount = paged.TotalCount });
         }
 
 

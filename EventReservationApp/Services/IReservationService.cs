@@ -2,6 +2,7 @@
 using EventReservations.Models;
 using EventReservations.Repositories;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace EventReservations.Services
@@ -19,6 +20,17 @@ namespace EventReservations.Services
         Task<IEnumerable<Reservation>> GetAllReservationsAsync(string? status = null, int? eventId = null);
         Task<IEnumerable<Reservation>> GetReservationsByUserAndEventAsync(int userId, int eventId);
         Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId);
+        /// <summary>
+        /// Obtiene una lista paginada de reservas con filtros opcionales para uso administrativo.
+        /// Permite filtrar por estado y evento, ordenar por fecha, y paginar resultados.
+        /// </summary>
+        /// <param name="page">El número de página a recuperar (empezando en 1). Si es menor a 1, se asume 1.</param>
+        /// <param name="pageSize">El número de elementos por página (máximo recomendado: 100 para performance).</param>
+        /// <param name="sort">Orden de los resultados: "asc" para ascendente o "desc" para descendente (por defecto "desc" por fecha de reserva).</param>
+        /// <param name="status">Filtro opcional por estado de la reserva (e.g., "Pending", "Confirmed"). Si es null o vacío, no filtra.</param>
+        /// <param name="eventId">Filtro opcional por ID de evento. Si es null, no filtra.</param>
+        /// <returns>Un objeto PagedResponseDto con la lista de reservas, página actual, tamaño de página y total de elementos.</returns>
+        Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId);
     }
 
     public class ReservationService : IReservationService
@@ -151,5 +163,12 @@ namespace EventReservations.Services
         {
             throw new NotImplementedException();
         }
+
+        // Reemplaza la implementación de GetPagedReservationsAsync con una llamada al repository
+        public async Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId)
+        {
+            return await _reservationRepository.GetPagedReservationsAsync(page, pageSize, sort, status, eventId);
+        }
+
     }
 }

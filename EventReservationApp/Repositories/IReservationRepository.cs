@@ -1,4 +1,6 @@
-﻿using EventReservations.Models;
+﻿using EventReservations.Dto;
+using EventReservations.Models;
+
 
 
 namespace EventReservations.Repositories
@@ -14,6 +16,7 @@ namespace EventReservations.Repositories
         Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId);
         Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(string? status, int? eventId, int page, int pageSize, string sort);
         Task<IEnumerable<Reservation>> GetReservationsByUserAndEventAsync(int userId, int eventId);
+        Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId);
     }
 }
 
