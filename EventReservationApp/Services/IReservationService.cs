@@ -10,7 +10,7 @@ namespace EventReservations.Services
         Task<Reservation> CreateReservationAsync(Reservation reservation);
         Task<Reservation> CancelReservationAsync(int id);
         Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId);
-        Task<IEnumerable<Reservation>> GetAdminReservationsAsync(string status, int? eventId);
+        Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(string? status, int? eventId, int page,  int pageSize, string sort);
         Task<Reservation> UpdateReservationAsync(Reservation createdReservation);
         Task<Reservation> DeleteReservation(int id);
         Task<Reservation> GetReservationAsync(int id);
@@ -25,13 +25,20 @@ namespace EventReservations.Services
             // Lógica de negocio: e.g., verificar si ya está pagada
             return await _reservationRepository.CancelReservationAsync(id);
         }
+
         public async Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId)
         {
             return await _reservationRepository.GetReservationsByUserAsync(userId);
         }
-        public async Task<IEnumerable<Reservation>> GetAdminReservationsAsync(string status, int? eventId)
+
+        public async Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(
+            string? status,
+            int? eventId,
+            int page,
+            int pageSize,
+            string sort)
         {
-            return await _reservationRepository.GetAdminReservationsAsync(status, eventId);
+            return await _reservationRepository.GetAdminReservationsAsync(status, eventId, page, pageSize, sort);
         }
 
         public ReservationService(IReservationRepository reservationRepository)

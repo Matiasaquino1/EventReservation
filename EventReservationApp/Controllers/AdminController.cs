@@ -37,19 +37,28 @@ namespace EventReservationApp.Controllers
         /// Obtiene una lista de reservas con filtros opcionales para administración.
         /// </summary>
         [HttpGet("reservations")]
-        [ProducesResponseType(typeof(IEnumerable<AdminReservationDto>), 200)]
-        [ProducesResponseType(typeof(object), 500)]
-        public async Task<ActionResult<IEnumerable<AdminReservationDto>>> GetAdminReservations(
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(object), 200)]
+        public async Task<IActionResult> GetAdminReservations(
             [FromQuery] string? status = null,
-            [FromQuery] int? eventId = null)
+            [FromQuery] int? eventId = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string sort = "desc")
         {
-            var reservations = await _reservationService.GetAdminReservationsAsync(status, eventId);
-            var adminDtos = _mapper.Map<IEnumerable<AdminReservationDto>>(reservations);
+            var result = await _reservationService.GetAdminReservationsAsync(status, eventId, page, pageSize, sort);
+            var adminDtos = _mapper.Map<IEnumerable<AdminReservationDto>>(result.Data);
 
-            _logger.LogInformation("Reservas obtenidas para admin: {Count} registros", reservations.Count());
-
-            return Ok(adminDtos);
+            return Ok(new
+            {
+                page,
+                pageSize,
+                totalRecords = result.TotalRecords,
+                totalPages = (int)Math.Ceiling(result.TotalRecords / (double)pageSize),
+                data = adminDtos
+            });
         }
+
 
         /// <summary>
         /// Fuerza la confirmación de un evento específico.

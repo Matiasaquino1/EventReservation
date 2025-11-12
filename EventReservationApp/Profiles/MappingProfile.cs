@@ -19,7 +19,8 @@ namespace EventReservations.Profiles
                 .ReverseMap()
                 .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId));
             CreateMap<CreatedReservationDto, Reservation>();
-            CreateMap<Reservation, AdminReservationDto>();  // Si necesitas mapear a DTO admin
+            CreateMap<Reservation, AdminReservationDto>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));  // Si necesitas mapear a DTO admin
             // Mapeos para Payments (si tienes más DTOs)
             CreateMap<Payment, PaymentRequestDto>().ReverseMap();  // Asume que tienes PaymentDto
         }

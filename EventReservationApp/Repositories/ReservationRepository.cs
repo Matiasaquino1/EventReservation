@@ -1,6 +1,7 @@
 ﻿using EventReservations.Data;
 using EventReservations.Models;
 using Microsoft.EntityFrameworkCore;
+using EventReservations.Dto;
 
 
 namespace EventReservations.Repositories
@@ -28,13 +29,42 @@ namespace EventReservations.Repositories
         {
             return await _context.Reservations.Where(r => r.UserId == userId).ToListAsync();
         }
-        public async Task<IEnumerable<Reservation>> GetAdminReservationsAsync(string status, int? eventId)
+        public async Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(
+            string? status,
+            int? eventId,
+            int page,
+            int pageSize,
+            string sort)
         {
-            var query = _context.Reservations.AsQueryable();
-            if (!string.IsNullOrEmpty(status)) query = query.Where(r => r.Status == status);
-            if (eventId.HasValue) query = query.Where(r => r.EventId == eventId.Value);
-            return await query.ToListAsync();
+            var query = _context.Reservations
+                .Include(r => r.EventId)
+                .Include(r => r.UserId)
+                .AsQueryable();
+
+            // Filtros
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(r => r.Status == status);
+
+            if (eventId.HasValue)
+                query = query.Where(r => r.EventId == eventId.Value);
+
+            // Total antes de paginar
+            var totalRecords = await query.CountAsync();
+
+            // Ordenamiento
+            query = sort.ToLower() == "desc"
+                ? query.OrderByDescending(r => r.CreatedAt)
+                : query.OrderBy(r => r.CreatedAt);
+
+            // Paginación
+            var data = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (data, totalRecords);
         }
+
 
         public async Task<Reservation> GetByIdAsync(int id)
         {

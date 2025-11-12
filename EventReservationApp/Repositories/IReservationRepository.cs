@@ -11,7 +11,12 @@ namespace EventReservations.Repositories
         Task DeleteAsync(int id);
         Task<IEnumerable<Reservation>> GetAllAsync(string? status = null, int? eventId = null);
         Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId);
-        Task<IEnumerable<Reservation>> GetAdminReservationsAsync(string status, int? eventId);
+        Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(
+            string? status,
+            int? eventId,
+            int page,
+            int pageSize,
+            string sort);
     }
 }
 
