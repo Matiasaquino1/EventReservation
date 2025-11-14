@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using EventReservations.Dto;
-using EventReservations.Models;
 using EventReservations.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

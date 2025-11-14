@@ -10,8 +10,8 @@
         public string Name { get; set; } = string.Empty;
         public DateTime Created { get; set; } = DateTime.UtcNow;
 
-        public Event Event {  get; set; }
-        public Reservation Reservation { get; set; }
+        public ICollection<Reservation> Reservations { get; set; }
+
     }
 
 }

@@ -9,8 +9,6 @@
         public DateTime PaymentDate { get; set; }  // Fecha del pago
         public string StripePaymentIntentId { get; set; } = string.Empty;
 
-        public Event Event { get; set; }
-
-
+        public Reservation Reservation { get; set; }
     }
 }
