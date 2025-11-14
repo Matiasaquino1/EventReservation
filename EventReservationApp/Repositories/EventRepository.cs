@@ -24,8 +24,8 @@ namespace EventReservations.Repositories
             var eventModel = await _context.Events.FindAsync(id);
             if (eventModel != null)
             {
-                // Lógica simple: e.g., marcar como confirmado (agrega lógica personalizada)
-                eventModel.Status = "Confirmed";  // Asume un campo Status en Event
+                // Lógica simple: marca como confirmado 
+                eventModel.Status = "Confirmed";  
                 _context.Events.Update(eventModel);
                 await _context.SaveChangesAsync();
             }
@@ -42,19 +42,26 @@ namespace EventReservations.Repositories
             return eventModel;
         }
 
-        public Task<Event> UpdateAsync(Event eventModel)
+        public async Task<Event> UpdateAsync(Event eventModel)
         {
-            throw new NotImplementedException();
+            _context.Events.Update(eventModel);  
+            await _context.SaveChangesAsync();  
+            return eventModel; 
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)  
         {
-            throw new NotImplementedException();
+            var eventModel = await _context.Events.FindAsync(id);  
+            if (eventModel != null)
+            {
+                _context.Events.Remove(eventModel);
+                await _context.SaveChangesAsync();  
+            }
         }
 
-        public Task<IEnumerable<Event>> GetAllAsync()
+        public async Task<IEnumerable<Event>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Events.ToListAsync();
         }
 
     }

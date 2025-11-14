@@ -8,21 +8,36 @@ namespace EventReservations.Profiles
     {
         public MappingProfile()
         {
-            // Mapeos para Events
-            CreateMap<Event, EventDto>();  // De modelo a DTO
-            CreateMap<CreateEventDto, Event>();  // De DTO a modelo
-            CreateMap<UpdateEventDto, Event>();  // De DTO a modelo
-            CreateMap<Event, UpdateEventDto>().ReverseMap();  // Bidireccional si es necesario
-            // Mapeos para Reservations
+            // EVENTS
+            CreateMap<Event, EventDto>();
+            CreateMap<CreateEventDto, Event>();
+            CreateMap<UpdateEventDto, Event>();
+            CreateMap<Event, UpdateEventDto>();
+
+
+            // RESERVATIONS
             CreateMap<Reservation, ReservationDto>()
                 .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
-                .ReverseMap()
-                .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId));
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.EventId))
+                .ReverseMap();
+
             CreateMap<CreatedReservationDto, Reservation>();
+
+            // DTO para Admin (incluye user email)
             CreateMap<Reservation, AdminReservationDto>()
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));  // Si necesitas mapear a DTO admin
-            // Mapeos para Payments (si tienes más DTOs)
-            CreateMap<Payment, PaymentRequestDto>().ReverseMap();  // Asume que tienes PaymentDto
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
+                .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.EventId))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
+
+            CreateMap<User, LoginResponseDto>();
+            CreateMap<User, UserDto>();
+
+
+            // PAYMENTS
+            CreateMap<Payment, PaymentRequestDto>().ReverseMap();
         }
     }
+
 }

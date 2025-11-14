@@ -1,7 +1,9 @@
-﻿using EventReservations.Dto;
+﻿using BCrypt.Net;
+using EventReservations.Dto;
 using EventReservations.Models;  
 using EventReservations.Repositories;
-using BCrypt.Net;
+using Microsoft.EntityFrameworkCore;
+using Stripe.Forwarding;
 
 
 namespace EventReservations.Services  
@@ -24,6 +26,9 @@ namespace EventReservations.Services
 
             public async Task<User> RegisterAsync(RegisterRequestDto dto)
             {
+                if (await _userRepository.EmailExistsAsync(dto.Email))
+                    return null;
+
                 var user = new User
                 {
                     Name = dto.Name,

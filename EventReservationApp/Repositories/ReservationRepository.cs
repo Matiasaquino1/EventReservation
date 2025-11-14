@@ -114,7 +114,7 @@ namespace EventReservations.Repositories
         /// </summary>
         public async Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId)
         {
-            // Paso 1: Validar y ajustar parámetros
+            // Validar y ajustar parámetros
             if (page < 1) page = 1;
             if (pageSize < 1 || pageSize > 100) pageSize = 10;
             // Paso 2: Obtener consulta base
@@ -128,18 +128,18 @@ namespace EventReservations.Repositories
             {
                 query = query.Where(r => r.EventId == eventId.Value);
             }
-            // Paso 4: Aplicar orden
+            // Aplicar orden
             query = string.Equals(sort, "asc", StringComparison.OrdinalIgnoreCase)
                 ? query.OrderBy(r => r.ReservationDate)
                 : query.OrderByDescending(r => r.ReservationDate);
-            // Paso 5: Calcular total
+            // Calcula total
             var totalCount = await query.CountAsync();
-            // Paso 6: Aplicar paginación
+            // Aplica paginación
             var data = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            // Paso 7: Retornar respuesta paginada
+            // Retorna respuesta paginada
             return new PagedResponseDto<Reservation>
             {
                 Data = data,

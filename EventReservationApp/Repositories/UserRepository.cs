@@ -26,19 +26,31 @@ namespace EventReservations.Repositories
             return user;
 
         }
-        public Task<User?> UpdateAsync(User user)
+        public async Task<User?> UpdateAsync(User user)
         {
-            throw new NotImplementedException();
+            _context.Users.Update(user);  
+            await _context.SaveChangesAsync();  
+            return user; 
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var user = await _context.Users.FindAsync(id); 
+            if (user != null)
+            {
+                _context.Users.Remove(user);  
+                await _context.SaveChangesAsync();  
+            }
         }
 
-        public Task<IEnumerable<User?>> GetAllAsync()
+        public async Task<IEnumerable<User?>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Users.ToListAsync();
+        }
+
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
     }

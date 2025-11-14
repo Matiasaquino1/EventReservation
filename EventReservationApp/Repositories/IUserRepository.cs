@@ -11,6 +11,7 @@ namespace EventReservations.Repositories
         Task<User?> AddAsync(User user);
         Task<User?> UpdateAsync(User user);
         Task DeleteAsync(int id);
-        Task<IEnumerable<User?>> GetAllAsync(); 
+        Task<IEnumerable<User?>> GetAllAsync();
+        Task<bool> EmailExistsAsync(string email);
     }
 }

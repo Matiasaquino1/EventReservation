@@ -5,11 +5,12 @@ using EventReservations.Profiles;
 using EventReservations.Repositories;
 using EventReservations.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Stripe;
 using System.Net;
@@ -141,6 +142,31 @@ try
             Description = "API para reservas de eventos con autenticación JWT, pagos Stripe y gestión de usuarios/organizadores."
         });
 
+        var securitySchema = new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Description = "Ingrese 'Bearer <token>'",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        };
+        
+        options.AddSecurityDefinition("Bearer", securitySchema);
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                securitySchema,
+                new string[] {}
+            }
+        });
+
         var xmlFile = "EventReservations.xml";
         var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         if (System.IO.File.Exists(xmlPath))
@@ -174,6 +200,7 @@ try
         app.UseSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Event Reservation API v1");
+            options.EnablePersistAuthorization();
             options.RoutePrefix = string.Empty;
         });
     }
@@ -200,12 +227,12 @@ try
 
     app.MapControllers();
 
-    Log.Information("Aplicación iniciada correctamente ✅");
+    Log.Information("Aplicación iniciada correctamente");
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Fallo crítico al iniciar la aplicación ❌");
+    Log.Fatal(ex, "Fallo crítico al iniciar la aplicación");
 }
 finally
 {

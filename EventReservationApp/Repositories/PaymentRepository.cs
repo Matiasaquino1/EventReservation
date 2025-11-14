@@ -55,7 +55,7 @@ namespace EventReservations.Repositories
 
         public async Task<IEnumerable<Payment>> GetPaymentsByUserIdAsync(int userId)
         {
-            // Asume que Reservation existe y Payments.ReservationId relaciona a Reservation
+            // Payments.ReservationId relaciona a Reservation
             return await _context.Payments
                 .Where(p => _context.Reservations.Any(r => r.ReservationId == p.ReservationId && r.UserId == userId))
                 .ToListAsync();

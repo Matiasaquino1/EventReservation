@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
             return BadRequest(new { error = "Usuario ya existe o datos inválidos." });
         }
 
-        var userDto = _mapper.Map<LoginRequestDto>(registeredUser);
+        var userDto = _mapper.Map<UserDto>(registeredUser);
         _logger.LogInformation("Usuario registrado exitosamente: {UserId}", registeredUser.UserId);
         return Ok(userDto);
     }
