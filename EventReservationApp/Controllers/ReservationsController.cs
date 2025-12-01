@@ -43,10 +43,10 @@ namespace EventReservations.Controllers
         /// <returns>Reserva creada en formato DTO.</returns>
         /// <response code="201">Reserva creada exitosamente.</response>
         /// <response code="400">Datos inválidos.</response>
-        /// <response code="401">No autorizado (requiere rol User).</response>
+        /// <response code="401">No autorizado (requiere rol User o Admin).</response>
         /// <response code="500">Error interno al crear la reserva.</response>
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Admin")]
         [ProducesResponseType(typeof(ReservationDto), 201)]
         [ProducesResponseType(typeof(object), 400)]
         [ProducesResponseType(401)]
@@ -114,61 +114,76 @@ namespace EventReservations.Controllers
         /// <returns>Reserva y resultado del pago mapeado a DTOs.</returns>
         /// <response code="200">Reserva y pago procesados.</response>
         /// <response code="400">Datos inválidos o error en pago.</response>
-        /// <response code="401">No autorizado (requiere rol User).</response>
+        /// <response code="401">No autorizado (requiere rol User o Admin).</response>
         /// <response code="500">Error interno.</response>
         [HttpPost("create-with-payment")]
-        [Authorize(Roles = "User")]
-        [ProducesResponseType(typeof(object), 200)]
-        [ProducesResponseType(typeof(object), 400)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(typeof(object), 500)]
+        [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult> CreateReservationWithPayment([FromBody] CreatePaymentIntentDto createDto)
         {
             try
             {
                 if (createDto == null || createDto.Amount <= 0 || string.IsNullOrEmpty(createDto.PaymentMethodId))
-                    return BadRequest(new { error = "Datos de reserva inválidos. Amount debe ser > 0 y PaymentMethodId requerido." });
+                    return BadRequest(new { error = "Datos inválidos." });
 
-                var reservation = _mapper.Map<Reservation>(createDto);
-                reservation.Status = "Pending";
-                reservation.ReservationDate = DateTime.UtcNow;
+                // Obtener el userId desde el JWT
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null)
+                    return Unauthorized(new { error = "No se pudo obtener el usuario autenticado." });
 
-                var createdReservation = await _reservationService.CreateReservationAsync(reservation);
-                if (createdReservation == null)
-                    return StatusCode(500, new { error = "Error al crear la reserva." });
+                if (!int.TryParse(userId, out var userIdInt))
+                    return BadRequest(new { error = "El token contiene un UserId inválido." });
 
-                var paymentResult = await _paymentService.ProcessPaymentAsync(
-                    createdReservation.ReservationId,
+                // 1) Procesar pago primero
+                var paymentIntent = await _paymentService.ProcessStripePaymentAsync(
                     createDto.Amount,
-                    "usd",
+                    createDto.Currency,
                     createDto.PaymentMethodId
                 );
 
-                createdReservation.Status = paymentResult.Status == "succeeded" ? "Confirmed" : "PaymentFailed";
-                await _reservationService.UpdateReservationAsync(createdReservation);
+                if (paymentIntent.Status != "succeeded")
+                    return BadRequest(new { error = "El pago no pudo ser completado." });
 
-                var reservationResponse = _mapper.Map<ReservationDto>(createdReservation);
-                var paymentResponse = _mapper.Map<PaymentRequestDto>(paymentResult);
+                // 2) Crear la reserva en BD
+                var reservation = new Reservation
+                {
+                    EventId = createDto.EventId,
+                    UserId = userIdInt,
+                    NumberOfTickets = createDto.NumberOfTickets,
+                    ReservationDate = DateTime.UtcNow,
+                    Status = "Confirmed"
+                };
 
-                _logger.LogInformation("Reserva y pago procesados: Reserva {ReservationId}, Pago {PaymentId}", createdReservation.ReservationId, paymentResult.PaymentId);
+                var createdReservation = await _reservationService.CreateReservationAsync(reservation);
+
+                // 3) Guardar el pago asociado a la reserva
+                var payment = new Payment
+                {
+                    ReservationId = createdReservation.ReservationId,
+                    Amount = createDto.Amount,
+                    Status = paymentIntent.Status,
+                    PaymentDate = DateTime.UtcNow,
+                    StripePaymentIntentId = paymentIntent.Id
+                };
+
                 return Ok(new
                 {
-                    message = "Reserva y pago procesados correctamente.",
-                    reservation = reservationResponse,
-                    payment = paymentResponse
+                    message = "Pago y reserva completados.",
+                    reservation = createdReservation,
+                    payment = payment
                 });
             }
             catch (StripeException ex)
             {
-                _logger.LogWarning(ex, "Error en pago con Stripe: {Message}", ex.StripeError.Message);
-                return BadRequest(new { error = "Error en el procesamiento del pago." });
+                return BadRequest(new { error = ex.StripeError.Message });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error procesando reserva con pago");
-                return StatusCode(500, new { error = "Error interno del servidor." });
+                return StatusCode(500, new { error = ex.Message });
             }
         }
+
+
+
 
         /// <summary>
         /// Obtiene todas las reservas de un usuario específico (solo el propietario o Admin).
@@ -282,4 +297,4 @@ namespace EventReservations.Controllers
             }
         }
     }
-}f
+}

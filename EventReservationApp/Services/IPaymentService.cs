@@ -7,21 +7,24 @@ namespace EventReservations.Services
 {
     public interface IPaymentService
     {
-        Task<Payment> ProcessPaymentAsync(int reservationId, decimal amount, string currency, string paymentMethodId);
+        Task<Payment> ProcessPaymentAsync(int reservationId, decimal amount, string currency, string PaymentMethodId);
+        Task<PaymentIntent> ProcessStripePaymentAsync(decimal amount, string currency, string paymentMethodId);
+        Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency);
         Task<Payment> GetPaymentAsync(int id);
         Task ProcessPaymentAsync(int reservationId, decimal amount);
-        Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency);
         Task ProcessWebhookAsync(Stripe.Event stripeEvent);
         Task<Payment?> GetPaymentByReservationIdAsync(int reservationId);
+        Task<Payment> SavePaymentAsync(int reservationId, decimal amount, string stripeIntentId, string status);
         Task<IEnumerable<Payment>> GetPaymentsByUserIdAsync(int userId);
         Task<IEnumerable<Payment>> GetAllPaymentsAsync();
+
     }
 
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly IConfiguration _configuration;
-        private readonly IReservationRepository _reservationRepository; 
+        private readonly IReservationRepository _reservationRepository;
 
         public PaymentService(IPaymentRepository paymentRepository, IConfiguration configuration, IReservationRepository reservationRepository)
         {
@@ -37,21 +40,20 @@ namespace EventReservations.Services
         /// <param name="currency">Código de moneda (por defecto "usd").</param>
         /// <returns>El PaymentIntent creado en Stripe.</returns>
         /// <exception cref="ArgumentException">Se lanza si el monto es inválido o la moneda está vacía.</exception>
-        public async Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency = "usd")
+        public async Task<PaymentIntent> ProcessStripePaymentAsync(decimal amount, string currency, string paymentMethodId)
         {
-            if (amount <= 0)
-                throw new ArgumentException("El monto debe ser mayor a cero.", nameof(amount));
-
-            if (string.IsNullOrWhiteSpace(currency))
-                throw new ArgumentException("La moneda no puede estar vacía.", nameof(currency));
+            StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
 
             var options = new PaymentIntentCreateOptions
             {
-                Amount = (long)(amount * 100), // Stripe usa centavos
-                Currency = currency.ToLower(),
+                Amount = (long)(amount * 100),
+                Currency = currency,
+                PaymentMethod = paymentMethodId,
+                Confirm = true,
                 AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
                 {
-                    Enabled = true // Habilita métodos automáticos (tarjeta, etc.)
+                    Enabled = true,
+                    AllowRedirects = "never"
                 }
             };
 
@@ -59,6 +61,20 @@ namespace EventReservations.Services
             return await service.CreateAsync(options);
         }
 
+        public async Task<Payment> SavePaymentAsync(int reservationId, decimal amount, string stripeIntentId, string status)
+        {
+            var payment = new Payment
+            {
+                ReservationId = reservationId,
+                Amount = amount,
+                Status = status,
+                PaymentDate = DateTime.UtcNow,
+                StripePaymentIntentId = stripeIntentId
+            };
+
+            await _paymentRepository.AddAsync(payment);
+            return payment;
+        }
 
         public async Task ProcessWebhookAsync(Stripe.Event stripeEvent)
         {
@@ -143,7 +159,7 @@ namespace EventReservations.Services
         {
             // 1️⃣ Inicializar Stripe con la clave secreta
             StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
-            
+
 
             // 2️⃣ Crear el pago
             var options = new PaymentIntentCreateOptions
@@ -175,7 +191,7 @@ namespace EventReservations.Services
             await _paymentRepository.AddAsync(payment);
             return payment;
         }
-        
+
 
         public async Task<Payment> GetPaymentAsync(int id)
         {
@@ -202,6 +218,29 @@ namespace EventReservations.Services
             return await _paymentRepository.GetAllAsync();
         }
 
+        public async Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency)
+        {
+            if (amount <= 0)
+                throw new ArgumentException("El monto debe ser mayor a cero.", nameof(amount));
+
+            if (string.IsNullOrWhiteSpace(currency))
+                throw new ArgumentException("La moneda no puede estar vacía.", nameof(currency));
+
+            StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
+
+            var options = new PaymentIntentCreateOptions
+            {
+                Amount = (long)(amount * 100),   // Stripe usa centavos
+                Currency = currency.ToLower(),
+                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                {
+                    Enabled = true               // Habilita métodos automáticos
+                }
+            };
+
+            var service = new PaymentIntentService();
+            return await service.CreateAsync(options);
+        }
 
     }
 }
