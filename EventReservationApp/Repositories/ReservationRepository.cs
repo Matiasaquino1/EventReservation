@@ -28,10 +28,16 @@ namespace EventReservations.Repositories
             }
             return reservation;
         }
+        
         public async Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId)
         {
             return await _context.Reservations.Where(r => r.UserId == userId).ToListAsync();
         }
+
+        /// <summary>
+        /// Implementa paginacion: Muestra una lista de las reservas paginada con filtros y orden.
+        /// Se requiere rol Admin
+        /// </summary>
         public async Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(
             string? status,
             int? eventId,
