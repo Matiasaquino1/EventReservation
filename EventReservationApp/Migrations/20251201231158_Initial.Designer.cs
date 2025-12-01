@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251114080506_Initial")]
+    [Migration("20251201231158_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -109,6 +109,9 @@ namespace EventReservations.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NumberOfTickets")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("ReservationDate")

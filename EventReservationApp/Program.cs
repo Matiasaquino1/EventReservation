@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EventReservationApp;
 using EventReservations.Data;
+using EventReservations.Models;
 using EventReservations.Profiles;
 using EventReservations.Repositories;
 using EventReservations.Services;
@@ -229,6 +230,33 @@ try
 
     Log.Information("Aplicación iniciada correctamente");
     app.Run();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+        var adminEmail = config["DefaultAdmin:Email"];
+        var adminPassword = config["DefaultAdmin:Password"];
+        var adminName = config["DefaultAdmin:Name"];
+
+        if (!context.Users.Any(u => u.Role == "Admin"))
+        {
+            var admin = new User
+            {
+                Name = adminName,
+                Email = adminEmail,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+                Role = "Admin"
+            };
+
+            context.Users.Add(admin);
+            context.SaveChanges();
+
+            Console.WriteLine("Admin inicial creado.");
+        }
+    }
+
 }
 catch (Exception ex)
 {

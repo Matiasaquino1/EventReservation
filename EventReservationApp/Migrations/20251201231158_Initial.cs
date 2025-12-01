@@ -59,7 +59,8 @@ namespace EventReservations.Migrations
                     EventId = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: true),
                     ReservationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    NumberOfTickets = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

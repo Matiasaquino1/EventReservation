@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
+using EventReservations.Data;
 using EventReservations.Dto;
+using EventReservations.Profiles;
 using EventReservations.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using EventReservations.Profiles;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging; 
 
-namespace EventReservationApp.Controllers
+namespace EventReservations.Controllers
 {
     /// <summary>
     /// Controlador para operaciones administrativas, como gestión de reservas y eventos.
@@ -23,13 +24,16 @@ namespace EventReservationApp.Controllers
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
         private readonly ILogger<AdminController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public AdminController(IReservationService reservationService, IEventService eventService, IMapper mapper, ILogger<AdminController> logger)
+
+        public AdminController(IReservationService reservationService, IEventService eventService, IMapper mapper, ILogger<AdminController> logger, ApplicationDbContext dbContext)
         {
             _reservationService = reservationService;
             _eventService = eventService;
             _mapper = mapper;
             _logger = logger;
+            _context = dbContext;
         }
 
         /// <summary>
@@ -63,6 +67,29 @@ namespace EventReservationApp.Controllers
 
             _logger.LogInformation("Evento forzado a confirmar: {Id}", id);
             return Ok(eventModel);
+        }
+
+        /// <summary>
+        /// Admins pueden promover a otros usuarios
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpPost("promote/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> PromoteUser(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return NotFound(new { message = "Usuario no encontrado." });
+
+            if (user.Role == "Admin")
+                return BadRequest(new { message = "El usuario ya es Admin." });
+
+            user.Role = "Admin";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Usuario promovido a Admin correctamente." });
         }
     }
 }

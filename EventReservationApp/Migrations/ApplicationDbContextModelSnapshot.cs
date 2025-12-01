@@ -108,6 +108,9 @@ namespace EventReservations.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("NumberOfTickets")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("timestamp with time zone");
 

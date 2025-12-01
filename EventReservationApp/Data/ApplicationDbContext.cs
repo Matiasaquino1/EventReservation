@@ -7,7 +7,7 @@ namespace EventReservations.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-
+            Database.SetCommandTimeout(180);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
