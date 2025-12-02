@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using EventReservationApp;
 using EventReservations.Data;
 using EventReservations.Models;
 using EventReservations.Profiles;
@@ -222,15 +221,6 @@ try
         });
     }
 
-    app.UseHttpsRedirection();
-    app.UseAuthentication();
-    app.UseAuthorization();
-
-    app.MapControllers();
-
-    Log.Information("Aplicación iniciada correctamente");
-    app.Run();
-
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -256,6 +246,17 @@ try
             Console.WriteLine("Admin inicial creado.");
         }
     }
+
+    app.UseHttpsRedirection();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    Log.Information("Aplicación iniciada correctamente");
+    app.Run();
+
+
 
 }
 catch (Exception ex)
