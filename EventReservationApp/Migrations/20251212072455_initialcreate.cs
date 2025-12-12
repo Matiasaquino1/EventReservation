@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initialcreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,7 +25,8 @@ namespace EventReservations.Migrations
                     Location = table.Column<string>(type: "text", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    TicketsAvailable = table.Column<int>(type: "integer", nullable: false)
+                    TicketsAvailable = table.Column<int>(type: "integer", nullable: false),
+                    TotalTickets = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

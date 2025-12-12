@@ -49,23 +49,27 @@ namespace EventReservations.Services
         public async Task<Reservation> CancelReservationAsync(int id)
         {
             var reservation = await _reservationRepository.GetByIdAsync(id);
+
             if (reservation != null && reservation.Status != "Cancelled")
             {
                 reservation.Status = "Cancelled";
                 await _reservationRepository.UpdateAsync(reservation);
 
-                // Reabrir cupos
                 var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
                 if (eventModel != null)
                 {
-                    eventModel.TicketsAvailable++;
-                    if (eventModel.Status == "Full") eventModel.Status = "Active";  
+                    eventModel.TicketsAvailable += reservation.NumberOfTickets;
+
+                    if (eventModel.TicketsAvailable > 0 && eventModel.Status == "SoldOut")
+                        eventModel.Status = "Active";
+
                     await _eventRepository.UpdateAsync(eventModel);
-                    _logger.LogInformation("Reserva {ReservationId} cancelada, cupos reabiertos en evento {EventId}", id, reservation.EventId);
                 }
             }
+
             return reservation;
         }
+
 
         public async Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId)
         {
@@ -90,24 +94,24 @@ namespace EventReservations.Services
         public async Task<Reservation> CreateReservationAsync(Reservation reservation, bool checkAvailability = true)
         {
             if (await IsDuplicateReservationAsync(reservation.UserId, reservation.EventId))
-            {
-                _logger.LogWarning("Intento de reserva duplicada: Usuario {UserId} para Evento {EventId}", reservation.UserId, reservation.EventId);
                 throw new InvalidOperationException("Ya tienes una reserva para este evento.");
-            }
+
+            var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
+
+            if (eventModel == null)
+                throw new InvalidOperationException("Evento no encontrado.");
+
             if (checkAvailability)
             {
-                var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
-                if (eventModel == null || eventModel.TicketsAvailable <= 0)
-                {
-                    _logger.LogWarning("Evento {EventId} sin entradas disponibles", reservation.EventId);
-                    throw new InvalidOperationException("No hay entradas disponibles para este evento.");
-                }
+                if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
+                    throw new InvalidOperationException("No hay suficientes entradas disponibles.");
             }
-            // Crear reserva (sin decrementar aún)
+
+            // Crear reserva
             var created = await _reservationRepository.AddAsync(reservation);
-            _logger.LogInformation("Reserva creada con ID {ReservationId} para usuario {UserId}", created.ReservationId, created.UserId);
             return created;
         }
+
 
         public async Task<bool> IsDuplicateReservationAsync(int userId, int eventId)
         {
@@ -124,20 +128,25 @@ namespace EventReservations.Services
         public async Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId)
         {
             var reservation = await _reservationRepository.GetByIdAsync(reservationId);
-            if (reservation != null && reservation.Status == "Pending")
-            {
-                var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
-                if (eventModel != null && eventModel.TicketsAvailable > 0)
-                {
-                    eventModel.TicketsAvailable--;
-                    if (eventModel.TicketsAvailable == 0) eventModel.Status = "Full";
-                    await _eventRepository.UpdateAsync(eventModel);
-                    reservation.Status = "Confirmed";
-                    await UpdateReservationAsync(reservation);
-                    _logger.LogInformation("Pago confirmado y entradas decrementadas para reserva {ReservationId}", reservationId);
-                }
-            }
+            if (reservation == null || reservation.Status != "Pending") return;
+
+            var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
+            if (eventModel == null) return;
+
+            if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
+                throw new InvalidOperationException("Entradas insuficientes al confirmar el pago.");
+
+            eventModel.TicketsAvailable -= reservation.NumberOfTickets;
+
+            if (eventModel.TicketsAvailable == 0)
+                eventModel.Status = "SoldOut";
+
+            await _eventRepository.UpdateAsync(eventModel);
+
+            reservation.Status = "Confirmed";
+            await UpdateReservationAsync(reservation);
         }
+
 
         public async Task<Reservation> GetReservationAsync(int id) 
         { 

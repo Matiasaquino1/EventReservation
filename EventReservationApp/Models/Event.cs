@@ -10,9 +10,9 @@
         public string Location { get; set; }
         public string Status { get; set; } 
         public decimal Price { get; set; }
-        public int TicketsAvailable { get; set; }  // Número de entradas disponibles
-        
-        
+        public int TicketsAvailable { get; set; }  // Número de entradas disponibles        
+        public int TotalTickets { get; set; }
+
         public ICollection<Reservation> Reservations { get; set; }
     }
 }

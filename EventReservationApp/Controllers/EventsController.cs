@@ -98,17 +98,20 @@ namespace EventReservations.Controllers
         /// <response code="500">Error interno del servidor.</response>
         [HttpPost]
         [Authorize(Roles = "Organizer,Admin")]
-        [ProducesResponseType(typeof(EventDto), 201)]
-        [ProducesResponseType(typeof(object), 400)]
         public async Task<ActionResult<EventDto>> CreateEvent([FromBody] CreateEventDto createDto)
         {
             var eventModel = _mapper.Map<Event>(createDto);
+
+            eventModel.TicketsAvailable = createDto.TotalTickets;
+            eventModel.TotalTickets = createDto.TotalTickets;
+
             var createdEvent = await _eventService.CreateEventAsync(eventModel);
+
             var eventDto = _mapper.Map<EventDto>(createdEvent);
 
-            _logger.LogInformation("Evento creado: {Id}", eventDto.EventId);
             return CreatedAtAction(nameof(GetEvent), new { id = eventDto.EventId }, eventDto);
         }
+
 
         /// <summary>
         /// Actualiza un evento existente (requiere rol Organizer o Admin).

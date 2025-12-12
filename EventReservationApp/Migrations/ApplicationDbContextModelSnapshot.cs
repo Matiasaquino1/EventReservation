@@ -57,6 +57,9 @@ namespace EventReservations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("TotalTickets")
+                        .HasColumnType("integer");
+
                     b.HasKey("EventId");
 
                     b.ToTable("Events");

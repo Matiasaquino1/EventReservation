@@ -18,9 +18,6 @@ namespace EventReservations.Dto
         [Required]
         public int EventId { get; set; } 
 
-        [Required]
-        public int UserId { get; set; } 
-
         public int NumberOfTickets { get; set; } = 1;
     }
 

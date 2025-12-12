@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251201231158_Initial")]
-    partial class Initial
+    [Migration("20251212072455_initialcreate")]
+    partial class initialcreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,6 +59,9 @@ namespace EventReservations.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("TotalTickets")
+                        .HasColumnType("integer");
 
                     b.HasKey("EventId");
 

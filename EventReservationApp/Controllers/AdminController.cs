@@ -91,5 +91,35 @@ namespace EventReservations.Controllers
 
             return Ok(new { message = "Usuario promovido a Admin correctamente." });
         }
+
+        // PUT api/admin/events/{id}/stock
+        [HttpPut("events/{id}/stock")]
+        [ProducesResponseType(typeof(EventDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> AdjustEventStock([FromRoute] int id, [FromBody] AdjustStockDto dto)
+        {
+            if (dto == null) return BadRequest(new { error = "Request body required." });
+            if (dto.NewTotalTickets < 0) return BadRequest(new { error = "Total tickets must be >= 0." });
+
+            var ev = await _eventService.GetEventByIdAsync(id);
+            if (ev == null) return NotFound(new { error = "Event not found." });
+
+            // Ajuste: si se reduce total, TicketsAvailable ajusta restando la diferencia
+            var oldTotal = ev.TotalTickets;
+            var newTotal = dto.NewTotalTickets;
+            var diff = newTotal - oldTotal;
+
+            ev.TotalTickets = newTotal;
+            ev.TicketsAvailable = Math.Max(0, ev.TicketsAvailable + diff);
+
+            // Si tickets agotadas
+            if (ev.TicketsAvailable == 0) ev.Status = "SoldOut";
+            else if (ev.Status == "SoldOut") ev.Status = "Active";
+
+            var updated = await _eventService.UpdateEventAsync(ev);
+            var dtoOut = _mapper.Map<EventDto>(updated);
+            return Ok(dtoOut);
+        }
     }
 }

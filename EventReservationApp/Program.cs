@@ -20,7 +20,7 @@ using System.Text;
 
 try
 {
-    // Configurar Serilog antes del host
+    // Config Serilog antes del host
     Log.Logger = new LoggerConfiguration()
         .Enrich.FromLogContext()
         .WriteTo.Console(

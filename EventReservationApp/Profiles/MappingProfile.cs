@@ -10,11 +10,15 @@ namespace EventReservations.Profiles
         {
             // EVENTS
             CreateMap<Event, EventDto>();
-            CreateMap<CreateEventDto, Event>();
-            CreateMap<UpdateEventDto, Event>();
+            CreateMap<CreateEventDto, Event>()
+                .ForMember(dest => dest.TicketsAvailable, opt => opt.Ignore())
+                .ForMember(dest => dest.TotalTickets, opt => opt.MapFrom(src => src.TotalTickets))
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.EventId, opt => opt.Ignore());
+            CreateMap<UpdateEventDto, Event>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Event, UpdateEventDto>();
-
-
+                
             // RESERVATIONS
             CreateMap<Reservation, ReservationDto>()
                 .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
@@ -34,9 +38,10 @@ namespace EventReservations.Profiles
             CreateMap<User, LoginResponseDto>();
             CreateMap<User, UserDto>();
 
-
             // PAYMENTS
             CreateMap<Payment, PaymentRequestDto>().ReverseMap();
+            CreateMap<Payment, PaymentDto>().ReverseMap();
+
         }
     }
 

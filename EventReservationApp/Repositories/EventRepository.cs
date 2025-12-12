@@ -35,6 +35,7 @@ namespace EventReservations.Repositories
         {
             return await _context.Events.FindAsync(id);
         }
+
         public async Task<Event> AddAsync(Event eventModel)
         {
             _context.Events.Add(eventModel);

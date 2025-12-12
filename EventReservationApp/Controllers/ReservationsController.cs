@@ -122,10 +122,10 @@ namespace EventReservations.Controllers
         {
             try
             {
-                if (createDto == null || createDto.Amount <= 0 || string.IsNullOrEmpty(createDto.PaymentMethodId))
-                    return BadRequest(new { error = "Datos inválidos." });
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-                // Obtener el userId desde el JWT
+                // Obtener userId desde el JWT
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId == null)
                     return Unauthorized(new { error = "No se pudo obtener el usuario autenticado." });
@@ -133,7 +133,7 @@ namespace EventReservations.Controllers
                 if (!int.TryParse(userId, out var userIdInt))
                     return BadRequest(new { error = "El token contiene un UserId inválido." });
 
-                // 1) Procesar pago primero
+                // 1) Procesar pago
                 var paymentIntent = await _paymentService.ProcessStripePaymentAsync(
                     createDto.Amount,
                     createDto.Currency,
@@ -143,19 +143,20 @@ namespace EventReservations.Controllers
                 if (paymentIntent.Status != "succeeded")
                     return BadRequest(new { error = "El pago no pudo ser completado." });
 
-                // 2) Crear la reserva en BD
+                // 2) Crear reserva en BD
                 var reservation = new Reservation
                 {
-                    EventId = createDto.EventId,
                     UserId = userIdInt,
+                    EventId = createDto.EventId,
                     NumberOfTickets = createDto.NumberOfTickets,
                     ReservationDate = DateTime.UtcNow,
-                    Status = "Confirmed"
+                    Status = "Confirmed",
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 var createdReservation = await _reservationService.CreateReservationAsync(reservation);
 
-                // 3) Guardar el pago asociado a la reserva
+                // 3) Crear el pago asociado
                 var payment = new Payment
                 {
                     ReservationId = createdReservation.ReservationId,
@@ -165,11 +166,15 @@ namespace EventReservations.Controllers
                     StripePaymentIntentId = paymentIntent.Id
                 };
 
+                // 4) Mapear a DTOs usando AutoMapper
+                var reservationDto = _mapper.Map<ReservationDto>(createdReservation);
+                var paymentDto = _mapper.Map<PaymentDto>(payment);
+
                 return Ok(new
                 {
                     message = "Pago y reserva completados.",
-                    reservation = createdReservation,
-                    payment = payment
+                    reservation = reservationDto,
+                    payment = paymentDto
                 });
             }
             catch (StripeException ex)
@@ -178,9 +183,11 @@ namespace EventReservations.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = ex.ToString() });
             }
         }
+
+
 
 
 
