@@ -1,4 +1,6 @@
-﻿namespace EventReservations.Models
+﻿using EventReservations.Enums;
+
+namespace EventReservations.Models
 {
     public class Reservation
     {
@@ -7,7 +9,7 @@
         public int UserId { get; set; }  // Relación con User
         public int EventId { get; set; }  // Relación con Event
 
-        public string? Status { get; set; }  // Ej: "Pending", "Confirmed", "Cancelled"
+        public ReservationStatus Status { get; set; }  // Ej: "Pending", "Confirmed", "Cancelled"
         public DateTime ReservationDate { get; set; }  // Fecha de la reserva
         public DateTime CreatedAt { get; set; } //Fecha de creada/realizada la reserva
         public int NumberOfTickets { get; set; } // Cantidad de tickets

@@ -1,4 +1,6 @@
-﻿namespace EventReservations.Models
+﻿using EventReservations.Enums;
+
+namespace EventReservations.Models
 {
     public class Event
     {
@@ -8,7 +10,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;  // Fecha y hora del evento
         public DateTime? EventDate { get; set; } 
         public string Location { get; set; }
-        public string Status { get; set; } 
+        public EventStatus Status { get; set; }
         public decimal Price { get; set; }
         public int TicketsAvailable { get; set; }  // Número de entradas disponibles        
         public int TotalTickets { get; set; }

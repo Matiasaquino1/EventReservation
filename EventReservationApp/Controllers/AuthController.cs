@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using EventReservations.Dto;
 using EventReservations.Services; // IUserService, IJwtService
 using Microsoft.AspNetCore.Authorization;
-using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging; // Para ILogger
 using System.ComponentModel.DataAnnotations; // Para validación (si no está en DTOs)
 

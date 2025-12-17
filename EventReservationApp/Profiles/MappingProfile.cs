@@ -18,7 +18,7 @@ namespace EventReservations.Profiles
             CreateMap<UpdateEventDto, Event>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Event, UpdateEventDto>();
-                
+
             // RESERVATIONS
             CreateMap<Reservation, ReservationDto>()
                 .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
@@ -35,14 +35,16 @@ namespace EventReservations.Profiles
                 .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.EventId))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
 
-            
+
             // USERS
             CreateMap<User, UserDto>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.Role,
+                opt => opt.MapFrom(src => src.Role.ToString()))
                 .ForMember(dest => dest.Created, opt => opt.MapFrom(src => src.Created));
-            CreateMap<User, LoginResponseDto>();
-
+            CreateMap<User, LoginResponseDto>()
+                .ForMember(dest => dest.Role,
+                opt => opt.MapFrom(src => src.Role.ToString()));
             CreateMap<UserDto, User>()
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
 

@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using EventReservations.Models;
+﻿using EventReservations.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace EventReservations.Data 
 {
@@ -9,6 +10,7 @@ namespace EventReservations.Data
         {
             Database.SetCommandTimeout(180);
         }
+
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
