@@ -52,6 +52,7 @@ try
     builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
     // Services
+    builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IEventService, EventReservations.Services.EventService>();
     builder.Services.AddScoped<IReservationService, ReservationService>();
@@ -108,6 +109,13 @@ try
 
     builder.Services.AddAuthorization();
     builder.Services.AddControllers();
+
+    builder.Services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    });
 
     // Validación global
     builder.Services.Configure<ApiBehaviorOptions>(options =>

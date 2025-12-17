@@ -188,10 +188,6 @@ namespace EventReservations.Controllers
         }
 
 
-
-
-
-
         /// <summary>
         /// Obtiene todas las reservas de un usuario específico (solo el propietario o Admin).
         /// </summary>

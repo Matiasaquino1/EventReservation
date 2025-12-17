@@ -35,8 +35,17 @@ namespace EventReservations.Profiles
                 .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.EventId))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
 
+            
+            // USERS
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.Created, opt => opt.MapFrom(src => src.Created));
             CreateMap<User, LoginResponseDto>();
-            CreateMap<User, UserDto>();
+
+            CreateMap<UserDto, User>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+
 
             // PAYMENTS
             CreateMap<Payment, PaymentRequestDto>().ReverseMap();

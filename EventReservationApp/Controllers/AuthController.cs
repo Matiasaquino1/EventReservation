@@ -14,14 +14,14 @@ using System.ComponentModel.DataAnnotations; // Para validación (si no está en
 /// </summary>
 public class AuthController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IAuthService _authService;
     private readonly IJwtService _jwtService;
     private readonly IMapper _mapper;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IUserService userService, IJwtService jwtService, IMapper mapper, ILogger<AuthController> logger)
+    public AuthController(IAuthService authService, IJwtService jwtService, IMapper mapper, ILogger<AuthController> logger)
     {
-        _userService = userService;
+        _authService = authService;
         _jwtService = jwtService;
         _mapper = mapper;
         _logger = logger;
@@ -41,7 +41,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(object), 400)]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
     {
-        var registeredUser = await _userService.RegisterAsync(request);
+        var registeredUser = await _authService.RegisterAsync(request);
         if (registeredUser == null)
         {
             _logger.LogWarning("Intento de registro fallido: usuario ya existe o datos inválidos para {Email}", request.Email);
@@ -67,7 +67,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(401)]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginDto)
     {
-        var user = await _userService.LoginAsync(loginDto);
+        var user = await _authService.LoginAsync(loginDto);
         if (user == null)
         {
             _logger.LogWarning("Intento de login fallido para {Email}", loginDto.Email);
