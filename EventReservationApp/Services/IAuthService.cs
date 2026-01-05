@@ -1,6 +1,5 @@
 ﻿using BCrypt.Net;
 using EventReservations.Dto;
-using EventReservations.Enums;
 using EventReservations.Models;  
 using EventReservations.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +32,7 @@ namespace EventReservations.Services
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                Role = UserRole.User,
+                Role = "User",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Created = DateTime.UtcNow
             };

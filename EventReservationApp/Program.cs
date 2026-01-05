@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using EventReservations.Data;
-using EventReservations.Enums;
 using EventReservations.Models;
 using EventReservations.Profiles;
 using EventReservations.Repositories;
@@ -239,8 +238,7 @@ try
         var adminPassword = config["DefaultAdmin:Password"];
         var adminName = config["DefaultAdmin:Name"];
 
-        // 👇 Enum en vez de string
-        if (!context.Users.Any(u => u.Role == UserRole.Admin))
+        if (!context.Users.Any(u => u.Role == "Admin"))
         {
             var admin = new User
             {
@@ -248,8 +246,7 @@ try
                 Email = adminEmail,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
 
-                // 👇 Enum, no string
-                Role = UserRole.Admin,
+                Role = "Admin",
                 Created = DateTime.UtcNow
             };
 

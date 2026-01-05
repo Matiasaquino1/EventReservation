@@ -39,12 +39,9 @@ namespace EventReservations.Profiles
             // USERS
             CreateMap<User, UserDto>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.Role,
-                opt => opt.MapFrom(src => src.Role.ToString()))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
                 .ForMember(dest => dest.Created, opt => opt.MapFrom(src => src.Created));
-            CreateMap<User, LoginResponseDto>()
-                .ForMember(dest => dest.Role,
-                opt => opt.MapFrom(src => src.Role.ToString()));
+            CreateMap<User, LoginResponseDto>();
             CreateMap<UserDto, User>()
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
