@@ -1,4 +1,5 @@
-﻿using EventReservations.Dto;
+﻿using EventReservations.Data;
+using EventReservations.Dto;
 using EventReservations.Models;
 using EventReservations.Repositories;
 using Microsoft.AspNetCore.SignalR;
@@ -35,12 +36,18 @@ namespace EventReservations.Services
 
     public class ReservationService : IReservationService
     {
-        private readonly IReservationRepository _reservationRepository;  // Inyecta el repositorio
-        private readonly IEventRepository _eventRepository;  // Para verificar y actualizar eventos
+        private readonly ApplicationDbContext _context;
+        private readonly IReservationRepository _reservationRepository;
+        private readonly IEventRepository _eventRepository;
         private readonly ILogger<ReservationService> _logger;
 
-        public ReservationService(IReservationRepository reservationRepository, IEventRepository eventRepository, ILogger<ReservationService> logger)
+        public ReservationService(
+            ApplicationDbContext context,
+            IReservationRepository reservationRepository,
+            IEventRepository eventRepository,
+            ILogger<ReservationService> logger)
         {
+            _context = context;
             _reservationRepository = reservationRepository;
             _eventRepository = eventRepository;
             _logger = logger;
@@ -127,25 +134,45 @@ namespace EventReservations.Services
 
         public async Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId)
         {
-            var reservation = await _reservationRepository.GetByIdAsync(reservationId);
-            if (reservation == null || reservation.Status != "Pending") return;
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
-            if (eventModel == null) return;
+            try
+            {
+                var reservation = await _reservationRepository.GetByIdAsync(reservationId);
+                if (reservation == null || reservation.Status != "Pending")
+                    throw new InvalidOperationException("Reserva inválida.");
 
-            if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
-                throw new InvalidOperationException("Entradas insuficientes al confirmar el pago.");
+                var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
+                if (eventModel == null)
+                    throw new InvalidOperationException("Evento no encontrado.");
 
-            eventModel.TicketsAvailable -= reservation.NumberOfTickets;
+                if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
+                    throw new InvalidOperationException("Entradas insuficientes.");
 
-            if (eventModel.TicketsAvailable == 0)
-                eventModel.Status = "SoldOut";
+                // 1️⃣ Descontar tickets
+                eventModel.TicketsAvailable -= reservation.NumberOfTickets;
+                if (eventModel.TicketsAvailable == 0)
+                    eventModel.Status = "SoldOut";
 
-            await _eventRepository.UpdateAsync(eventModel);
+                // 2️⃣ Confirmar reserva
+                reservation.Status = "Confirmed";
 
-            reservation.Status = "Confirmed";
-            await UpdateReservationAsync(reservation);
+                // 3️⃣ Guardar todo junto
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                _logger.LogInformation(
+                    "Pago confirmado y tickets descontados. Reserva {ReservationId}",
+                    reservationId
+                );
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
+
 
 
         public async Task<Reservation> GetReservationAsync(int id) 

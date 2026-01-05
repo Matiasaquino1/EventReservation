@@ -27,7 +27,6 @@ namespace EventReservations.Repositories
                 // Lógica simple: marca como confirmado 
                 eventModel.Status = "Confirmed";  
                 _context.Events.Update(eventModel);
-                await _context.SaveChangesAsync();
             }
             return eventModel;
         }
@@ -39,14 +38,12 @@ namespace EventReservations.Repositories
         public async Task<Event> AddAsync(Event eventModel)
         {
             _context.Events.Add(eventModel);
-            await _context.SaveChangesAsync();
             return eventModel;
         }
 
         public async Task<Event> UpdateAsync(Event eventModel)
         {
             _context.Events.Update(eventModel);  
-            await _context.SaveChangesAsync();  
             return eventModel; 
         }
 
@@ -55,8 +52,7 @@ namespace EventReservations.Repositories
             var eventModel = await _context.Events.FindAsync(id);  
             if (eventModel != null)
             {
-                _context.Events.Remove(eventModel);
-                await _context.SaveChangesAsync();  
+                _context.Events.Remove(eventModel); 
             }
         }
 

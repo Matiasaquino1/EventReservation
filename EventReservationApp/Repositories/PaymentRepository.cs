@@ -15,13 +15,11 @@ namespace EventReservations.Repositories
         public async Task<Payment> AddAsync(Payment payment)
         {
             _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
             return payment;
         }
         public async Task<Payment> UpdateAsync(Payment payment)
         {
             _context.Payments.Update(payment);
-            await _context.SaveChangesAsync();
             return payment;
         }
         public async Task DeleteAsync(int id)
@@ -30,7 +28,6 @@ namespace EventReservations.Repositories
             if (payment != null)
             {
                 _context.Payments.Remove(payment);
-                await _context.SaveChangesAsync();
             }
         }
 

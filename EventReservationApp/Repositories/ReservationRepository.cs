@@ -154,5 +154,6 @@ namespace EventReservations.Repositories
                 TotalCount = totalCount
             };
         }
+
     }
 }
