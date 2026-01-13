@@ -18,13 +18,13 @@ export const routes: Routes = [
   { path: 'my-reservations', component: MyReservationsComponent, canActivate: [AuthGuard] },
   { path: 'reservations/create', component: ReservationCreateComponent, canActivate: [AuthGuard] },
   {
-    path: 'admin',
-    canActivate: [RoleGuard],
-    data: { roles: ['Admin'] },
-    children: [
-      { path: 'users', component: UsersComponent },
-      { path: 'reservations', component: ReservationsAdminComponent }
-    ]
-  },
+  path: 'admin',
+  canActivate: [AuthGuard, RoleGuard],
+  data: { roles: ['Admin'] },
+  children: [
+    { path: 'users', component: UsersComponent },
+    { path: 'reservations', component: ReservationsAdminComponent }
+  ]
+},
   { path: '**', redirectTo: '' }
 ];

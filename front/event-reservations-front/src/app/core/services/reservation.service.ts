@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../enviroments/environment';
+import { environment } from '../../../environments/environment';
 import { Reservation } from '../models/reservation.model';
 import { AuthService } from './auth.service';
 
@@ -12,7 +12,9 @@ export class ReservationService {
   }
 
   getMyReservations(): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(`${environment.apiUrl}/Reservations/users/${this.authService.currentUser?.id}`);
+    return this.http.get<Reservation[]>(
+    `${environment.apiUrl}/Reservations/my`
+    );
   }
 
   getReservations(filters?: { status?: string; eventId?: number }, page = 1, limit = 10): Observable<{ reservations: Reservation[]; total: number }> {

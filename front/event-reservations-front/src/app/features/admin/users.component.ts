@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { environment } from '../../../enviroments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-users',

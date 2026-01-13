@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../enviroments/environment';
+import { environment } from '../../../environments/environment';
 import { Event } from '../models/event.model';
 import { EventFilters } from '../models/event-filters.model';
 import { PagedEvents } from '../models/paged-events.model';
@@ -9,11 +9,11 @@ import { PagedEvents } from '../models/paged-events.model';
 @Injectable({ providedIn: 'root' })
 export class EventService {
 
-  private readonly apiUrl = '/api/events';
+  private readonly apiUrl = `${environment.apiUrl}/Events`;
 
   constructor(private http: HttpClient) {}
 
-  getEvents(filters: EventFilters): Observable<PagedEvents> {
+  getEvents(filters: EventFilters) {
     let params = new HttpParams();
 
     Object.entries(filters).forEach(([key, value]) => {
@@ -25,19 +25,19 @@ export class EventService {
     return this.http.get<PagedEvents>(this.apiUrl, { params });
   }
 
-  getEvent(id: number): Observable<Event> {
+  getEvent(id: number) {
     return this.http.get<Event>(`${environment.apiUrl}/Events/${id}`);
   }
 
-  createEvent(event: Partial<Event>): Observable<Event> {
+  createEvent(event: Partial<Event>){
     return this.http.post<Event>(`${environment.apiUrl}/Events`, event);
   }
 
-  updateEvent(id: number, event: Partial<Event>): Observable<Event> {
+  updateEvent(id: number, event: Partial<Event>) {
     return this.http.put<Event>(`${environment.apiUrl}/Events/${id}`, event);
   }
 
-  deleteEvent(id: number): Observable<void> {
+  deleteEvent(id: number){
     return this.http.delete<void>(`${environment.apiUrl}/Events/${id}`);
   }
 }

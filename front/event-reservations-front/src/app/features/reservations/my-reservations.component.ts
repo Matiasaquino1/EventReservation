@@ -4,12 +4,13 @@ import { Reservation } from '../../core/models/reservation.model';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 
 @Component({
   selector: 'app-my-reservations',
   standalone: true,
-  imports: [CommonModule, MatButtonModule],
+  imports: [CommonModule, MatButtonModule, MatDialogModule],
   template: `
     <h2>Mis Reservas</h2>
     <div *ngFor="let res of reservations" class="card">
@@ -35,7 +36,9 @@ export class MyReservationsComponent implements OnInit {
       data: { title: 'Cancelar Reserva', message: '¿Estás seguro?' }
     });
     dialogRef.afterClosed().subscribe(result => {
-      if (result) this.reservationService.cancelReservation(id).subscribe(() => this.ngOnInit());
+      if (result) this.reservationService.cancelReservation(id).subscribe(() => {
+        this.reservations = this.reservations.filter(r => r.reservationId !== id);
+      });
     });
   }
 }

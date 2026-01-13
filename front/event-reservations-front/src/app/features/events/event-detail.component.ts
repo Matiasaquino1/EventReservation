@@ -15,7 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
     <div *ngIf="event">
       <h2>{{ event.title }}</h2>
       <p>{{ event.description }}</p>
-      <p>Fecha: {{ event.eventDate | date }}</p>
+      <p>Fecha: {{ event.eventDate | date:'shortDate' }} </p>
       <p>Ubicación: {{ event.location }}</p>
       <p>Precio: {{ event.price }}</p>
       <p>Disponibles: {{ event.ticketsAvailable }}</p>

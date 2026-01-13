@@ -7,8 +7,8 @@ export interface Reservation {
   userId: number;
   eventId: number;
   status?: string;
-  reservationDate: Date;
-  createdAt: Date;
+  reservationDate: String;
+  createdAt: String;
   numberOfTickets: number;
   user?: User;
   event?: Event;

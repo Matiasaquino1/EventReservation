@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { loadStripe } from '@stripe/stripe-js';
-import { environment } from '../../../enviroments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-reservation-create',

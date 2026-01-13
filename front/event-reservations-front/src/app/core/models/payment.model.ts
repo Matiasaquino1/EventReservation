@@ -5,7 +5,7 @@ export interface Payment {
   reservationId: number;
   status: string;
   amount: number;
-  paymentDate: Date;
+  paymentDate: String;
   stripePaymentIntentId: string;
   reservation?: Reservation;
 }
