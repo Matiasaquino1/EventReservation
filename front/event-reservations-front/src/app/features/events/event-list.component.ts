@@ -24,7 +24,7 @@ import { Event } from '../../core/models/event.model';
       <div class="card">
         <h3>{{ event.title }}</h3>
         <p>{{ event.description }}</p>
-        <p>Fecha: {{ event.eventDate | date:'shortDate' }}</p>
+        <p>Fecha: {{ event.eventDate ? (event.eventDate | date:'shortDate') : '-' }}</p>
         <p>Precio: {{ event.price }}</p>
         <p>Disponibles: {{ event.ticketsAvailable }}</p>
         <a [routerLink]="['/events', event.eventId]">Ver Detalle</a>

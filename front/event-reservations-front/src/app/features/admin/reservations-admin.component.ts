@@ -5,16 +5,15 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
-import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
 
 
 @Component({
   selector: 'app-reservations-admin',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatPaginatorModule, FormsModule, MatSelectModule],
+  imports: [CommonModule, MatTableModule, MatButtonModule, MatPaginatorModule, FormsModule, MatSelectModule, MatFormFieldModule],
   template: `
     <h2>Administrar Reservas</h2>
     <div>
@@ -57,12 +56,13 @@ import { HttpClient } from '@angular/common/http';
 export class ReservationsAdminComponent implements OnInit {
   reservations: Reservation[] = [];
   displayedColumns = ['user', 'event', 'status', 'actions'];
-  filters = { status: '', eventId: 0 };
+  filters: { status?: string; eventId?: number } = {};
   page = 1;
   limit = 10;
   total = 0;
 
-  constructor(private reservationService: ReservationService, private http: HttpClient) {}
+
+  constructor(private reservationService: ReservationService) {}
 
   ngOnInit() {
     this.loadReservations();
@@ -76,8 +76,10 @@ export class ReservationsAdminComponent implements OnInit {
   }
 
   forceConfirm(eventId: number) {
-    this.http.post(`${environment.apiUrl}/Admin/events/${eventId}/force-confirm`, {}).subscribe(() => this.loadReservations());
+    this.reservationService.forceConfirm(eventId)
+    .subscribe(() => this.loadReservations());
   }
+
 
   onPageChange(event: PageEvent) {
     this.page = event.pageIndex + 1;

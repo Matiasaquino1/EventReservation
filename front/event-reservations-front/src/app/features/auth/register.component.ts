@@ -29,6 +29,10 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    this.authService.register(this.form.value).subscribe(() => this.router.navigate(['/login']));
+    this.authService.register(this.form.value).subscribe({
+      next: () => this.router.navigate(['/login']),
+      error: err => console.error(err)
+    });
   }
+
 }

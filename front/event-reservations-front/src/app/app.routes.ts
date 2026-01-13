@@ -17,6 +17,7 @@ export const routes: Routes = [
   { path: 'events/:id', component: EventDetailComponent },
   { path: 'my-reservations', component: MyReservationsComponent, canActivate: [AuthGuard] },
   { path: 'reservations/create', component: ReservationCreateComponent, canActivate: [AuthGuard] },
+  {path: 'reservations/create/:eventId', component: ReservationCreateComponent, canActivate: [AuthGuard]},
   {
   path: 'admin',
   canActivate: [AuthGuard, RoleGuard],

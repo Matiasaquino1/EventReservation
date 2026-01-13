@@ -28,5 +28,14 @@ export class ReservationService {
     return this.http.put<void>(`${environment.apiUrl}/Reservations/${id}/cancel`, {});
   }
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  forceConfirm(eventId: number) {
+    return this.http.post(
+      `${environment.apiUrl}/Admin/events/${eventId}/force-confirm`,
+      {}
+    );
+  }
+  
+  constructor(
+  private reservationService: ReservationService,
+  private http: HttpClient) {}
 }

@@ -4,8 +4,8 @@ export interface Event {
   eventId: number;
   title: string;
   description?: string;
-  createdAt: String;
-  eventDate?: String;
+  createdAt: string;
+  eventDate?: string;
   location: string;
   status: string;
   price: number;

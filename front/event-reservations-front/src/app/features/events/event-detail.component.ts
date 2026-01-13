@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+
 import { EventService } from '../../core/services/event.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Event } from '../../core/models/event.model';
-import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-event-detail',
@@ -15,22 +15,51 @@ import { MatButtonModule } from '@angular/material/button';
     <div *ngIf="event">
       <h2>{{ event.title }}</h2>
       <p>{{ event.description }}</p>
-      <p>Fecha: {{ event.eventDate | date:'shortDate' }} </p>
+
+      <p>
+        Fecha:
+        {{ event.eventDate
+          ? (event.eventDate | date:'shortDate')
+          : '-' }}
+      </p>
+
       <p>Ubicación: {{ event.location }}</p>
       <p>Precio: {{ event.price }}</p>
       <p>Disponibles: {{ event.ticketsAvailable }}</p>
-      <button mat-raised-button color="primary" [routerLink]="['/reservations/create', { eventId: event.eventId }]" *ngIf="authService.currentUser">Reservar</button>
-      <button mat-raised-button *ngIf="authService.hasRole('Organizer') || authService.hasRole('Admin')" [routerLink]="['/admin/events', event.eventId]">Editar</button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        *ngIf="authService.currentUser"
+        [routerLink]="['/reservations/create']"
+        [queryParams]="{ eventId: event.eventId }">
+        Reservar
+      </button>
+
+      <button
+        mat-raised-button
+        *ngIf="authService.hasRole('Organizer') || authService.hasRole('Admin')"
+        [routerLink]="['/admin/events', event.eventId]">
+        Editar
+      </button>
     </div>
   `
 })
 export class EventDetailComponent implements OnInit {
+
   event: Event | null = null;
 
-  constructor(private route: ActivatedRoute, private eventService: EventService, public authService: AuthService, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private eventService: EventService,
+    public authService: AuthService
+  ) {}
 
-  ngOnInit() {
-    const id = +this.route.snapshot.paramMap.get('id')!;
-    this.eventService.getEvent(id).subscribe(e => this.event = e);
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (!id) return;
+
+    this.eventService.getEvent(id)
+      .subscribe(e => this.event = e);
   }
 }
