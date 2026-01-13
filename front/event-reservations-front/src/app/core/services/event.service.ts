@@ -3,16 +3,26 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../enviroments/environment';
 import { Event } from '../models/event.model';
+import { EventFilters } from '../models/event-filters.model';
+import { PagedEvents } from '../models/paged-events.model';
 
 @Injectable({ providedIn: 'root' })
 export class EventService {
-  getEvents(filters?: { date?: string; location?: string; minTickets?: number; maxPrice?: number }, page = 1, limit = 10): Observable<{ events: Event[]; total: number }> {
-    let params = new HttpParams().set('page', page).set('limit', limit);
-    if (filters?.date) params = params.set('date', filters.date);
-    if (filters?.location) params = params.set('location', filters.location);
-    if (filters?.minTickets) params = params.set('minTickets', filters.minTickets);
-    if (filters?.maxPrice) params = params.set('maxPrice', filters.maxPrice);
-    return this.http.get<{ events: Event[]; total: number }>(`${environment.apiUrl}/Events`, { params });
+
+  private readonly apiUrl = '/api/events';
+
+  constructor(private http: HttpClient) {}
+
+  getEvents(filters: EventFilters): Observable<PagedEvents> {
+    let params = new HttpParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
+
+    return this.http.get<PagedEvents>(this.apiUrl, { params });
   }
 
   getEvent(id: number): Observable<Event> {
@@ -30,6 +40,4 @@ export class EventService {
   deleteEvent(id: number): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/Events/${id}`);
   }
-
-  constructor(private http: HttpClient) {}
 }
