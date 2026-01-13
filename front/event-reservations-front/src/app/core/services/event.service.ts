@@ -13,7 +13,7 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
-  getEvents(filters: EventFilters) {
+  getEvents(filters: EventFilters): Observable<PagedEvents> {
     let params = new HttpParams();
 
     Object.entries(filters).forEach(([key, value]) => {
@@ -22,7 +22,7 @@ export class EventService {
       }
     });
 
-    return this.http.get<PagedEvents>(this.apiUrl, { params });
+    return this.http.get<PagedEvents>(`${environment.apiUrl}, ${ params }`);
   }
 
   getEvent(id: number) {

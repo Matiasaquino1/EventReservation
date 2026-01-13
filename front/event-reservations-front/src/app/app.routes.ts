@@ -11,14 +11,14 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', component: EventListComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'events/:id', component: EventDetailComponent },
-  { path: 'my-reservations', component: MyReservationsComponent, canActivate: [AuthGuard] },
-  { path: 'reservations/create', component: ReservationCreateComponent, canActivate: [AuthGuard] },
-  {path: 'reservations/create/:eventId', component: ReservationCreateComponent, canActivate: [AuthGuard]},
-  {
+  { path: '', loadComponent: () => import('./features/events/event-list.component').then(m => m.EventListComponent) },
+  { path: 'login', loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent) },
+  { path: 'register', loadComponent: () => import('./features/auth/register.component').then(m => m.RegisterComponent) },
+  { path: 'events/:id', loadComponent: () => import('./features/events/event-detail.component').then(m => m.EventDetailComponent) },
+  { path: 'my-reservations', loadComponent: () => import('./features/reservations/my-reservations.component').then(m => m.MyReservationsComponent),},
+  { path: 'reservations/create', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent),},
+  { path: 'reservations/create/:eventId', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent),},
+{
   path: 'admin',
   canActivate: [AuthGuard, RoleGuard],
   data: { roles: ['Admin'] },

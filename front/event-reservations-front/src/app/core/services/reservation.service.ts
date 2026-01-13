@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Reservation } from '../models/reservation.model';
-import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class ReservationService {
@@ -34,7 +33,7 @@ export class ReservationService {
       {}
     );
   }
-  
+
   constructor(
   private reservationService: ReservationService,
   private http: HttpClient) {}

@@ -20,26 +20,19 @@ using System.Text;
 
 try
 {
-    // Config Serilog antes del host
     Log.Logger = new LoggerConfiguration()
         .Enrich.FromLogContext()
-        .WriteTo.Console(
-            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}"
-        )
-        .WriteTo.File("logs/app_log.txt",
-            rollingInterval: RollingInterval.Day,
-            retainedFileCountLimit: 7,
-            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}"
-        )
+        .WriteTo.Console()
+        .WriteTo.File("logs/app_log.txt", rollingInterval: RollingInterval.Day)
         .MinimumLevel.Information()
         .CreateLogger();
 
-    Log.Information("Iniciando aplicación...");
-
     var builder = WebApplication.CreateBuilder(args);
-
-    // Serilog como logger principal
     builder.Host.UseSerilog();
+
+    // =========================
+    // SERVICES
+    // =========================
 
     // DbContext
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -57,59 +50,49 @@ try
     builder.Services.AddScoped<IEventService, EventReservations.Services.EventService>();
     builder.Services.AddScoped<IReservationService, ReservationService>();
     builder.Services.AddScoped<IPaymentService, PaymentService>();
-
-    builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-    // JWT config
-    var jwtSettings = builder.Configuration.GetSection("Jwt");
-    var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
-
-    builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ClockSkew = TimeSpan.Zero,
-            RoleClaimType = ClaimTypes.Role
-        };
-    });
-
-    // Servicio de tokens
     builder.Services.AddSingleton<IJwtService, JwtService>();
 
-    // Stripe
-    StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+    // AutoMapper
+    builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-    //Cors config 
+    // CORS
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowFrontend", policy =>
         {
-            policy.WithOrigins(
-                "http://localhost:5173",   // frontend local (React/Vite)
-                "http://localhost:4200"    // opcional: Angular
-                                           // "https://tudominio.com" // 
-            )
+            policy
+            .WithOrigins("http://localhost:4200", "http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
         });
     });
 
+    // JWT
+    var jwtSettings = builder.Configuration.GetSection("Jwt");
+    var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
+
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                RoleClaimType = ClaimTypes.Role,
+                ClockSkew = TimeSpan.Zero
+            };
+        });
+
     builder.Services.AddAuthorization();
     builder.Services.AddControllers();
 
+    // API Versioning
     builder.Services.AddApiVersioning(options =>
     {
         options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -117,157 +100,71 @@ try
         options.ReportApiVersions = true;
     });
 
-    // Validación global
-    builder.Services.Configure<ApiBehaviorOptions>(options =>
-    {
-        options.InvalidModelStateResponseFactory = context =>
-        {
-            var errors = context.ModelState
-                .Where(x => x.Value?.Errors.Count > 0)
-                .Select(x => new
-                {
-                    Field = x.Key,
-                    Errors = x.Value!.Errors.Select(e => e.ErrorMessage)
-                });
-
-            return new BadRequestObjectResult(new
-            {
-                statusCode = 400,
-                message = "Error de validación de datos.",
-                details = errors
-            });
-        };
-    });
-
     // Swagger
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(options =>
     {
-        options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-        {
-            Title = "Event Reservation API",
-            Version = "v1",
-            Description = "API para reservas de eventos con autenticación JWT, pagos Stripe y gestión de usuarios/organizadores."
-        });
-
-        var securitySchema = new OpenApiSecurityScheme
-        {
-            Name = "Authorization",
-            Description = "Ingrese 'Bearer <token>'",
-            In = ParameterLocation.Header,
-            Type = SecuritySchemeType.Http,
-            Scheme = "bearer",
-            BearerFormat = "JWT",
-            Reference = new OpenApiReference
-            {
-                Type = ReferenceType.SecurityScheme,
-                Id = "Bearer"
-            }
-        };
-        
-        options.AddSecurityDefinition("Bearer", securitySchema);
-
-        options.AddSecurityRequirement(new OpenApiSecurityRequirement
-        {
-            {
-                securitySchema,
-                new string[] {}
-            }
-        });
-
-        var xmlFile = "EventReservations.xml";
-        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-        if (System.IO.File.Exists(xmlPath))
-            options.IncludeXmlComments(xmlPath);
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header
     });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+    });
+
+    // Stripe
+    StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
     var app = builder.Build();
 
-    // Middleware global de manejo de errores (reemplaza UseExceptionHandler("/error"))
+    // =========================
+    // MIDDLEWARE
+    // =========================
+
     app.UseExceptionHandler(errorApp =>
     {
         errorApp.Run(async context =>
         {
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            context.Response.ContentType = "application/json";
-
-            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-            var error = exceptionHandlerPathFeature?.Error;
-
-            Log.Error(error, "Error no controlado");
-
+            context.Response.StatusCode = 500;
             await context.Response.WriteAsJsonAsync(new { error = "Error interno del servidor" });
         });
     });
 
-    app.UseStatusCodePages();
+    app.UseHttpsRedirection();
+    app.UseRouting();
 
+    app.UseCors("AllowFrontend");
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+    
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Event Reservation API v1");
-            options.EnablePersistAuthorization();
-            options.RoutePrefix = string.Empty;
-        });
+        app.UseSwaggerUI();
     }
-
-    // Simulación de usuario en entorno Testing
-    if (app.Environment.IsEnvironment("Testing"))
-    {
-        app.Use(async (context, next) =>
-        {
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, "testuser"),
-                new Claim(ClaimTypes.Role, "User")
-            };
-            var identity = new ClaimsIdentity(claims, "TestAuth");
-            context.User = new ClaimsPrincipal(identity);
-            await next();
-        });
-    }
-
-    using (var scope = app.Services.CreateScope())
-    {
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-        var adminEmail = config["DefaultAdmin:Email"];
-        var adminPassword = config["DefaultAdmin:Password"];
-        var adminName = config["DefaultAdmin:Name"];
-
-        if (!context.Users.Any(u => u.Role == "Admin"))
-        {
-            var admin = new User
-            {
-                Name = adminName,
-                Email = adminEmail,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
-
-                Role = "Admin",
-                Created = DateTime.UtcNow
-            };
-
-            context.Users.Add(admin);
-            context.SaveChanges();
-
-            Console.WriteLine("Admin inicial creado.");
-        }
-    }
-
-    app.UseHttpsRedirection();
-    app.UseAuthentication();
-    app.UseAuthorization();
 
     app.MapControllers();
-
+    
     Log.Information("Aplicación iniciada correctamente");
     app.Run();
-
-
-
 }
 catch (Exception ex)
 {
@@ -278,6 +175,6 @@ finally
     Log.CloseAndFlush();
 }
 
-// testing con WebApplicationFactory
 public partial class Program { }
+
 
