@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EventReservationApp\EventReservations.csproj" />
+	  <ProjectReference Include="..\..\src\EventReservations.Api\EventReservations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

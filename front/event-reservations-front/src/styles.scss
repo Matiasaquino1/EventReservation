@@ -1,1 +1,14 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+// Variables globales (si las tienes)
+$primary-color: #1976d2;
+
+// Estilos globales
+body {
+  margin: 0;
+  font-family: Roboto, sans-serif;
+  background: #f5f7fa;
+}
+
+// Incluye temas de Material (opcional, pero recomendado para UI limpia)
+@include mat.core();
