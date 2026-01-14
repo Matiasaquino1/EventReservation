@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly baseUrl = `${environment.apiUrl}/api/Auth`;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -20,7 +21,7 @@ export class AuthService {
 }
 
   login(credentials: { email: string; password: string }) {
-    return this.http.post(`${environment.apiUrl}/Auth/login`, credentials).pipe(
+    return this.http.post(`${this.baseUrl}/login`, credentials).pipe(
       tap((res: any) => {
         localStorage.setItem('token', res.token);
 
@@ -31,7 +32,7 @@ export class AuthService {
   }
 
   register(user: { username: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/Auth/register`, user);
+    return this.http.post(`${this.baseUrl}/register`, user);
   }
 
   logout(): void {

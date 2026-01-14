@@ -34,6 +34,8 @@ try
     // SERVICES
     // =========================
 
+    builder.Services.AddControllers();
+
     // DbContext
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -68,6 +70,15 @@ try
         });
     });
 
+    builder.Services.AddAuthorization();
+
+    builder.Services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    });
+
     // JWT
     var jwtSettings = builder.Configuration.GetSection("Jwt");
     var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
@@ -89,8 +100,6 @@ try
             };
         });
 
-    builder.Services.AddAuthorization();
-    builder.Services.AddControllers();
 
     // API Versioning
     builder.Services.AddApiVersioning(options =>

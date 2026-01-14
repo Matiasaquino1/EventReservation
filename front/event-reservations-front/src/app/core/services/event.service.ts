@@ -9,7 +9,7 @@ import { PagedEvents } from '../models/paged-events.model';
 @Injectable({ providedIn: 'root' })
 export class EventService {
 
-  private readonly apiUrl = `${environment.apiUrl}/Events`;
+  private readonly apiUrl = `${environment.apiUrl}/api/Events`;
 
   constructor(private http: HttpClient) {}
 
@@ -22,22 +22,22 @@ export class EventService {
       }
     });
 
-    return this.http.get<PagedEvents>(`${environment.apiUrl}, ${ params }`);
+    return this.http.get<PagedEvents>(this.apiUrl, { params });
   }
 
   getEvent(id: number) {
-    return this.http.get<Event>(`${environment.apiUrl}/Events/${id}`);
+    return this.http.get<Event>(`${this.apiUrl}/${id}`);
   }
 
-  createEvent(event: Partial<Event>){
-    return this.http.post<Event>(`${environment.apiUrl}/Events`, event);
+  createEvent(event: Partial<Event>) {
+    return this.http.post<Event>(this.apiUrl, event);
   }
 
   updateEvent(id: number, event: Partial<Event>) {
-    return this.http.put<Event>(`${environment.apiUrl}/Events/${id}`, event);
+    return this.http.put<Event>(`${this.apiUrl}/${id}`, event);
   }
 
-  deleteEvent(id: number){
-    return this.http.delete<void>(`${environment.apiUrl}/Events/${id}`);
+  deleteEvent(id: number) {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
