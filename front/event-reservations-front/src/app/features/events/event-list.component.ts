@@ -11,32 +11,17 @@ import { Event } from '../../core/models/event.model';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <div *ngIf="loading">Loading...</div>
+    <div *ngFor="let event of events" class="card">
+      <h3>{{ event.title }}</h3>
 
-    <div>
-      <input [(ngModel)]="filters.location" placeholder="Ubicación">
-      <input [(ngModel)]="filters.date" type="date">
-      <input [(ngModel)]="filters.maxPrice" type="number" placeholder="Precio máximo">
-      <button (click)="loadEvents()">Filtrar</button>
+      <button
+        mat-button
+        color="primary"
+        [routerLink]="['/events', event.eventId]">
+        Ver detalle
+      </button>
     </div>
-
-    <div *ngFor="let event of events">
-      <div class="card">
-        <h3>{{ event.title }}</h3>
-        <p>{{ event.description }}</p>
-        <p>Fecha: {{ event.eventDate ? (event.eventDate | date:'shortDate') : '-' }}</p>
-        <p>Precio: {{ event.price }}</p>
-        <p>Disponibles: {{ event.ticketsAvailable }}</p>
-        <a [routerLink]="['/events', event.eventId]">Ver Detalle</a>
-      </div>
-    </div>
-
-    <button (click)="prevPage()" [disabled]="page === 1">Anterior</button>
-    <button (click)="nextPage()" [disabled]="page * limit >= total">Siguiente</button>
-  `,
-  styles: [
-    '.card { border: 1px solid #ccc; padding: 1rem; margin: 1rem; }'
-  ]
+  `
 })
 export class EventListComponent implements OnInit {
 
