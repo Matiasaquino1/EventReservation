@@ -1,5 +1,5 @@
 import { User } from './user.model';
-import { Event } from './event.model';
+import { EventModel } from './event.model';
 import { Payment } from './payment.model';
 
 export interface Reservation {
@@ -11,6 +11,6 @@ export interface Reservation {
   createdAt: string;
   numberOfTickets: number;
   user?: User;
-  event?: Event;
+  event?: EventModel;
   payments?: Payment[];
 }

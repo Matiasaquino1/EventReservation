@@ -11,7 +11,7 @@ import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { ReservationService } from '../../core/services/reservation.service';
 import { PaymentService } from '../../core/services/payment.service';
 import { EventService } from '../../core/services/event.service';
-import { Event } from '../../core/models/event.model';
+import { EventModel } from '../../core/models/event.model';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -58,7 +58,7 @@ import { environment } from '../../../environments/environment';
 export class ReservationCreateComponent implements OnInit {
 
   form!: FormGroup;
-  event!: Event;
+  event!: EventModel;
   stripe!: Stripe | null;
   submitting = false;
 

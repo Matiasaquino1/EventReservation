@@ -1,6 +1,6 @@
-import { Event } from './event.model';
+import { EventModel } from './event.model';
 
 export interface PagedEvents {
-  events: Event[];
+  events: EventModel[];
   total: number;
 }

@@ -1,6 +1,6 @@
 import { Reservation } from './reservation.model';
 
-export interface Event {
+export interface EventModel {
   eventId: number;
   title: string;
   description?: string;

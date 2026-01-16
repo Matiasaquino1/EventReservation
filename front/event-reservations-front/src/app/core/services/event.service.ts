@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Event } from '../models/event.model';
+import { EventModel } from '../models/event.model';
 import { EventFilters } from '../models/event-filters.model';
 import { PagedEvents } from '../models/paged-events.model';
 
@@ -13,7 +13,7 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
-  getEvents(filters: EventFilters): Observable<PagedEvents> {
+  getEvents(filters: EventFilters): Observable<EventModel[]> {
     let params = new HttpParams();
 
     Object.entries(filters).forEach(([key, value]) => {
@@ -22,19 +22,19 @@ export class EventService {
       }
     });
 
-    return this.http.get<PagedEvents>(this.apiUrl, { params });
+    return this.http.get<EventModel[]>(this.apiUrl, { params });
   }
 
   getEvent(id: number) {
-    return this.http.get<Event>(`${this.apiUrl}/${id}`);
+    return this.http.get<EventModel>(`${this.apiUrl}/${id}`);
   }
 
-  createEvent(event: Partial<Event>) {
-    return this.http.post<Event>(this.apiUrl, event);
+  createEvent(event: Partial<EventModel>) {
+    return this.http.post<EventModel>(this.apiUrl, event);
   }
 
-  updateEvent(id: number, event: Partial<Event>) {
-    return this.http.put<Event>(`${this.apiUrl}/${id}`, event);
+  updateEvent(id: number, event: Partial<EventModel>) {
+    return this.http.put<EventModel>(`${this.apiUrl}/${id}`, event);
   }
 
   deleteEvent(id: number) {

@@ -11,7 +11,13 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./features/events/event-list.component').then(m => m.EventListComponent) },
+  {
+  path: '',
+  pathMatch: 'full',
+  loadComponent: () =>
+    import('./features/events/event-list.component')
+      .then(m => m.EventListComponent)
+  },
   { path: 'login', loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./features/auth/register.component').then(m => m.RegisterComponent) },
   { path: 'events/:id', loadComponent: () => import('./features/events/event-detail.component').then(m => m.EventDetailComponent) },

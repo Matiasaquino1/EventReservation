@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 
 import { EventService } from '../../core/services/event.service';
-import { Event } from '../../core/models/event.model';
+import { EventModel } from '../../core/models/event.model';
 
 @Component({
   selector: 'app-event-admin',
@@ -90,7 +90,7 @@ export class EventAdminComponent implements OnInit {
   onSubmit(): void {
     const formValue = this.form.value;
 
-    const payload: Partial<Event> = {
+    const payload: Partial<EventModel> = {
       ...formValue,
       eventDate: formValue.eventDate
         ? new Date(formValue.eventDate).toISOString()
