@@ -21,6 +21,24 @@
   gap: 1.5rem;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pagination button {
+  padding: .5rem 1rem;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
 .card {
   padding: 1rem;
   border-radius: 8px;

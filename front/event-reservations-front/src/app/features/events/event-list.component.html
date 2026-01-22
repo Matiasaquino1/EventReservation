@@ -47,3 +47,20 @@
   </div>
 </div>
 
+<div class="pagination" *ngIf="events.length > 0">
+
+  <button
+    (click)="prevPage()"
+    [disabled]="filters.page === 1">
+    ◀ Anterior
+  </button>
+
+  <span>Página {{ filters.page }}</span>
+
+  <button (click)="nextPage()">
+    Siguiente ▶
+  </button>
+
+</div>
+
+
