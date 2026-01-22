@@ -1,0 +1,49 @@
+<h1>Eventos disponibles</h1>
+
+<form class="filters" (ngSubmit)="onSearch()">
+
+  <input
+    type="text"
+    placeholder="Ubicación"
+    [(ngModel)]="filters.location"
+    name="location" />
+
+  <input
+    type="date"
+    [(ngModel)]="filters.date"
+    name="date" />
+
+  <input
+    type="number"
+    placeholder="Entradas mínimas"
+    [(ngModel)]="filters.minTickets"
+    name="minTickets" />
+
+  <input
+    type="number"
+    placeholder="Precio máximo"
+    [(ngModel)]="filters.maxPrice"
+    name="maxPrice" />
+
+  <button type="submit">Buscar</button>
+  <button type="button" (click)="onReset()">Limpiar</button>
+
+</form>
+
+<p *ngIf="!loading && events.length === 0">
+  No hay eventos disponibles
+</p>
+
+<div class="grid" *ngIf="!loading && events.length > 0">
+  <div class="card" *ngFor="let event of events">
+    <h3>{{ event.title }}</h3>
+    <p>{{ event.location }}</p>
+    <p>{{ event.eventDate | date:'shortDate' }}</p>
+    <p class="price">$ {{ event.price }}</p>
+
+    <a [routerLink]="['/events', event.eventId]">
+      Ver detalle
+    </a>
+  </div>
+</div>
+
