@@ -30,10 +30,6 @@
 
 </form>
 
-<p *ngIf="!loading && events.length === 0">
-  No hay eventos disponibles
-</p>
-
 <div class="grid" *ngIf="!loading && events.length > 0">
   <div class="card" *ngFor="let event of events">
     <h3>{{ event.title }}</h3>
@@ -62,5 +58,7 @@
   </button>
 
 </div>
+
+
 
 

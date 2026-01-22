@@ -1,0 +1,45 @@
+.detail {
+  max-width: 700px;
+  margin: auto;
+}
+
+.date, .location {
+  color: #555;
+}
+
+.description {
+  margin: 1rem 0;
+}
+
+.price {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.tickets {
+  margin-bottom: 1.5rem;
+}
+
+.back {
+  display: inline-block;
+  margin-top: 1rem;
+  text-decoration: none;
+}
+.back:hover {
+  text-decoration: underline;
+}
+.button {
+  padding: .5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.button:hover {
+  background-color: #218838;
+}
+.button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}

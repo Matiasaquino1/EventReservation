@@ -1,0 +1,38 @@
+<!-- Loading -->
+<p *ngIf="loading">Cargando evento...</p>
+
+<!-- Not found -->
+<p *ngIf="!loading && notFound">
+  Evento no encontrado
+</p>
+
+<!-- Event -->
+<div *ngIf="!loading && event" class="detail">
+
+  <h1>{{ event.title }}</h1>
+
+  <p class="date">
+    📅 {{ event.eventDate | date:'fullDate' }}
+  </p>
+
+  <p class="location">
+    📍 {{ event.location }}
+  </p>
+
+  <p class="description">
+    {{ event.description }}
+  </p>
+
+  <p class="price">
+    💲 {{ event.price }}
+  </p>
+
+  <p class="tickets">
+    🎟️ Disponibles: {{ event.ticketsAvailable }}
+  </p>
+
+  <a routerLink="/" class="back">
+    ← Volver a eventos
+  </a>
+
+</div>

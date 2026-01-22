@@ -19,6 +19,7 @@ export class EventListComponent implements OnInit {
 
   events: EventModel[] = [];
   loading = false;
+  notFound = false;
 
   filters: EventFilters = {
     location: '',
