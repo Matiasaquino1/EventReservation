@@ -57,9 +57,9 @@ namespace EventReservations.Services
         {
             var reservation = await _reservationRepository.GetByIdAsync(id);
 
-            if (reservation != null && reservation.Status != "Cancelled")
+            if (reservation != null && reservation.Status != ReservationStatuses.Cancelled)
             {
-                reservation.Status = "Cancelled";
+                reservation.Status = ReservationStatuses.Cancelled;
                 await _reservationRepository.UpdateAsync(reservation);
 
                 var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);

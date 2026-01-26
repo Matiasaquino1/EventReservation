@@ -1,120 +1,70 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-
-import { firstValueFrom } from 'rxjs';
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { FormsModule } from '@angular/forms';
 
 import { ReservationService } from '../../core/services/reservation.service';
-import { PaymentService } from '../../core/services/payment.service';
 import { EventService } from '../../core/services/event.service';
 import { EventModel } from '../../core/models/event.model';
-import { environment } from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-reservation-create',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatInputModule
-  ],
-  template: `
-    <div *ngIf="event; else loading">
-      <h2>Reservar: {{ event.title }}</h2>
-
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline">
-          <mat-label>Número de tickets</mat-label>
-          <input
-            matInput
-            type="number"
-            formControlName="numberOfTickets"
-            min="1"
-            [max]="event.ticketsAvailable"
-          />
-        </mat-form-field>
-
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="form.invalid || submitting"
-        >
-          Reservar y pagar
-        </button>
-      </form>
-    </div>
-
-    <ng-template #loading>
-      <p>Cargando evento...</p>
-    </ng-template>
-  `
+  imports: [CommonModule, FormsModule],
+  templateUrl: './reservation-create.component.html',
+  styleUrls: ['./reservation-create.component.css']
 })
 export class ReservationCreateComponent implements OnInit {
 
-  form!: FormGroup;
-  event!: EventModel;
-  stripe!: Stripe | null;
-  submitting = false;
-
+  event: EventModel | null = null;
+  error = '';
+  numberOfTickets = 1;
+  success = false;
+  
   constructor(
-    private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router,
+    private eventService: EventService,
     private reservationService: ReservationService,
-    private paymentService: PaymentService,
-    private eventService: EventService
+    private router: Router
   ) {}
 
-  async ngOnInit(): Promise<void> {
-    this.form = this.fb.group({
-      numberOfTickets: [1, [Validators.required, Validators.min(1)]]
-    });
+  ngOnInit(): void {
+  const eventId = Number(this.route.snapshot.queryParamMap.get('eventId'));
 
-    this.stripe = await loadStripe(environment.stripePublishableKey);
-
-    const eventId = Number(this.route.snapshot.paramMap.get('eventId'));
-    if (!eventId) {
-      this.router.navigate(['/']);
-      return;
-    }
-
-    this.event = await firstValueFrom(
-      this.eventService.getEvent(eventId)
-    );
+  if (!eventId) {
+    this.error = 'Evento inválido';
+    return;
   }
 
-  async onSubmit(): Promise<void> {
-    if (!this.event || this.form.invalid) return;
-
-    this.submitting = true;
-
-    try {
-      const reservation = await firstValueFrom(
-        this.reservationService.createReservation({
-          eventId: this.event.eventId,
-          numberOfTickets: this.form.value.numberOfTickets
-        })
-      );
-
-      await firstValueFrom(
-        this.paymentService.createPaymentIntent(
-          this.event.price * this.form.value.numberOfTickets
-        )
-      );
-
-      // 👉 Acá después podés integrar Stripe Elements
-      this.router.navigate(['/my-reservations']);
-
-    } catch (error) {
-      console.error('Error al crear reserva o pago', error);
-    } finally {
-      this.submitting = false;
+  this.eventService.getEvent(eventId).subscribe({
+    next: event => {
+      console.log('EVENTO:', event);
+      this.event = event;
+    },
+    error: () => {
+      this.error = 'Evento no encontrado';
     }
+  });
+  }
+
+  reserve(): void {
+    if (this.numberOfTickets < 1 || !this.event) return;
+
+    this.reservationService.createReservation({
+      eventId: this.event.eventId,
+      numberOfTickets: this.numberOfTickets
+    }).subscribe({
+      next: () => {
+        this.success = true;
+        setTimeout(() => {
+          this.router.navigate(['/my-reservations']);
+        }, 1200);
+      },
+      error: err => {
+        this.error = err.error?.message || 'Error al reservar';
+      }
+    });
   }
 }
+

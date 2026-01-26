@@ -1,0 +1,26 @@
+<p *ngIf="!event && !error">Cargando evento...</p>
+
+<div *ngIf="event" class="container">
+
+  <h1>{{ event.title }}</h1>
+
+  <p>📍 {{ event.location }}</p>
+  <p>📅 {{ event.eventDate | date:'fullDate' }}</p>
+  <p>💲 {{ event.price }}</p>
+  <p>🎟️ Disponibles: {{ event.ticketsAvailable }}</p>
+
+  <label>
+    Cantidad:
+    <input
+      type="number"
+      [(ngModel)]="numberOfTickets"
+      [max]="event.ticketsAvailable"
+      min="1">
+  </label>
+
+  <button (click)="reserve()">Confirmar reserva</button>
+
+  <p class="success" *ngIf="success">Reserva creada ✔</p>
+</div>
+
+<p class="error" *ngIf="error">{{ error }}</p>

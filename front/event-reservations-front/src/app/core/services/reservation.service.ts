@@ -3,17 +3,21 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Reservation } from '../models/reservation.model';
+import { CreateReservation } from '../models/create-reservation.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReservationService {
-  createReservation(reservation: { eventId: number; numberOfTickets: number }): Observable<Reservation> {
-    return this.http.post<Reservation>(`${environment.apiUrl}/Reservations`, reservation);
+  private apiUrl = `${environment.apiUrl}/api/Reservations`;
+  
+  constructor(
+  private http: HttpClient) {}
+
+  createReservation(data: CreateReservation) {
+    return this.http.post(this.apiUrl, data);
   }
 
-  getMyReservations(): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(
-    `${environment.apiUrl}/Reservations/my`
-    );
+  getMyReservations() {
+    return this.http.get<Reservation[]>(`${this.apiUrl}/my`);
   }
 
   getReservations(filters?: { status?: string; eventId?: number }, page = 1, limit = 10): Observable<{ reservations: Reservation[]; total: number }> {
@@ -33,8 +37,5 @@ export class ReservationService {
       {}
     );
   }
-
-  constructor(
-  private reservationService: ReservationService,
-  private http: HttpClient) {}
 }
+

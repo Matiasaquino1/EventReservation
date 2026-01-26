@@ -35,4 +35,9 @@
     ← Volver a eventos
   </a>
 
-</div>
+  <a
+    [routerLink]="['/reservations/create']"
+    [queryParams]="{ eventId: event.eventId }">
+    Reservar
+  </a>
+

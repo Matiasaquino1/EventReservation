@@ -8,7 +8,7 @@ namespace EventReservations.Models
         public int UserId { get; set; }  // Relación con User
         public int EventId { get; set; }  // Relación con Event
 
-        public String? Status { get; set; }  // Ej: "Pending", "Confirmed", "Cancelled"
+        public String? Status { get; set; }  // "Pending" = creada, sin pagar, "Confirmed"= pago ok, "Cancelled"= cancelada por usuario.
         public DateTime ReservationDate { get; set; }  // Fecha de la reserva
         public DateTime CreatedAt { get; set; } //Fecha de creada/realizada la reserva
         public int NumberOfTickets { get; set; } // Cantidad de tickets
@@ -18,5 +18,6 @@ namespace EventReservations.Models
         public Event Event { get; set; }
 
         public ICollection<Payment> Payments { get; set; }
+
     }
 }

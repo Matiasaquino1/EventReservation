@@ -43,3 +43,16 @@
   background-color: #6c757d;
   cursor: not-allowed;
 }
+
+.reserve {
+  margin-top: 1rem;
+  padding: .75rem 1.5rem;
+  background: #1976d2;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.reserve:hover {
+  background: #1565c0;
+}

@@ -103,7 +103,7 @@ namespace EventReservations.Services
                             var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
                             if (reservation != null)
                             {
-                                reservation.Status = "Confirmed";
+                                reservation.Status = ReservationStatuses.Confirmed;
                                 await _reservationRepository.UpdateAsync(reservation);
                             }
 
