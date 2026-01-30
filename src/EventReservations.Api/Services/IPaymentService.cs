@@ -7,9 +7,9 @@ namespace EventReservations.Services
 {
     public interface IPaymentService
     {
-        Task<Payment> ProcessPaymentAsync(int reservationId, decimal amount, string currency, string PaymentMethodId);
+        Task<Payment> ProcessPaymentAsync(int reservationId, decimal amount, string currency, string paymentMethodId);
         Task<PaymentIntent> ProcessStripePaymentAsync(decimal amount, string currency, string paymentMethodId);
-        Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency);
+        Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency, int reservationId, int userId);
         Task<Payment> GetPaymentAsync(int id);
         Task ProcessPaymentAsync(int reservationId, decimal amount);
         Task ProcessWebhookAsync(Stripe.Event stripeEvent);
@@ -54,7 +54,7 @@ namespace EventReservations.Services
                 {
                     Enabled = true,
                     AllowRedirects = "never"
-                }
+                },
             };
 
             var service = new PaymentIntentService();
@@ -218,7 +218,7 @@ namespace EventReservations.Services
             return await _paymentRepository.GetAllAsync();
         }
 
-        public async Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency)
+        public async Task<PaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency, int reservationId, int userId)
         {
             if (amount <= 0)
                 throw new ArgumentException("El monto debe ser mayor a cero.", nameof(amount));
@@ -235,6 +235,11 @@ namespace EventReservations.Services
                 AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
                 {
                     Enabled = true               // Habilita métodos automáticos
+                },
+                Metadata = new Dictionary<string, string>
+                {
+                    ["reservationId"] = reservationId.ToString(),
+                    ["userId"] = userId.ToString()
                 }
             };
 

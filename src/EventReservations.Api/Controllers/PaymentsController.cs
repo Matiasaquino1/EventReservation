@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using EventReservations.Dto;
-using EventReservations.Profiles;
 using EventReservations.Models;
+using EventReservations.Profiles;
 using EventReservations.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Stripe;
-using System.Security.Claims;
 using Newtonsoft.Json;
+using Stripe;
 using System.ComponentModel.DataAnnotations; // Para validación
+using System.Security.Claims;
 
 namespace EventReservations.Controllers
 {
@@ -63,10 +63,14 @@ namespace EventReservations.Controllers
                     request.PaymentMethodId
                 );
                 if (payment.Status == "Succeeded")
-                { 
-                    await _reservationService.ConfirmPaymentAndDecrementTicketsAsync(request.ReservationId);
+                {
+                    await _reservationService.ConfirmPaymentAndDecrementTicketsAsync(
+                        request.ReservationId,
+                        payment.StripePaymentIntentId
+                        );
                     _logger.LogInformation("Pago confirmado y entradas decrementadas para reserva {ReservationId}", request.ReservationId);
                 }
+
                 var paymentDto = _mapper.Map<PaymentDto>(payment);
                 return Ok(new
                 {

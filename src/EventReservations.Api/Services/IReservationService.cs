@@ -20,7 +20,7 @@ namespace EventReservations.Services
         Task<Reservation> GetReservationAsync(int id);
         Task<IEnumerable<Reservation>> GetAllReservationsAsync(string? status = null, int? eventId = null);
         Task<IEnumerable<Reservation>> GetReservationsByUserAndEventAsync(int userId, int eventId);
-        Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId);
+        Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId, string StripePaymentIntentId);
         /// <summary>
         /// Obtiene una lista paginada de reservas con filtros opcionales para uso administrativo.
         /// Permite filtrar por estado y evento, ordenar por fecha, y paginar resultados.
@@ -112,6 +112,8 @@ namespace EventReservations.Services
             {
                 if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
                     throw new InvalidOperationException("No hay suficientes entradas disponibles.");
+                eventModel.TicketsAvailable = reservation.NumberOfTickets;
+                reservation.Status = ReservationStatuses.Pending;
             }
 
             // Crear reserva
@@ -132,14 +134,24 @@ namespace EventReservations.Services
             _logger.LogInformation("Reserva {ReservationId} actualizada a status {Status}", reservation.ReservationId, reservation.Status);
         }
 
-        public async Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId)
+        public async Task ConfirmPaymentAndDecrementTicketsAsync(
+            int reservationId,
+            string stripePaymentIntentId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
                 var reservation = await _reservationRepository.GetByIdAsync(reservationId);
-                if (reservation == null || reservation.Status != "Pending")
+
+                if (reservation == null)
+                    throw new InvalidOperationException("Reserva no encontrada.");
+
+                // 🔐 Idempotencia
+                if (reservation.Status == ReservationStatuses.Confirmed)
+                    return;
+
+                if (reservation.Status != ReservationStatuses.Pending)
                     throw new InvalidOperationException("Reserva inválida.");
 
                 var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
@@ -149,15 +161,29 @@ namespace EventReservations.Services
                 if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
                     throw new InvalidOperationException("Entradas insuficientes.");
 
-                // 1️⃣ Descontar tickets
+                // 🔍 Obtener pago asociado
+                var payment = await _context.Payments.FirstOrDefaultAsync(p =>
+                    p.ReservationId == reservationId &&
+                    p.StripePaymentIntentId == stripePaymentIntentId);
+
+                if (payment == null)
+                    throw new InvalidOperationException("Pago no encontrado.");
+
+                if (payment.Status == PaymentStatuses.Succeeded)
+                    return; // idempotente
+
+                // 1️⃣ Actualizar pago
+                payment.Status = PaymentStatuses.Succeeded;
+                payment.PaymentDate = DateTime.UtcNow;
+
+                // 2️⃣ Descontar tickets
                 eventModel.TicketsAvailable -= reservation.NumberOfTickets;
                 if (eventModel.TicketsAvailable == 0)
                     eventModel.Status = "SoldOut";
 
-                // 2️⃣ Confirmar reserva
-                reservation.Status = "Confirmed";
+                // 3️⃣ Confirmar reserva
+                reservation.Status = ReservationStatuses.Confirmed;
 
-                // 3️⃣ Guardar todo junto
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
@@ -172,6 +198,7 @@ namespace EventReservations.Services
                 throw;
             }
         }
+
 
 
 

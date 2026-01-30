@@ -107,18 +107,25 @@ namespace EventReservations.Repositories
             }
         }
 
-        public async Task<IEnumerable<Reservation>> GetAllAsync(string? ReservationStatuses = null, int? eventId = null)
+        public async Task<IEnumerable<Reservation>> GetAllAsync(
+            string? status = null, int? eventId = null)
         {
             var q = _context.Reservations.AsQueryable();
-            if (!string.IsNullOrEmpty(ReservationStatuses)) q = q.Where(r => r.Status == ReservationStatuses);
-            if (eventId.HasValue) q = q.Where(r => r.EventId == eventId.Value);
+
+            if (!string.IsNullOrEmpty(status))
+                q = q.Where(r => r.Status == status);
+
+            if (eventId.HasValue)
+                q = q.Where(r => r.EventId == eventId.Value);
+
             return await q.ToListAsync();
         }
+
 
         /// <summary>
         /// Implementa GetPagedReservationsAsync: Construye una consulta paginada con filtros y orden directamente en el repository.
         /// </summary>
-        public async Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string ReservationStatuses, int? eventId)
+        public async Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId)
         {
             // Validar y ajustar parámetros
             if (page < 1) page = 1;
@@ -126,9 +133,9 @@ namespace EventReservations.Repositories
             // Paso 2: Obtener consulta base
             var query = _context.Reservations.AsQueryable();
             // Paso 3: Aplicar filtros
-            if (!string.IsNullOrEmpty(ReservationStatuses))
+            if (!string.IsNullOrEmpty(status))
             {
-                query = query.Where(r => r.Status == ReservationStatuses);
+                query = query.Where(r => r.Status == status);
             }
             if (eventId.HasValue)
             {
