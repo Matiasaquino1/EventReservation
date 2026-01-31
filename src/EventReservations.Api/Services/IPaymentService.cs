@@ -31,9 +31,8 @@ namespace EventReservations.Services
         // ===============================
         public async Task<PaymentIntent> CreatePaymentIntentAsync(int reservationId, int userId)
         {
-            var reservation = await _reservationRepository.GetByIdAsync(reservationId);
-            if (reservation == null)
-                throw new InvalidOperationException("Reserva no encontrada.");
+            var reservation = await _reservationRepository.GetByIdAsync(reservationId)
+                ?? throw new InvalidOperationException("Reserva no encontrada.");
 
             if (reservation.UserId != userId)
                 throw new UnauthorizedAccessException();
@@ -41,13 +40,20 @@ namespace EventReservations.Services
             if (reservation.Status != ReservationStatuses.Pending)
                 throw new InvalidOperationException("La reserva no puede pagarse.");
 
+            // Idempotencia
+            if (!string.IsNullOrEmpty(reservation.PaymentIntentId))
+            {
+                var existingService = new PaymentIntentService();
+                return await existingService.GetAsync(reservation.PaymentIntentId);
+            }
+
             StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
 
             var options = new PaymentIntentCreateOptions
             {
                 Amount = (long)(reservation.Amount * 100),
                 Currency = "usd",
-                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                AutomaticPaymentMethods = new()
                 {
                     Enabled = true
                 },
@@ -61,20 +67,13 @@ namespace EventReservations.Services
             var service = new PaymentIntentService();
             var intent = await service.CreateAsync(options);
 
-            // el intent asociado
+            // persistimos la key
             reservation.PaymentIntentId = intent.Id;
-
-            await _paymentRepository.AddAsync(new Payment
-            {
-                ReservationId = reservationId,
-                Amount = reservation.Amount,
-                Status = PaymentStatuses.Pending,
-                StripePaymentIntentId = intent.Id,
-                PaymentDate = DateTime.UtcNow
-            });
+            await _reservationRepository.UpdateAsync(reservation);
 
             return intent;
         }
+
 
         // ===============================
         // STRIPE WEBHOOK
@@ -118,17 +117,15 @@ namespace EventReservations.Services
         // ===============================
         // PRIVATE MAPPER
         // ===============================
-        private static PaymentStatuses MapStripeStatus(string stripeStatus)
+        private static PaymentStatuses MapStripeStatus(string status) => status switch
         {
-            return stripeStatus switch
-            {
-                "succeeded" => PaymentStatuses.Succeeded,
-                "processing" => PaymentStatuses.Pending,
-                "requires_payment_method" => PaymentStatuses.Failed,
-                "canceled" => PaymentStatuses.Canceled,
-                _ => PaymentStatuses.Pending
-            };
-        }
+            "succeeded" => PaymentStatuses.Succeeded,
+            "processing" => PaymentStatuses.Processing,
+            "requires_payment_method" => PaymentStatuses.Failed,
+            "canceled" => PaymentStatuses.Canceled,
+            _ => PaymentStatuses.Pending
+        };
+
     }
 }
 
