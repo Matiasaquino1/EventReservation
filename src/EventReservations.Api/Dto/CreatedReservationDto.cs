@@ -3,6 +3,7 @@
     public class CreatedReservationDto
     {
         public int EventId { get; set; }
-        public decimal TotalAmount { get; set; }  // Para calcular pago
+        public int NumberOfTickets { get; set; }
+        public decimal Amount { get; set; }
     }
 }

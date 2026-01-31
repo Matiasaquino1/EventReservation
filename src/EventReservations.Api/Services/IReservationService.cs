@@ -53,29 +53,40 @@ namespace EventReservations.Services
             _logger = logger;
         }
 
+        public async Task<Reservation> CreateReservationAsync(
+            Reservation reservation,
+            bool checkAvailability = true)
+        {
+            if (await IsDuplicateReservationAsync(reservation.UserId, reservation.EventId))
+                throw new InvalidOperationException("Ya tienes una reserva para este evento.");
+
+            var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId)
+                ?? throw new InvalidOperationException("Evento no encontrado.");
+
+            if (checkAvailability && eventModel.TicketsAvailable < reservation.NumberOfTickets)
+                throw new InvalidOperationException("No hay suficientes entradas disponibles.");
+
+            reservation.Status = ReservationStatuses.Pending;
+            reservation.CreatedAt = DateTime.UtcNow;
+
+            return await _reservationRepository.AddAsync(reservation);
+        }
+
+
         public async Task<Reservation> CancelReservationAsync(int id)
         {
-            var reservation = await _reservationRepository.GetByIdAsync(id);
+            var reservation = await _reservationRepository.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("Reserva no encontrada.");
 
-            if (reservation != null && reservation.Status != ReservationStatuses.Cancelled)
-            {
-                reservation.Status = ReservationStatuses.Cancelled;
-                await _reservationRepository.UpdateAsync(reservation);
+            if (reservation.Status != ReservationStatuses.Pending)
+                throw new InvalidOperationException("Solo se pueden cancelar reservas pendientes.");
 
-                var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
-                if (eventModel != null)
-                {
-                    eventModel.TicketsAvailable += reservation.NumberOfTickets;
-
-                    if (eventModel.TicketsAvailable > 0 && eventModel.Status == "SoldOut")
-                        eventModel.Status = "Active";
-
-                    await _eventRepository.UpdateAsync(eventModel);
-                }
-            }
+            reservation.Status = ReservationStatuses.Cancelled;
+            await _reservationRepository.UpdateAsync(reservation);
 
             return reservation;
         }
+
 
 
         public async Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId)
@@ -98,28 +109,6 @@ namespace EventReservations.Services
             _reservationRepository = reservationRepository;
         }
 
-        public async Task<Reservation> CreateReservationAsync(Reservation reservation, bool checkAvailability = true)
-        {
-            if (await IsDuplicateReservationAsync(reservation.UserId, reservation.EventId))
-                throw new InvalidOperationException("Ya tienes una reserva para este evento.");
-
-            var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
-
-            if (eventModel == null)
-                throw new InvalidOperationException("Evento no encontrado.");
-
-            if (checkAvailability)
-            {
-                if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
-                    throw new InvalidOperationException("No hay suficientes entradas disponibles.");
-                eventModel.TicketsAvailable = reservation.NumberOfTickets;
-                reservation.Status = ReservationStatuses.Pending;
-            }
-
-            // Crear reserva
-            var created = await _reservationRepository.AddAsync(reservation);
-            return created;
-        }
 
 
         public async Task<bool> IsDuplicateReservationAsync(int userId, int eventId)
@@ -135,33 +124,29 @@ namespace EventReservations.Services
         }
 
         public async Task ConfirmPaymentAndDecrementTicketsAsync(
-            int reservationId,
-            string stripePaymentIntentId)
+                int reservationId,
+                string stripePaymentIntentId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                var reservation = await _reservationRepository.GetByIdAsync(reservationId);
+                var reservation = await _reservationRepository.GetByIdAsync(reservationId)
+                    ?? throw new InvalidOperationException("Reserva no encontrada.");
 
-                if (reservation == null)
-                    throw new InvalidOperationException("Reserva no encontrada.");
-
-                // 🔐 Idempotencia
+                // Idempotencia
                 if (reservation.Status == ReservationStatuses.Confirmed)
                     return;
 
                 if (reservation.Status != ReservationStatuses.Pending)
                     throw new InvalidOperationException("Reserva inválida.");
 
-                var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId);
-                if (eventModel == null)
-                    throw new InvalidOperationException("Evento no encontrado.");
+                var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId)
+                    ?? throw new InvalidOperationException("Evento no encontrado.");
 
                 if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
                     throw new InvalidOperationException("Entradas insuficientes.");
 
-                // 🔍 Obtener pago asociado
                 var payment = await _context.Payments.FirstOrDefaultAsync(p =>
                     p.ReservationId == reservationId &&
                     p.StripePaymentIntentId == stripePaymentIntentId);
@@ -170,27 +155,23 @@ namespace EventReservations.Services
                     throw new InvalidOperationException("Pago no encontrado.");
 
                 if (payment.Status == PaymentStatuses.Succeeded)
-                    return; // idempotente
+                    return;
 
-                // 1️⃣ Actualizar pago
                 payment.Status = PaymentStatuses.Succeeded;
                 payment.PaymentDate = DateTime.UtcNow;
 
-                // 2️⃣ Descontar tickets
                 eventModel.TicketsAvailable -= reservation.NumberOfTickets;
                 if (eventModel.TicketsAvailable == 0)
                     eventModel.Status = "SoldOut";
 
-                // 3️⃣ Confirmar reserva
                 reservation.Status = ReservationStatuses.Confirmed;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 _logger.LogInformation(
-                    "Pago confirmado y tickets descontados. Reserva {ReservationId}",
-                    reservationId
-                );
+                    "Reserva {ReservationId} confirmada y stock descontado.",
+                    reservationId);
             }
             catch
             {
@@ -198,9 +179,6 @@ namespace EventReservations.Services
                 throw;
             }
         }
-
-
-
 
         public async Task<Reservation> GetReservationAsync(int id) 
         { 

@@ -104,19 +104,19 @@ namespace EventReservations.Controllers
         [ProducesResponseType(typeof(object), 200)]
         [ProducesResponseType(typeof(object), 400)]
         [ProducesResponseType(typeof(object), 500)]
-        public async Task<IActionResult> CreatePaymentIntent([FromBody] CreatePaymentIntentDto request)
+        public async Task<IActionResult> CreatePaymentIntent(
+            [FromBody] CreatePaymentIntentDto dto)
         {
-            try
-            {
-                var paymentIntent = await _paymentService.CreatePaymentIntentAsync(request.Amount, request.Currency);
-                return Ok(new { clientSecret = paymentIntent.ClientSecret});
-              
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creando Payment Intent");
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            );
+
+            var intent = await _paymentService.CreatePaymentIntentAsync(
+                dto.ReservationId,
+                userId
+            );
+
+            return Ok(new { clientSecret = intent.ClientSecret });
         }
 
         /// <summary>

@@ -1,9 +1,11 @@
 ﻿namespace EventReservations.Models
 {
-    public class ReservationStatuses
+    public enum ReservationStatuses
     {
-        public const string Pending = "Pending"; // creada, sin pagar
-        public const string Confirmed = "Confirmed"; // "Confirmed"= pago ok
-        public const string Cancelled = "Cancelled"; //"Cancelled"= cancelada por usuario. 
+        Pending = 0,
+        Confirmed = 1,
+        Cancelled = 2,
+        Expired = 3
     }
+
 }

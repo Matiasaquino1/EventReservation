@@ -1,9 +1,10 @@
 ﻿namespace EventReservations.Models
 {
-    public class PaymentStatuses
+    public enum PaymentStatuses
     {
-        public const string Pending = "Pending"; // creada, sin pagar
-        public const string Succeeded = "Succeeded"; // pago ok
-        public const string Failed = "Failed"; // Fallo el pago o cancelo el user 
+        Pending = 0,
+        Succeeded = 1,
+        Failed = 2,
+        Canceled = 3
     }
 }
