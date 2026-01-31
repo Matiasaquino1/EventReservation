@@ -2,9 +2,10 @@
 {
     public enum PaymentStatuses
     {
-        Pending = 0,
-        Succeeded = 1,
-        Failed = 2,
-        Canceled = 3
+        Pending,        // creado localmente, esperando confirmación real
+        Processing,     // Stripe lo está procesando
+        Succeeded,      // pago confirmado por webhook
+        Failed,         // falló
+        Canceled        // cancelado manualmente o expirado
     }
 }

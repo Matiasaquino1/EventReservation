@@ -2,10 +2,11 @@
 {
     public enum ReservationStatuses
     {
-        Pending = 0,
-        Confirmed = 1,
-        Cancelled = 2,
-        Expired = 3
+        Pending,        // creada, tickets reservados lógicamente
+        AwaitingPayment,// esperando confirmación de Stripe
+        Confirmed,      // pago confirmado
+        Cancelled,      // cancelada por usuario / timeout
+        Expired         // no se pagó a tiempo
     }
 
 }
