@@ -45,6 +45,7 @@ try
     builder.Services.AddScoped<IEventRepository, EventRepository>();
     builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
     builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+    builder.Services.AddScoped<IStripeWebhookEventRepository, StripeWebhookEventRepository>();
 
     // Services
     builder.Services.AddScoped<IAuthService, AuthService>();
@@ -53,6 +54,7 @@ try
     builder.Services.AddScoped<IReservationService, ReservationService>();
     builder.Services.AddScoped<IPaymentService, PaymentService>();
     builder.Services.AddSingleton<IJwtService, JwtService>();
+    builder.Services.AddScoped<IStripeWebhookService, StripeWebhookService>();
 
     // AutoMapper
     builder.Services.AddAutoMapper(typeof(MappingProfile));

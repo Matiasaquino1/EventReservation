@@ -36,6 +36,10 @@ namespace EventReservations.Data
             modelBuilder.Entity<Reservation>()
                 .Property(r => r.Status)
                 .HasConversion<int>();
+
+            modelBuilder.Entity<StripeWebhookEvent>()
+                .HasIndex(e => e.StripeEventId)
+                .IsUnique();
         }
 
 
@@ -43,6 +47,8 @@ namespace EventReservations.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<StripeWebhookEvent> StripeWebhookEvents { get; set; }
+
     }
 
 

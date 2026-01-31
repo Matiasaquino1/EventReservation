@@ -5,70 +5,128 @@ using Stripe;
 
 namespace EventReservations.Services
 {
-    public class IWebhookService
+    public interface IStripeWebhookService
     {
-        public interface IStripeWebhookService
-        {
-            Task HandleEventAsync(Stripe.Event stripeEvent);
-        }
-        public class StripeWebhookService : IStripeWebhookService
-        {
-            private readonly ApplicationDbContext _context;
-            private readonly ILogger<StripeWebhookService> _logger;
+        Task HandleEventAsync(Stripe.Event stripeEvent);
 
-            public StripeWebhookService(
-                ApplicationDbContext context,
-                ILogger<StripeWebhookService> logger)
+    }
+    public class StripeWebhookService(
+        ApplicationDbContext context,
+        ILogger<StripeWebhookService> logger) : IStripeWebhookService
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<StripeWebhookService> _logger = logger;
+
+        // ===============================
+        // ENTRY POINT
+        // ===============================
+        public async Task HandleEventAsync(Stripe.Event stripeEvent)
+        {
+            // IDEMPOTENCIA POR EVENT ID
+            var alreadyProcessed = await _context.StripeWebhookEvents
+                .AnyAsync(e => e.StripeEventId == stripeEvent.Id);
+
+            if (alreadyProcessed)
             {
-                _context = context;
-                _logger = logger;
+                _logger.LogInformation(
+                    "Webhook duplicado ignorado: {EventId}",
+                    stripeEvent.Id
+                );
+                return;
             }
 
-            public async Task HandleEventAsync(Stripe.Event stripeEvent)
+            if (stripeEvent.Data.Object is not PaymentIntent intent)
+                return;
+
+            using var tx = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded)
+                switch (stripeEvent.Type)
                 {
-                    var intent = stripeEvent.Data.Object as PaymentIntent ?? throw new InvalidOperationException("Evento Stripe inválido");
-                    await HandlePaymentSucceeded(intent);
-                }
-            }
+                    case EventTypes.PaymentIntentSucceeded:
+                        await HandlePaymentSucceededAsync(intent);
+                        break;
 
-            private async Task HandlePaymentSucceeded(PaymentIntent intent)
-            {
-                using var tx = await _context.Database.BeginTransactionAsync();
-
-                var reservation = await _context.Reservations
-                    .FirstOrDefaultAsync(r => r.PaymentIntentId == intent.Id);
-
-                if (reservation == null || reservation.Status == ReservationStatuses.Confirmed)
-                    return;
-
-                var paymentExists = await _context.Payments
-                    .AnyAsync(p => p.StripePaymentIntentId == intent.Id);
-
-                if (!paymentExists)
-                {
-                    _context.Payments.Add(new Payment
-                    {
-                        ReservationId = reservation.ReservationId,
-                        Amount = reservation.Amount,
-                        Status = PaymentStatuses.Succeeded,
-                        StripePaymentIntentId = intent.Id,
-                        PaymentDate = DateTime.UtcNow
-                    });
+                    case EventTypes.PaymentIntentPaymentFailed:
+                        await HandlePaymentFailedAsync(intent);
+                        break;
                 }
 
-                reservation.Status = ReservationStatuses.Confirmed;
+                // Registrar evento procesado
+                _context.StripeWebhookEvents.Add(new StripeWebhookEvent
+                {
+                    StripeEventId = stripeEvent.Id,
+                    Type = stripeEvent.Type,
+                    ProcessedAt = DateTime.UtcNow
+                });
 
                 await _context.SaveChangesAsync();
                 await tx.CommitAsync();
-
-                _logger.LogInformation(
-                    "Reserva {ReservationId} confirmada por webhook",
-                    reservation.ReservationId
-                );
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
             }
         }
 
-    }
+        // ===============================
+        // PAYMENT SUCCEEDED
+        // ===============================
+        private async Task HandlePaymentSucceededAsync(PaymentIntent intent)
+        {
+            var payment = await _context.Payments
+                .FirstOrDefaultAsync(p => p.StripePaymentIntentId == intent.Id);
+
+            if (payment == null)
+            {
+                _logger.LogWarning(
+                    "PaymentIntent {IntentId} sin pago asociado",
+                    intent.Id
+                );
+                return;
+            }
+
+            if (payment.Status == PaymentStatuses.Succeeded)
+                return; // idempotencia de dominio
+
+            payment.Status = PaymentStatuses.Succeeded;
+            payment.PaymentDate = DateTime.UtcNow;
+
+            var reservation = await _context.Reservations
+                .FirstOrDefaultAsync(r => r.ReservationId == payment.ReservationId);
+
+            if (reservation != null &&
+                reservation.Status == ReservationStatuses.Pending)
+            {
+                reservation.Status = ReservationStatuses.Confirmed;
+            }
+
+            _logger.LogInformation(
+                "Pago confirmado por webhook. Reserva {ReservationId}",
+                payment.ReservationId
+            );
+        }
+
+        // ===============================
+        // PAYMENT FAILED
+        // ===============================
+        private async Task HandlePaymentFailedAsync(PaymentIntent intent)
+        {
+            var payment = await _context.Payments
+                .FirstOrDefaultAsync(p => p.StripePaymentIntentId == intent.Id);
+
+            if (payment == null)
+                return;
+
+            payment.Status = PaymentStatuses.Failed;
+
+            _logger.LogWarning(
+                "Pago fallido por webhook. PaymentIntent {IntentId}",
+                intent.Id
+            );
+        }
+
+    }   
 }
