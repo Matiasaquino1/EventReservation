@@ -58,16 +58,31 @@ namespace EventReservations.Controllers
         public async Task<IActionResult> CreatePaymentIntent(
             [FromBody] CreatePaymentIntentDto dto)
         {
-            var userId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            if (dto == null || dto.ReservationId <= 0)
+                return BadRequest(new { error = "Reserva inválida." });
 
-            var intent = await _paymentService.CreatePaymentIntentAsync(
-                dto.ReservationId,
-                userId
-            );
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null || !int.TryParse(claim.Value, out var userId))
+                return Unauthorized();
 
-            return Ok(new { clientSecret = intent.ClientSecret });
+            try
+            {
+                var intent = await _paymentService.CreatePaymentIntentAsync(
+                    dto.ReservationId,
+                    userId
+                );
+
+                return Ok(new { clientSecret = intent.ClientSecret });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "No se pudo crear el intent de pago");
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         /// <summary>
@@ -116,6 +131,5 @@ namespace EventReservations.Controllers
 
 
 }
-
 
 

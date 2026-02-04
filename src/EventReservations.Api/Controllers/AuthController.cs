@@ -37,7 +37,7 @@ public class AuthController : ControllerBase
     /// <response code="500">Error interno del servidor.</response>
     [HttpPost("register")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(LoginRequestDto), 200)]
+    [ProducesResponseType(typeof(UserDto), 200)]
     [ProducesResponseType(typeof(object), 400)]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
     {
@@ -82,7 +82,6 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 }
-
 
 
 
