@@ -14,7 +14,7 @@ namespace EventReservations.Services
         Task<Reservation> CancelReservationAsync(int id);
         Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId);
         Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(string? status, int? eventId, int page,  int pageSize, string sort);
-        Task<Reservation> UpdateReservationAsync(Reservation createdReservation);
+        Task<Reservation> UpdateReservationAsync(Reservation reservation);
         Task<bool> IsDuplicateReservationAsync(int userId, int eventId);
         Task<Reservation> DeleteReservation(int id);
         Task<Reservation> GetReservationAsync(int id);
@@ -104,23 +104,17 @@ namespace EventReservations.Services
             return await _reservationRepository.GetAdminReservationsAsync(status, eventId, page, pageSize, sort);
         }
 
-        public ReservationService(IReservationRepository reservationRepository)
-        {
-            _reservationRepository = reservationRepository;
-        }
-
-
-
         public async Task<bool> IsDuplicateReservationAsync(int userId, int eventId)
         {
             var existing = await _reservationRepository.GetReservationsByUserAndEventAsync(userId, eventId);
             return existing.Any();
         }
 
-        public async Task UpdateReservationAsync(Reservation reservation)
+        public async Task<Reservation> UpdateReservationAsync(Reservation reservation)
         {
-            await _reservationRepository.UpdateAsync(reservation);
+            var updated = await _reservationRepository.UpdateAsync(reservation);
             _logger.LogInformation("Reserva {ReservationId} actualizada a status {Status}", reservation.ReservationId, reservation.Status);
+            return updated;
         }
 
         public async Task ConfirmPaymentAndDecrementTicketsAsync(
@@ -185,9 +179,13 @@ namespace EventReservations.Services
             return await _reservationRepository.GetByIdAsync(id); 
         }
 
-        public Task<Reservation> DeleteReservation(int id)
+        public async Task<Reservation> DeleteReservation(int id)
         {
-            throw new NotImplementedException();
+            var existing = await _reservationRepository.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("Reserva no encontrada.");
+
+            await _reservationRepository.DeleteAsync(id);
+            return existing;
         }
 
         public async Task<IEnumerable<Reservation>> GetAllReservationsAsync(string? status = null, int? eventId = null)
@@ -195,14 +193,9 @@ namespace EventReservations.Services
             return await _reservationRepository.GetAllAsync(status, eventId);
         }
 
-        Task<Reservation> IReservationService.UpdateReservationAsync(Reservation createdReservation)
+        public async Task<IEnumerable<Reservation>> GetReservationsByUserAndEventAsync(int userId, int eventId)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Reservation>> GetReservationsByUserAndEventAsync(int userId, int eventId)
-        {
-            throw new NotImplementedException();
+            return await _reservationRepository.GetReservationsByUserAndEventAsync(userId, eventId);
         }
 
         // Reemplaza la implementación de GetPagedReservationsAsync con una llamada al repository

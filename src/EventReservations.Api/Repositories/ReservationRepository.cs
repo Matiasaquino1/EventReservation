@@ -46,13 +46,16 @@ namespace EventReservations.Repositories
             string sort)
         {
             var query = _context.Reservations
-                .Include(r => r.EventId)
-                .Include(r => r.UserId)
+                .Include(r => r.Event)
+                .Include(r => r.User)
                 .AsQueryable();
 
             // Filtros
-            if (!string.IsNullOrEmpty(status))
-                query = query.Where(r => r.Status == status);
+            if (!string.IsNullOrEmpty(status) &&
+                Enum.TryParse<ReservationStatuses>(status, true, out var parsedStatus))
+            {
+                query = query.Where(r => r.Status == parsedStatus);
+            }
 
             if (eventId.HasValue)
                 query = query.Where(r => r.EventId == eventId.Value);
@@ -112,8 +115,11 @@ namespace EventReservations.Repositories
         {
             var q = _context.Reservations.AsQueryable();
 
-            if (!string.IsNullOrEmpty(status))
-                q = q.Where(r => r.Status == status);
+            if (!string.IsNullOrEmpty(status) &&
+                Enum.TryParse<ReservationStatuses>(status, true, out var parsedStatus))
+            {
+                q = q.Where(r => r.Status == parsedStatus);
+            }
 
             if (eventId.HasValue)
                 q = q.Where(r => r.EventId == eventId.Value);
@@ -133,9 +139,10 @@ namespace EventReservations.Repositories
             // Paso 2: Obtener consulta base
             var query = _context.Reservations.AsQueryable();
             // Paso 3: Aplicar filtros
-            if (!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrEmpty(status) &&
+                Enum.TryParse<ReservationStatuses>(status, true, out var parsedStatus))
             {
-                query = query.Where(r => r.Status == status);
+                query = query.Where(r => r.Status == parsedStatus);
             }
             if (eventId.HasValue)
             {

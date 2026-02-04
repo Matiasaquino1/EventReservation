@@ -10,7 +10,7 @@ namespace EventReservations.Services
 {
     public interface IAuthService
     {
-        Task<User> RegisterAsync(RegisterRequestDto dto);
+        Task<User?> RegisterAsync(RegisterRequestDto dto);
         Task<User?> LoginAsync(LoginRequestDto loginDto);
     }
 
@@ -23,7 +23,7 @@ namespace EventReservations.Services
             _userRepository = userRepository;
         }
 
-        public async Task<User> RegisterAsync(RegisterRequestDto dto)
+        public async Task<User?> RegisterAsync(RegisterRequestDto dto)
         {
             if (await _userRepository.EmailExistsAsync(dto.Email))
                 return null;
@@ -60,4 +60,3 @@ namespace EventReservations.Services
     }
 
 }
-

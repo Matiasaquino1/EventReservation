@@ -14,7 +14,10 @@ namespace EventReservations.Repositories
         public async Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability)
         {
             var query = _context.Events.AsQueryable();
-            if (date.HasValue) query = query.Where(e => e.CreatedAt.Date == date.Value.Date);
+            if (date.HasValue)
+            {
+                query = query.Where(e => e.EventDate.HasValue && e.EventDate.Value.Date == date.Value.Date);
+            }
             if (!string.IsNullOrEmpty(location)) query = query.Where(e => e.Location.Contains(location));
             if (availability.HasValue) query = query.Where(e => e.TicketsAvailable >= availability.Value);
             return await query.ToListAsync();
@@ -27,6 +30,7 @@ namespace EventReservations.Repositories
                 // Lógica simple: marca como confirmado 
                 eventModel.Status = "Confirmed";  
                 _context.Events.Update(eventModel);
+                await _context.SaveChangesAsync();
             }
             return eventModel;
         }
@@ -38,13 +42,15 @@ namespace EventReservations.Repositories
         public async Task<Event> AddAsync(Event eventModel)
         {
             _context.Events.Add(eventModel);
+            await _context.SaveChangesAsync();
             return eventModel;
         }
 
         public async Task<Event> UpdateAsync(Event eventModel)
         {
-            _context.Events.Update(eventModel);  
-            return eventModel; 
+            _context.Events.Update(eventModel);
+            await _context.SaveChangesAsync();
+            return eventModel;
         }
 
         public async Task DeleteAsync(int id)  
@@ -52,7 +58,8 @@ namespace EventReservations.Repositories
             var eventModel = await _context.Events.FindAsync(id);  
             if (eventModel != null)
             {
-                _context.Events.Remove(eventModel); 
+                _context.Events.Remove(eventModel);
+                await _context.SaveChangesAsync();
             }
         }
 
