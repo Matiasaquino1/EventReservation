@@ -51,14 +51,19 @@ namespace EventReservations.Controllers
         [ProducesResponseType(typeof(object), 400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(typeof(object), 500)]
-        public async Task<ActionResult<ReservationDto>> CreateReservation([FromBody] ReservationDto reservationDto)
+        public async Task<ActionResult<ReservationDto>> CreateReservation([FromBody] CreatedReservationDto reservationDto)
         {
             try
             {
                 if (reservationDto == null)
                     return BadRequest(new { error = "Datos de reserva inválidos." });
 
+                var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (claim == null || !int.TryParse(claim.Value, out var userId))
+                    return Unauthorized();
+
                 var reservation = _mapper.Map<Reservation>(reservationDto);
+                reservation.UserId = userId;
                 reservation.Status = ReservationStatuses.Pending;
                 reservation.ReservationDate = DateTime.UtcNow;
 
@@ -69,6 +74,11 @@ namespace EventReservations.Controllers
                 var createdDto = _mapper.Map<ReservationDto>(created);
                 _logger.LogInformation("Reserva creada: {ReservationId} para usuario {UserId}", createdDto.ReservationId, createdDto.UserId);
                 return CreatedAtAction(nameof(GetUserReservations), new { userId = createdDto.UserId }, createdDto);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Regla de negocio inválida al crear reserva");
+                return BadRequest(new { error = ex.Message });
             }
             catch (Exception ex)
             {
@@ -280,6 +290,13 @@ namespace EventReservations.Controllers
                     return NotFound(new { error = "Reserva no encontrada." });
                 }
 
+                var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (claim == null || !int.TryParse(claim.Value, out var userId))
+                    return Unauthorized();
+
+                if (reservation.UserId != userId && !User.IsInRole("Admin"))
+                    return Forbid();
+
                 var dto = _mapper.Map<ReservationDto>(reservation);
                 return Ok(dto);
             }
@@ -309,6 +326,20 @@ namespace EventReservations.Controllers
         {
             try
             {
+                var reservation = await _reservationService.GetReservationAsync(id);
+                if (reservation == null)
+                {
+                    _logger.LogWarning("Reserva no encontrada para cancelar: {Id}", id);
+                    return NotFound(new { error = "Reserva no encontrada." });
+                }
+
+                var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (claim == null || !int.TryParse(claim.Value, out var userId))
+                    return Unauthorized();
+
+                if (reservation.UserId != userId && !User.IsInRole("Admin"))
+                    return Forbid();
+
                 var updated = await _reservationService.CancelReservationAsync(id);
                 if (updated == null)
                 {
