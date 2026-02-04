@@ -24,97 +24,63 @@ export class EventListComponent implements OnInit {
   filters: EventFilters = {
     location: '',
     date: '',
-    minTickets: undefined,
-    maxPrice: undefined,
-    page: 1,
-    limit: 10
+    availability: undefined
   };
 
   constructor(
-  private eventService: EventService,
-  private route: ActivatedRoute,
-  private router: Router
-) {}
+    private eventService: EventService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-  this.route.queryParams.subscribe(params => {
-    this.filters = {
-      location: params['location'] || '',
-      date: params['date'] || '',
-      minTickets: params['minTickets']
-        ? Number(params['minTickets'])
-        : undefined,
-      maxPrice: params['maxPrice']
-        ? Number(params['maxPrice'])
-        : undefined,
-      page: params['page']
-        ? Number(params['page'])
-        : 1,
-      limit: this.filters.limit ?? 10
-    };
+    this.route.queryParams.subscribe(params => {
+      this.filters = {
+        location: params['location'] || '',
+        date: params['date'] || '',
+        availability: params['availability']
+          ? Number(params['availability'])
+          : undefined
+      };
 
-    this.loadEvents();
-  });
+      this.loadEvents();
+    });
   }
 
 
   loadEvents(): void {
     this.loading = true;
+    this.notFound = false;
 
     this.eventService.getEvents(this.filters).subscribe({
       next: events => {
         this.events = events;
+        this.notFound = events.length === 0;
         this.loading = false;
       },
       error: () => {
         this.loading = false;
+        this.notFound = true;
       }
     });
   }
 
   onSearch(): void {
-  this.filters.page = 1;
-
-  this.router.navigate([], {
-    queryParams: {
-      location: this.filters.location || null,
-      date: this.filters.date || null,
-      minTickets: this.filters.minTickets || null,
-      maxPrice: this.filters.maxPrice || null,
-      page: this.filters.page
-    },
-    queryParamsHandling: 'merge'
-  });
+    this.router.navigate([], {
+      queryParams: {
+        location: this.filters.location || null,
+        date: this.filters.date || null,
+        availability: this.filters.availability || null
+      },
+      queryParamsHandling: 'merge'
+    });
   }
 
 
   onReset(): void {
-  this.router.navigate([], {
-    queryParams: {}
-  });
+    this.router.navigate([], {
+      queryParams: {}
+    });
   }
-
-  nextPage(): void {
-  this.router.navigate([], {
-    queryParams: {
-      page: (this.filters.page ?? 1) + 1
-    },
-    queryParamsHandling: 'merge'
-  });
-  }
-
-  prevPage(): void {
-  if ((this.filters.page ?? 1) <= 1) return;
-
-  this.router.navigate([], {
-    queryParams: {
-      page: (this.filters.page ?? 1) - 1
-    },
-    queryParamsHandling: 'merge'
-  });
-  }
-
-
 }
-
 

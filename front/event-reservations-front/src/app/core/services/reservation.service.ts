@@ -24,18 +24,17 @@ export class ReservationService {
     let params = new HttpParams().set('page', page).set('limit', limit);
     if (filters?.status) params = params.set('status', filters.status);
     if (filters?.eventId) params = params.set('eventId', filters.eventId);
-    return this.http.get<{ reservations: Reservation[]; total: number }>(`${environment.apiUrl}/Reservations`, { params });
+    return this.http.get<{ reservations: Reservation[]; total: number }>(`${environment.apiUrl}/api/Reservations`, { params });
   }
 
   cancelReservation(id: number): Observable<void> {
-    return this.http.put<void>(`${environment.apiUrl}/Reservations/${id}/cancel`, {});
+    return this.http.put<void>(`${environment.apiUrl}/api/Reservations/${id}/cancel`, {});
   }
 
   forceConfirm(eventId: number) {
     return this.http.post(
-      `${environment.apiUrl}/Admin/events/${eventId}/force-confirm`,
+      `${environment.apiUrl}/api/Admin/events/${eventId}/force-confirm`,
       {}
     );
   }
 }
-

@@ -1,16 +1,20 @@
-<p *ngIf="!event && !error">Cargando evento...</p>
+<p *ngIf="loading" class="loading">Cargando evento...</p>
 
-<div *ngIf="event" class="container">
-
+<div *ngIf="event && !loading" class="container">
   <h1>{{ event.title }}</h1>
 
-  <p>📍 {{ event.location }}</p>
-  <p>📅 {{ event.eventDate | date:'fullDate' }}</p>
-  <p>💲 {{ event.price }}</p>
-  <p>🎟️ Disponibles: {{ event.ticketsAvailable }}</p>
+  <div class="meta">
+    <p>📍 {{ event.location }}</p>
+    <p>📅 {{ event.eventDate | date:'fullDate' }}</p>
+  </div>
 
-  <label>
-    Cantidad:
+  <div class="details">
+    <p class="price">💲 {{ event.price | number:'1.0-0' }}</p>
+    <p>🎟️ Disponibles: {{ event.ticketsAvailable }}</p>
+  </div>
+
+  <label class="field">
+    Cantidad de entradas
     <input
       type="number"
       [(ngModel)]="numberOfTickets"
@@ -18,7 +22,15 @@
       min="1">
   </label>
 
-  <button (click)="reserve()">Confirmar reserva</button>
+  <button
+    (click)="reserve()"
+    [disabled]="event.ticketsAvailable === 0 || numberOfTickets < 1">
+    Confirmar reserva
+  </button>
+
+  <p class="hint" *ngIf="!authService.currentUser">
+    Debes iniciar sesión antes de reservar.
+  </p>
 
   <p class="success" *ngIf="success">Reserva creada ✔</p>
 </div>

@@ -13,20 +13,26 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
-  const token = localStorage.getItem('token');
-  if (token) {
-    const decoded: any = jwtDecode(token);
-    this.currentUserSubject.next(decoded.user);
+    const token = localStorage.getItem('token');
+    if (token) {
+      const user = this.decodeUser(token);
+      if (user) {
+        this.currentUserSubject.next(user);
+      }
+    }
   }
-}
 
   login(credentials: { email: string; password: string }) {
     return this.http.post(`${this.baseUrl}/login`, credentials).pipe(
       tap((res: any) => {
-        localStorage.setItem('token', res.token);
+        const token = res.token ?? res.Token;
+        if (!token) return;
+        localStorage.setItem('token', token);
 
-        const decoded: any = jwtDecode(res.token);
-        this.currentUserSubject.next(decoded.user);
+        const user = this.decodeUser(token);
+        if (user) {
+          this.currentUserSubject.next(user);
+        }
       })
     );
   }
@@ -47,5 +53,39 @@ export class AuthService {
 
   get currentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  private decodeUser(token: string): User | null {
+    try {
+      const decoded: any = jwtDecode(token);
+      const id =
+        decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ??
+        decoded['nameid'] ??
+        decoded['sub'];
+      const email =
+        decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ??
+        decoded['email'] ??
+        '';
+      const username =
+        decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ??
+        decoded['unique_name'] ??
+        decoded['name'] ??
+        email;
+      const role =
+        decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??
+        decoded['role'] ??
+        'User';
+
+      if (!id) return null;
+
+      return {
+        id: Number(id),
+        username,
+        email,
+        role
+      };
+    } catch {
+      return null;
+    }
   }
 }
