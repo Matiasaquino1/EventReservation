@@ -1,64 +1,73 @@
-<h1>Eventos disponibles</h1>
+<section class="page-header">
+  <div>
+    <h1>Eventos disponibles</h1>
+    <p class="subtitle">Encuentra el evento ideal y reserva en segundos.</p>
+  </div>
+</section>
 
 <form class="filters" (ngSubmit)="onSearch()">
+  <div class="filter-field">
+    <label for="location">Ubicación</label>
+    <input
+      id="location"
+      type="text"
+      placeholder="Ej. Medellín"
+      [(ngModel)]="filters.location"
+      name="location" />
+  </div>
 
-  <input
-    type="text"
-    placeholder="Ubicación"
-    [(ngModel)]="filters.location"
-    name="location" />
+  <div class="filter-field">
+    <label for="date">Fecha</label>
+    <input
+      id="date"
+      type="date"
+      [(ngModel)]="filters.date"
+      name="date" />
+  </div>
 
-  <input
-    type="date"
-    [(ngModel)]="filters.date"
-    name="date" />
+  <div class="filter-field">
+    <label for="availability">Entradas mínimas</label>
+    <input
+      id="availability"
+      type="number"
+      min="1"
+      placeholder="Ej. 2"
+      [(ngModel)]="filters.availability"
+      name="availability" />
+  </div>
 
-  <input
-    type="number"
-    placeholder="Entradas mínimas"
-    [(ngModel)]="filters.minTickets"
-    name="minTickets" />
-
-  <input
-    type="number"
-    placeholder="Precio máximo"
-    [(ngModel)]="filters.maxPrice"
-    name="maxPrice" />
-
-  <button type="submit">Buscar</button>
-  <button type="button" (click)="onReset()">Limpiar</button>
-
+  <div class="filter-actions">
+    <button type="submit" class="primary">Buscar</button>
+    <button type="button" class="ghost" (click)="onReset()">Limpiar</button>
+  </div>
 </form>
 
-<div class="grid" *ngIf="!loading && events.length > 0">
-  <div class="card" *ngFor="let event of events">
-    <h3>{{ event.title }}</h3>
-    <p>{{ event.location }}</p>
-    <p>{{ event.eventDate | date:'shortDate' }}</p>
-    <p class="price">$ {{ event.price }}</p>
+<div class="loading" *ngIf="loading">Cargando eventos...</div>
 
-    <a [routerLink]="['/events', event.eventId]">
+<div class="grid" *ngIf="!loading && events.length > 0">
+  <article class="card" *ngFor="let event of events">
+    <div class="card-header">
+      <h3>{{ event.title }}</h3>
+      <span class="status" [class.sold-out]="event.ticketsAvailable === 0">
+        {{ event.ticketsAvailable === 0 ? 'Agotado' : 'Disponible' }}
+      </span>
+    </div>
+    <p class="meta">
+      <span>📍 {{ event.location }}</span>
+      <span>📅 {{ event.eventDate | date:'mediumDate' }}</span>
+    </p>
+    <p class="price">$ {{ event.price | number:'1.0-0' }}</p>
+    <p class="tickets">🎟️ {{ event.ticketsAvailable }} entradas</p>
+
+    <a class="card-action" [routerLink]="['/events', event.eventId]">
       Ver detalle
     </a>
-  </div>
+  </article>
 </div>
 
-<div class="pagination" *ngIf="events.length > 0">
-
-  <button
-    (click)="prevPage()"
-    [disabled]="filters.page === 1">
-    ◀ Anterior
-  </button>
-
-  <span>Página {{ filters.page }}</span>
-
-  <button (click)="nextPage()">
-    Siguiente ▶
-  </button>
-
+<div class="no-events" *ngIf="!loading && notFound">
+  No encontramos eventos con esos filtros. Prueba con otra búsqueda.
 </div>
-
 
 
 

@@ -4,11 +4,12 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
+import { Reservation } from '../models/reservation.model';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
 
-  private readonly apiUrl = `${environment.apiUrl}/Admin`;
+  private readonly apiUrl = `${environment.apiUrl}/api/Admin`;
 
   constructor(private http: HttpClient) {}
 
@@ -33,6 +34,25 @@ export class AdminService {
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(
       `${this.apiUrl}/users/${userId}`
+    );
+  }
+
+  getAdminReservations(
+    page = 1,
+    pageSize = 10,
+    status?: string,
+    eventId?: number
+  ): Observable<{ data: Reservation[]; page: number; pageSize: number; totalCount: number }> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('pageSize', pageSize);
+
+    if (status) params = params.set('status', status);
+    if (eventId) params = params.set('eventId', eventId);
+
+    return this.http.get<{ data: Reservation[]; page: number; pageSize: number; totalCount: number }>(
+      `${this.apiUrl}/reservations`,
+      { params }
     );
   }
 }

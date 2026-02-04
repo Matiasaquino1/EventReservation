@@ -1,58 +1,103 @@
+.detail-wrapper {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+}
+
+.loading,
+.not-found {
+  text-align: center;
+  color: #5f6b7a;
+  padding: 2rem 0;
+}
+
 .detail {
-  max-width: 700px;
-  margin: auto;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
 }
 
-.date, .location {
-  color: #555;
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.description {
+.badge {
+  background: #e0f2fe;
+  color: #0284c7;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.badge.sold-out {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.detail-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: #5f6b7a;
   margin: 1rem 0;
 }
 
-.price {
-  font-size: 1.3rem;
-  font-weight: bold;
+.description {
+  margin: 1rem 0 1.5rem;
+  color: #2f3a48;
 }
 
-.tickets {
+.detail-info {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
 
-.back {
-  display: inline-block;
-  margin-top: 1rem;
-  text-decoration: none;
+.price {
+  font-size: 1.4rem;
+  font-weight: 700;
 }
+
+.tickets {
+  color: #4b5563;
+}
+
+.detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.back {
+  text-decoration: none;
+  color: #475569;
+  font-weight: 600;
+}
+
 .back:hover {
   text-decoration: underline;
 }
-.button {
-  padding: .5rem 1rem;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.button:hover {
-  background-color: #218838;
-}
-.button:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
 
 .reserve {
-  margin-top: 1rem;
-  padding: .75rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   background: #1976d2;
-  color: white;
-  border-radius: 6px;
+  color: #ffffff;
+  border-radius: 10px;
   border: none;
+  text-decoration: none;
+  font-weight: 600;
   cursor: pointer;
 }
+
 .reserve:hover {
   background: #1565c0;
 }

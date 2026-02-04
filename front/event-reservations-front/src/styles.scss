@@ -1,14 +1,37 @@
 @use '@angular/material' as mat;
 
-// Variables globales (si las tienes)
-$primary-color: #1976d2;
+$primary: mat.m2-define-palette(mat.$m2-indigo-palette, 600);
+$accent: mat.m2-define-palette(mat.$m2-pink-palette, 500);
+$warn: mat.m2-define-palette(mat.$m2-red-palette);
+$theme: mat.m2-define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: 0
+));
 
-// Estilos globales
-body {
-  margin: 0;
-  font-family: Roboto, sans-serif;
-  background: #f5f7fa;
+@include mat.core();
+@include mat.all-component-themes($theme);
+
+* {
+  box-sizing: border-box;
 }
 
-// Incluye temas de Material (opcional, pero recomendado para UI limpia)
-@include mat.core();
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: #f5f7fa;
+  color: #1f2a37;
+}
+
+h1, h2, h3 {
+  color: #1f2937;
+}
+
+main {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+}

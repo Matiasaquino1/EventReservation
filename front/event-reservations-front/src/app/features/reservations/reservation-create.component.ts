@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { ReservationService } from '../../core/services/reservation.service';
 import { EventService } from '../../core/services/event.service';
 import { EventModel } from '../../core/models/event.model';
+import { AuthService } from '../../core/services/auth.service';
 
 
 @Component({
@@ -21,35 +22,46 @@ export class ReservationCreateComponent implements OnInit {
   error = '';
   numberOfTickets = 1;
   success = false;
+  loading = true;
   
   constructor(
     private route: ActivatedRoute,
     private eventService: EventService,
     private reservationService: ReservationService,
-    private router: Router
+    private router: Router,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
-  const eventId = Number(this.route.snapshot.queryParamMap.get('eventId'));
+    const eventId = Number(
+      this.route.snapshot.queryParamMap.get('eventId') ??
+      this.route.snapshot.paramMap.get('eventId')
+    );
 
-  if (!eventId) {
-    this.error = 'Evento inválido';
-    return;
-  }
-
-  this.eventService.getEvent(eventId).subscribe({
-    next: event => {
-      console.log('EVENTO:', event);
-      this.event = event;
-    },
-    error: () => {
-      this.error = 'Evento no encontrado';
+    if (!eventId) {
+      this.error = 'Evento inválido';
+      this.loading = false;
+      return;
     }
-  });
+
+    this.eventService.getEvent(eventId).subscribe({
+      next: event => {
+        this.event = event;
+        this.loading = false;
+      },
+      error: () => {
+        this.error = 'Evento no encontrado';
+        this.loading = false;
+      }
+    });
   }
 
   reserve(): void {
     if (this.numberOfTickets < 1 || !this.event) return;
+    if (!this.authService.currentUser) {
+      this.error = 'Debes iniciar sesión para reservar.';
+      return;
+    }
 
     this.reservationService.createReservation({
       eventId: this.event.eventId,
@@ -67,4 +79,3 @@ export class ReservationCreateComponent implements OnInit {
     });
   }
 }
-
