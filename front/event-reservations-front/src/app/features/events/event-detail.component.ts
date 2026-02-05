@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { EventService } from '../../core/services/event.service';
 import { EventModel } from '../../core/models/event.model';
 
@@ -23,16 +25,21 @@ export class EventDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    const id = Number(idParam);
+    this.route.paramMap.pipe(
+      switchMap(params => {
+        const id = Number(params.get('id') ?? params.get('eventId'));
 
-    if (!id) {
-      this.notFound = true;
-      this.loading = false;
-      return;
-    }
+        if (!id || Number.isNaN(id)) {
+          this.notFound = true;
+          this.loading = false;
+          return of(null);
+        }
 
-    this.eventService.getEvent(id).subscribe({
+        this.loading = true;
+        this.notFound = false;
+        return this.eventService.getEvent(id);
+      })
+    ).subscribe({
       next: event => {
         this.event = event;
         this.loading = false;
