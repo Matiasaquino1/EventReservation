@@ -6,18 +6,18 @@ import { Payment } from '../models/payment.model';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
-  private readonly apiUrl = `${environment.apiUrl}/Payments`;
+  private readonly apiUrl = `${environment.apiUrl}/api/Payments`;
   constructor(private http: HttpClient) {}
   processPayment(paymentData: { reservationId: number; amount: number; stripeToken: string }): Observable<Payment> {
-    return this.http.post<Payment>(`${environment.apiUrl}/process`, paymentData);
+    return this.http.post<Payment>(`${this.apiUrl}/process`, paymentData);
   }
 
   createPaymentIntent(amount: number): Observable<{ clientSecret: string }> {
-    return this.http.post<{ clientSecret: string }>(`${environment.apiUrl}/Payments/create-payment-intent`, { amount });
+    return this.http.post<{ clientSecret: string }>(`${this.apiUrl}/create-payment-intent`, { amount });
   }
 
   getPaymentHistory(): Observable<Payment[]> {
-    return this.http.get<Payment[]>(`${environment.apiUrl}/Payments/history`);
+    return this.http.get<Payment[]>(`${this.apiUrl}/history`);
   }
 
 }

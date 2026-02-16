@@ -1,43 +1,42 @@
-<!-- Loading -->
-<p *ngIf="loading">Cargando evento...</p>
+<section class="detail-wrapper">
+  <p *ngIf="loading" class="loading">Cargando evento...</p>
 
-<!-- Not found -->
-<p *ngIf="!loading && notFound">
-  Evento no encontrado
-</p>
-
-<!-- Event -->
-<div *ngIf="!loading && event" class="detail">
-
-  <h1>{{ event.title }}</h1>
-
-  <p class="date">
-    📅 {{ event.eventDate | date:'fullDate' }}
+  <p *ngIf="!loading && notFound" class="not-found">
+    Evento no encontrado.
   </p>
 
-  <p class="location">
-    📍 {{ event.location }}
-  </p>
+  <div *ngIf="!loading && event" class="detail">
+    <div class="detail-header">
+      <h1>{{ event.title }}</h1>
+      <span class="badge" [class.sold-out]="event.ticketsAvailable === 0">
+        {{ event.ticketsAvailable === 0 ? 'Agotado' : 'Disponible' }}
+      </span>
+    </div>
 
-  <p class="description">
-    {{ event.description }}
-  </p>
+    <div class="detail-meta">
+      <p class="date">📅 {{ event.eventDate | date:'fullDate' }}</p>
+      <p class="location">📍 {{ event.location }}</p>
+    </div>
 
-  <p class="price">
-    💲 {{ event.price }}
-  </p>
+    <p class="description">
+      {{ event.description || 'Este evento aún no tiene descripción.' }}
+    </p>
 
-  <p class="tickets">
-    🎟️ Disponibles: {{ event.ticketsAvailable }}
-  </p>
+    <div class="detail-info">
+      <p class="price">💲 {{ event.price | number:'1.0-0' }}</p>
+      <p class="tickets">🎟️ Disponibles: {{ event.ticketsAvailable }}</p>
+    </div>
 
-  <a routerLink="/" class="back">
-    ← Volver a eventos
-  </a>
+    <div class="detail-actions">
+      <a routerLink="/" class="back">
+        ← Volver a eventos
+      </a>
 
-  <a
-    [routerLink]="['/reservations/create']"
-    [queryParams]="{ eventId: event.eventId }">
-    Reservar
-  </a>
-
+      <a
+        class="reserve"
+        [routerLink]="['/reservations/create', event.eventId]">
+        Reservar ahora
+      </a>
+    </div>
+  </div>
+</section>

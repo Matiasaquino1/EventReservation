@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ReservationService } from '../../core/services/reservation.service';
+import { AdminService } from '../../core/services/admin.service';
 import { Reservation } from '../../core/models/reservation.model';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
@@ -62,17 +63,21 @@ export class ReservationsAdminComponent implements OnInit {
   total = 0;
 
 
-  constructor(private reservationService: ReservationService) {}
+  constructor(
+    private reservationService: ReservationService,
+    private adminService: AdminService
+  ) {}
 
   ngOnInit() {
     this.loadReservations();
   }
 
   loadReservations() {
-    this.reservationService.getReservations(this.filters, this.page, this.limit).subscribe(res => {
-      this.reservations = res.reservations;
-      this.total = res.total;
-    });
+    this.adminService.getAdminReservations(this.page, this.limit, this.filters.status, this.filters.eventId)
+      .subscribe(res => {
+        this.reservations = res.data;
+        this.total = res.totalCount;
+      });
   }
 
   forceConfirm(eventId: number) {
