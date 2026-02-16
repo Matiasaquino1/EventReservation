@@ -9,16 +9,16 @@ namespace EventReservations.Controllers
     [Route("api/webhooks/stripe")]
     public class StripeWebhooksController : ControllerBase
     {
-        private readonly IPaymentService _paymentService;
+        private readonly IStripeWebhookService _stripeWebhookService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<StripeWebhooksController> _logger;
 
         public StripeWebhooksController(
-            IPaymentService paymentService,
+            IStripeWebhookService stripeWebhookService,
             IConfiguration configuration,
             ILogger<StripeWebhooksController> logger)
         {
-            _paymentService = paymentService;
+            _stripeWebhookService = stripeWebhookService;
             _configuration = configuration;
             _logger = logger;
         }
@@ -63,7 +63,7 @@ namespace EventReservations.Controllers
                 }
 
                 // Delegar lógica al dominio
-                await _paymentService.ProcessWebhookAsync(stripeEvent);
+                await _stripeWebhookService.HandleEventAsync(stripeEvent);
 
                 return Ok(new { received = true });
             }

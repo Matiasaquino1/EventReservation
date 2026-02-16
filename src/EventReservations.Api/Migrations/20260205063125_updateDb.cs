@@ -12,26 +12,26 @@ namespace EventReservations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Events",
-                columns: table => new
-                {
-                    EventId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EventDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Location = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    TicketsAvailable = table.Column<int>(type: "integer", nullable: false),
-                    TotalTickets = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Events", x => x.EventId);
-                });
+            //migrationBuilder.CreateTable(
+            //    name: "Events",
+            //    columns: table => new
+            //    {
+            //        EventId = table.Column<int>(type: "integer", nullable: false)
+            //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            //        Title = table.Column<string>(type: "text", nullable: false),
+            //        Description = table.Column<string>(type: "text", nullable: true),
+            //        CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+            //        EventDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+            //        Location = table.Column<string>(type: "text", nullable: false),
+            //        Status = table.Column<string>(type: "text", nullable: false),
+            //        Price = table.Column<decimal>(type: "numeric", nullable: false),
+            //        TicketsAvailable = table.Column<int>(type: "integer", nullable: false),
+            //        TotalTickets = table.Column<int>(type: "integer", nullable: false)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_Events", x => x.EventId);
+            //    });
 
             migrationBuilder.CreateTable(
                 name: "StripeWebhookEvents",
