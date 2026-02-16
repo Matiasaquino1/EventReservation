@@ -12,11 +12,11 @@ import { RoleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
-  path: '',
-  pathMatch: 'full',
-  loadComponent: () =>
-    import('./features/events/event-list.component')
-      .then(m => m.EventListComponent)
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./features/events/event-list.component')
+        .then(m => m.EventListComponent)
   },
   { path: 'login', loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./features/auth/register.component').then(m => m.RegisterComponent) },
@@ -24,14 +24,14 @@ export const routes: Routes = [
   { path: 'my-reservations', loadComponent: () => import('./features/reservations/my-reservations.component').then(m => m.MyReservationsComponent),},
   { path: 'reservations/create', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent),},
   { path: 'reservations/create/:eventId', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent),},
-{
-  path: 'admin',
-  canActivate: [AuthGuard, RoleGuard],
-  data: { roles: ['Admin'] },
-  children: [
-    { path: 'users', component: UsersComponent },
-    { path: 'reservations', component: ReservationsAdminComponent }
-  ]
-},
+  {
+    path: 'admin',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin'] },
+    children: [
+      { path: 'users', component: UsersComponent },
+      { path: 'reservations', component: ReservationsAdminComponent }
+    ]
+  },
   { path: '**', redirectTo: '' }
 ];

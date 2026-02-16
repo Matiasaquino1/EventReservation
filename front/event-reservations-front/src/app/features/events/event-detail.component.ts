@@ -3,9 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EventService } from '../../core/services/event.service';
 import { EventModel } from '../../core/models/event.model';
-import { ChangeDetectorRef } from '@angular/core';
-
-
 
 @Component({
   selector: 'app-event-detail',
@@ -22,34 +19,28 @@ export class EventDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private eventService: EventService,
-    private cdr: ChangeDetectorRef
+    private eventService: EventService
   ) {}
 
   ngOnInit(): void {
-  const idParam = this.route.snapshot.paramMap.get('id');
-  const id = Number(idParam);
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const id = Number(idParam);
 
-  if (!id) {
-    this.notFound = true;
-    this.loading = false;
-    return;
-  }
-
-  this.eventService.getEvent(id).subscribe({
-    next: event => {
-      this.event = event;
-      this.loading = false;
-
-      // 🔥 ESTO ES LA CLAVE
-      this.cdr.detectChanges();
-    },
-    error: () => {
+    if (!id) {
       this.notFound = true;
       this.loading = false;
-      this.cdr.detectChanges();
+      return;
     }
-  });
+
+    this.eventService.getEvent(id).subscribe({
+      next: event => {
+        this.event = event;
+        this.loading = false;
+      },
+      error: () => {
+        this.notFound = true;
+        this.loading = false;
+      }
+    });
   }
 }
-
