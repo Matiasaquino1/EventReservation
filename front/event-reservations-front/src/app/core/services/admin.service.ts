@@ -10,7 +10,6 @@ import { Reservation } from '../models/reservation.model';
 export class AdminService {
 
   private readonly apiUrl = `${environment.apiUrl}/api/Admin`;
-  private readonly usersApiUrl = `${environment.apiUrl}/api/v1/users`;
 
   constructor(private http: HttpClient) {}
 
@@ -54,51 +53,9 @@ export class AdminService {
     if (status) params = params.set('status', status);
     if (eventId) params = params.set('eventId', eventId);
 
-    return this.http.get<{ data: any[]; page: number; pageSize: number; totalCount: number }>(
+    return this.http.get<{ data: Reservation[]; page: number; pageSize: number; totalCount: number }>(
       `${this.apiUrl}/reservations`,
       { params }
-    ).pipe(
-      map(response => ({
-        ...response,
-        data: response.data.map(reservation => this.normalizeAdminReservation(reservation))
-      }))
     );
-  }
-
-  private normalizeUser(user: any): User {
-    return {
-      id: Number(user?.id ?? user?.userId ?? user?.UserId ?? 0),
-      username: user?.username ?? user?.name ?? user?.Name ?? '',
-      email: user?.email ?? user?.Email ?? '',
-      role: user?.role ?? user?.Role ?? 'User'
-    };
-  }
-
-  private normalizeAdminReservation(reservation: any): Reservation {
-    const eventTitle = reservation?.eventTitle ?? reservation?.EventTitle;
-    const userEmail = reservation?.email ?? reservation?.Email;
-
-    return {
-      reservationId: Number(reservation?.reservationId ?? reservation?.ReservationId ?? 0),
-      userId: Number(reservation?.userId ?? reservation?.UserId ?? 0),
-      eventId: Number(reservation?.eventId ?? reservation?.EventId ?? 0),
-      status: reservation?.status ?? reservation?.Status,
-      reservationDate: reservation?.reservationDate ?? reservation?.ReservationDate ?? '',
-      createdAt: reservation?.createdAt ?? reservation?.CreatedAt ?? '',
-      numberOfTickets: Number(reservation?.numberOfTickets ?? reservation?.NumberOfTickets ?? 0),
-      user: userEmail ? { id: 0, username: userEmail, email: userEmail, role: 'User' } : undefined,
-      event: eventTitle
-        ? {
-            eventId: Number(reservation?.eventId ?? reservation?.EventId ?? 0),
-            title: eventTitle,
-            location: '',
-            status: 'Active',
-            price: 0,
-            ticketsAvailable: 0,
-            totalTickets: 0,
-            createdAt: ''
-          }
-        : undefined
-    };
   }
 }

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EventService } from '../../core/services/event.service';
 import { EventModel } from '../../core/models/event.model';
 
@@ -11,7 +12,10 @@ import { EventModel } from '../../core/models/event.model';
   templateUrl: './event-detail.component.html',
   styleUrls: ['./event-detail.component.css']
 })
+
 export class EventDetailComponent implements OnInit {
+
+  private destroyRef = inject(DestroyRef);
 
   event: EventModel | null = null;
   loading = true;
@@ -23,24 +27,32 @@ export class EventDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    const id = Number(idParam);
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const id = Number(params.get('id'));
 
-    if (!id) {
-      this.notFound = true;
-      this.loading = false;
-      return;
-    }
+        if (!id || Number.isNaN(id)) {
+          this.notFound = true;
+          this.loading = false;
+          return;
+        }
 
-    this.eventService.getEvent(id).subscribe({
-      next: event => {
-        this.event = event;
-        this.loading = false;
-      },
-      error: () => {
-        this.notFound = true;
-        this.loading = false;
-      }
-    });
+        this.loading = true;
+
+        this.eventService.getEvent(id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: event => {
+              this.event = event;
+              this.notFound = false;
+              this.loading = false;
+            },
+            error: () => {
+              this.notFound = true;
+              this.loading = false;
+            }
+          });
+      });
   }
 }

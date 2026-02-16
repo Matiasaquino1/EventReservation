@@ -57,6 +57,9 @@ namespace EventReservations.Services
             Reservation reservation,
             bool checkAvailability = true)
         {
+            if (reservation.NumberOfTickets <= 0)
+                throw new InvalidOperationException("La cantidad de entradas debe ser mayor a cero.");
+
             if (await IsDuplicateReservationAsync(reservation.UserId, reservation.EventId))
                 throw new InvalidOperationException("Ya tienes una reserva para este evento.");
 
@@ -65,6 +68,13 @@ namespace EventReservations.Services
 
             if (checkAvailability && eventModel.TicketsAvailable < reservation.NumberOfTickets)
                 throw new InvalidOperationException("No hay suficientes entradas disponibles.");
+            
+            if (eventModel.Status == "Cancelled")
+                throw new InvalidOperationException("No se pueden crear reservas para eventos cancelados.");
+
+            // El monto se calcula en backend para evitar manipulación del cliente.
+            reservation.Amount = eventModel.Price * reservation.NumberOfTickets;
+
 
             reservation.Status = ReservationStatuses.Pending;
             reservation.CreatedAt = DateTime.UtcNow;
@@ -107,7 +117,9 @@ namespace EventReservations.Services
         public async Task<bool> IsDuplicateReservationAsync(int userId, int eventId)
         {
             var existing = await _reservationRepository.GetReservationsByUserAndEventAsync(userId, eventId);
-            return existing.Any();
+            return existing.Any(r =>
+                r.Status == ReservationStatuses.Pending ||
+                r.Status == ReservationStatuses.Confirmed);
         }
 
         public async Task<Reservation> UpdateReservationAsync(Reservation reservation)

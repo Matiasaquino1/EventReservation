@@ -74,13 +74,6 @@ try
 
     builder.Services.AddAuthorization();
 
-    builder.Services.AddApiVersioning(options =>
-    {
-        options.DefaultApiVersion = new ApiVersion(1, 0);
-        options.AssumeDefaultVersionWhenUnspecified = true;
-        options.ReportApiVersions = true;
-    });
-
     // JWT
     var jwtSettings = builder.Configuration.GetSection("Jwt");
     var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);

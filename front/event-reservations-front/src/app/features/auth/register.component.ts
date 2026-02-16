@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 
         <label>
           Nombre de usuario
-          <input formControlName="name" placeholder="Tu nombre">
+          <input formControlName="username" placeholder="Tu usuario">
         </label>
 
         <label>
@@ -119,13 +119,7 @@ export class RegisterComponent {
     this.error = '';
     this.loading = true;
     this.success = false;
-    const payload = {
-      name: this.form.value.name,
-      email: this.form.value.email,
-      password: this.form.value.password
-    };
-
-    this.authService.register(payload).subscribe({
+    this.authService.register(this.form.value).subscribe({
       next: () => {
         this.success = true;
         this.loading = false;
