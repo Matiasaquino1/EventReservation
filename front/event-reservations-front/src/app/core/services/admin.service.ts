@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
@@ -14,13 +14,16 @@ export class AdminService {
   constructor(private http: HttpClient) {}
 
   getUsers(page: number, limit: number): Observable<{ users: User[]; total: number }> {
-    const params = new HttpParams()
-      .set('page', page)
-      .set('limit', limit);
-
-    return this.http.get<{ users: User[]; total: number }>(
-      `${this.apiUrl}/users`,
-      { params }
+    return this.http.get<any[]>(this.usersApiUrl).pipe(
+      map(users => {
+        const normalized = users.map(user => this.normalizeUser(user));
+        const start = (page - 1) * limit;
+        const pagedUsers = normalized.slice(start, start + limit);
+        return {
+          users: pagedUsers,
+          total: normalized.length
+        };
+      })
     );
   }
 
@@ -33,7 +36,7 @@ export class AdminService {
 
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(
-      `${this.apiUrl}/users/${userId}`
+      `${this.usersApiUrl}/${userId}`
     );
   }
 

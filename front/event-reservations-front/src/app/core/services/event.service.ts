@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { EventModel } from '../models/event.model';
 import { EventFilters } from '../models/event-filters.model';
-import { PagedEvents } from '../models/paged-events.model';
 
 @Injectable({ providedIn: 'root' })
 export class EventService {
@@ -22,11 +21,15 @@ export class EventService {
       }
     });
 
-    return this.http.get<EventModel[]>(this.apiUrl, { params });
+    return this.http.get<any[]>(this.apiUrl, { params }).pipe(
+      map(events => events.map(event => this.normalizeEvent(event)))
+    );
   }
 
   getEvent(id: number) {
-    return this.http.get<EventModel>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(event => this.normalizeEvent(event))
+    );
   }
 
   createEvent(event: Partial<EventModel>) {
@@ -39,5 +42,21 @@ export class EventService {
 
   deleteEvent(id: number) {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  private normalizeEvent(event: any): EventModel {
+    return {
+      eventId: Number(event?.eventId ?? event?.EventId ?? event?.id ?? 0),
+      title: event?.title ?? event?.Title ?? '',
+      description: event?.description ?? event?.Description,
+      createdAt: event?.createdAt ?? event?.CreatedAt ?? '',
+      eventDate: event?.eventDate ?? event?.EventDate,
+      location: event?.location ?? event?.Location ?? '',
+      status: event?.status ?? event?.Status ?? 'Active',
+      price: Number(event?.price ?? event?.Price ?? 0),
+      ticketsAvailable: Number(event?.ticketsAvailable ?? event?.TicketsAvailable ?? 0),
+      totalTickets: Number(event?.totalTickets ?? event?.TotalTickets ?? 0),
+      reservations: event?.reservations ?? event?.Reservations
+    };
   }
 }
