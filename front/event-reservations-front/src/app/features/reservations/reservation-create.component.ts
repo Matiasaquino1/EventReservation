@@ -69,9 +69,7 @@ export class ReservationCreateComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.success = true;
-        setTimeout(() => {
-          this.router.navigate(['/my-reservations']);
-        }, 1200);
+        this.router.navigate(['/my-reservations']);
       },
       error: err => {
         this.error = err.error?.message || 'Error al reservar';
