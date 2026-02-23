@@ -8,7 +8,7 @@ import { EventFilters } from '../models/event-filters.model';
 @Injectable({ providedIn: 'root' })
 export class EventService {
 
-  private readonly apiUrl = `${environment.apiUrl}/api/Events`;
+  private readonly apiUrl = `${environment.apiUrl}/api/events`;
 
   constructor(private http: HttpClient) {}
 
@@ -27,10 +27,8 @@ export class EventService {
   }
 
   getEvent(id: number) {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map(event => this.normalizeEvent(event))
-    );
-  }
+  return this.http.get<any>(`${this.apiUrl}/${id}`);
+}
 
   createEvent(event: Partial<EventModel>) {
     return this.http.post<EventModel>(this.apiUrl, event);
