@@ -129,7 +129,7 @@ export class RegisterComponent {
       next: () => {
         this.success = true;
         this.loading = false;
-        setTimeout(() => this.router.navigate(['/login']), 1200);
+        this.router.navigate(['/login']);
       },
       error: () => {
         this.error = 'No pudimos crear la cuenta. Verifica los datos.';
