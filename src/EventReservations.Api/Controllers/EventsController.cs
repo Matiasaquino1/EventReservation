@@ -182,7 +182,9 @@ namespace EventReservations.Controllers
                 totalEvents = events.Count(),
                 totalReservations = reservations.Count(),
                 totalPayments = payments.Count(),
-                totalRevenue = reservations.Sum(p => p.Amount)
+                totalRevenue = payments
+                    .Where(p => p.Status == PaymentStatuses.Succeeded)
+                    .Sum(p => p.Amount)
             };
 
             _logger.LogInformation("Resumen obtenido correctamente: Eventos={TotalEvents}, Reservas={TotalReservations}",

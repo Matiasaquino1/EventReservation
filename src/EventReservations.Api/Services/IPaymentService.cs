@@ -1,7 +1,6 @@
 ﻿using EventReservations.Models;
 using EventReservations.Repositories;
 using Stripe;
-using Stripe.V2;
 using System.Threading.Tasks;
 
 namespace EventReservations.Services
@@ -20,10 +19,12 @@ namespace EventReservations.Services
     public class PaymentService(
         IPaymentRepository paymentRepository,
         IReservationRepository reservationRepository,
+        IReservationService reservationService,
         IConfiguration configuration) : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository = paymentRepository;
         private readonly IReservationRepository _reservationRepository = reservationRepository;
+        private readonly IReservationService _reservationService = reservationService;
         private readonly IConfiguration _configuration = configuration;
 
         // ===============================
@@ -67,9 +68,33 @@ namespace EventReservations.Services
             var service = new PaymentIntentService();
             var intent = await service.CreateAsync(options);
 
-            // persistimos la key
+            // Persistimos el intent en la reserva
             reservation.PaymentIntentId = intent.Id;
             await _reservationRepository.UpdateAsync(reservation);
+
+            // Persistimos (o reutilizamos) el pago para que webhook/dominio tengan trazabilidad
+            var existingPayment = await _paymentRepository.GetByReservationIdAsync(reservationId);
+            if (existingPayment is null)
+            {
+                await _paymentRepository.AddAsync(new Payment
+                {
+                    ReservationId = reservationId,
+                    Amount = reservation.Amount,
+                    Status = PaymentStatuses.Pending,
+                    StripePaymentIntentId = intent.Id
+                });
+            }
+            else
+            {
+                existingPayment.StripePaymentIntentId = intent.Id;
+                existingPayment.Amount = reservation.Amount;
+                if (existingPayment.Status != PaymentStatuses.Succeeded)
+                {
+                    existingPayment.Status = PaymentStatuses.Pending;
+                }
+
+                await _paymentRepository.UpdateAsync(existingPayment);
+            }
 
             return intent;
         }
@@ -87,18 +112,17 @@ namespace EventReservations.Services
             if (payment == null)
                 throw new KeyNotFoundException($"Pago no encontrado ({intent.Id}).");
 
-            payment.Status = MapStripeStatus(intent.Status);
+            var mappedStatus = MapStripeStatus(intent.Status);
+            payment.Status = mappedStatus;
+            payment.PaymentDate = DateTime.UtcNow;
             await _paymentRepository.UpdateAsync(payment);
 
-            // No confirma la reserva acá, por si falla
-            if (payment.Status == PaymentStatuses.Succeeded)
+            // La confirmación de reserva y decremento de tickets se hace en dominio transaccional
+            if (mappedStatus == PaymentStatuses.Succeeded)
             {
-                var reservation = await _reservationRepository.GetByIdAsync(payment.ReservationId);
-                if (reservation != null)
-                {
-                    reservation.Status = ReservationStatuses.Confirmed;
-                    await _reservationRepository.UpdateAsync(reservation);
-                }
+                await _reservationService.ConfirmPaymentAndDecrementTicketsAsync(
+                    payment.ReservationId,
+                    intent.Id);
             }
         }
 
@@ -125,7 +149,6 @@ namespace EventReservations.Services
             "canceled" => PaymentStatuses.Canceled,
             _ => PaymentStatuses.Pending
         };
-
     }
 }
 

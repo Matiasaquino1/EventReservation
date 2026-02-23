@@ -7,30 +7,45 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     /// <inheritdoc />
-    public partial class initialcreate : Migration
+    public partial class updateDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            //migrationBuilder.CreateTable(
+            //    name: "Events",
+            //    columns: table => new
+            //    {
+            //        EventId = table.Column<int>(type: "integer", nullable: false)
+            //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            //        Title = table.Column<string>(type: "text", nullable: false),
+            //        Description = table.Column<string>(type: "text", nullable: true),
+            //        CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+            //        EventDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+            //        Location = table.Column<string>(type: "text", nullable: false),
+            //        Status = table.Column<string>(type: "text", nullable: false),
+            //        Price = table.Column<decimal>(type: "numeric", nullable: false),
+            //        TicketsAvailable = table.Column<int>(type: "integer", nullable: false),
+            //        TotalTickets = table.Column<int>(type: "integer", nullable: false)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_Events", x => x.EventId);
+            //    });
+
             migrationBuilder.CreateTable(
-                name: "Events",
+                name: "StripeWebhookEvents",
                 columns: table => new
                 {
-                    EventId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EventDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Location = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    TicketsAvailable = table.Column<int>(type: "integer", nullable: false),
-                    TotalTickets = table.Column<int>(type: "integer", nullable: false)
+                    StripeEventId = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.EventId);
+                    table.PrimaryKey("PK_StripeWebhookEvents", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -58,10 +73,12 @@ namespace EventReservations.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     EventId = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: true),
+                    PaymentIntentId = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     ReservationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    NumberOfTickets = table.Column<int>(type: "integer", nullable: false)
+                    NumberOfTickets = table.Column<int>(type: "integer", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,10 +104,11 @@ namespace EventReservations.Migrations
                     PaymentId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ReservationId = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: true),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    StripePaymentIntentId = table.Column<string>(type: "text", nullable: false)
+                    StripePaymentIntentId = table.Column<string>(type: "text", nullable: false),
+                    FailureReason = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -117,6 +135,12 @@ namespace EventReservations.Migrations
                 name: "IX_Reservations_UserId",
                 table: "Reservations",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StripeWebhookEvents_StripeEventId",
+                table: "StripeWebhookEvents",
+                column: "StripeEventId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -124,6 +148,9 @@ namespace EventReservations.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "StripeWebhookEvents");
 
             migrationBuilder.DropTable(
                 name: "Reservations");

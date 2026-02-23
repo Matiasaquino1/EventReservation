@@ -42,50 +42,35 @@ export class EventListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.filters$
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap(filters => {
-          this.loading = true;
-          this.notFound = false;
-          return this.eventService.getEvents(filters);
-        })
-      )
-      .subscribe({
-        next: events => {
-          this.events = events;
-          this.totalCount = events.length;
-          this.notFound = events.length === 0;
-          this.loading = false;
-        },
-        error: () => {
-          this.events = [];
-          this.totalCount = 0;
-          this.loading = false;
-          this.notFound = true;
-        }
-      });
+    this.route.queryParams.subscribe(params => {
+      this.filters = {
+        location: params['location'] || '',
+        date: params['date'] || '',
+        availability: params['availability']
+          ? Number(params['availability'])
+          : undefined
+      };
 
-    this.route.queryParams
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        this.filters = {
-          location: params['location'] || '',
-          date: params['date'] || '',
-          availability: params['availability']
-            ? Number(params['availability'])
-            : undefined
-        };
-
-        this.filters$.next({
-          ...this.filters,
-          page: 1,
-          pageSize: 10
-        });
-      });
-
-    this.onSearch();
+      this.loadEvents();
+    });
   }
+
+
+  loadEvents(): void {
+    this.loading = true;
+    this.notFound = false;
+
+    this.eventService.getEvents(this.filters).subscribe({
+      next: events => {
+        this.events = events;
+        this.notFound = events.length === 0;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.notFound = true;
+      }
+    });
 
   onSearch(): void {
     this.router.navigate([], {
@@ -96,33 +81,12 @@ export class EventListComponent implements OnInit, OnDestroy {
       },
       queryParamsHandling: 'merge'
     });
-
-    this.filters$.next({
-      ...this.filters,
-      page: 1,
-      pageSize: 10
-    });
   }
 
   onReset(): void {
-    this.filters = {
-      location: '',
-      date: '',
-      availability: undefined
-    };
-
     this.router.navigate([], {
       queryParams: {}
     });
-
-    this.filters$.next({
-      page: 1,
-      pageSize: 10
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
+

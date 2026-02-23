@@ -8,7 +8,6 @@ namespace EventReservations.Services
     public interface IStripeWebhookService
     {
         Task HandleEventAsync(Stripe.Event stripeEvent);
-
     }
     public class StripeWebhookService(
         ApplicationDbContext context,
@@ -17,21 +16,14 @@ namespace EventReservations.Services
         private readonly ApplicationDbContext _context = context;
         private readonly ILogger<StripeWebhookService> _logger = logger;
 
-        // ===============================
-        // ENTRY POINT
-        // ===============================
         public async Task HandleEventAsync(Stripe.Event stripeEvent)
         {
-            // IDEMPOTENCIA POR EVENT ID
             var alreadyProcessed = await _context.StripeWebhookEvents
                 .AnyAsync(e => e.StripeEventId == stripeEvent.Id);
 
             if (alreadyProcessed)
             {
-                _logger.LogInformation(
-                    "Webhook duplicado ignorado: {EventId}",
-                    stripeEvent.Id
-                );
+                _logger.LogInformation("Webhook duplicado ignorado: {EventId}", stripeEvent.Id);
                 return;
             }
 
@@ -53,7 +45,6 @@ namespace EventReservations.Services
                         break;
                 }
 
-                // Registrar evento procesado
                 _context.StripeWebhookEvents.Add(new StripeWebhookEvent
                 {
                     StripeEventId = stripeEvent.Id,
@@ -71,9 +62,6 @@ namespace EventReservations.Services
             }
         }
 
-        // ===============================
-        // PAYMENT SUCCEEDED
-        // ===============================
         private async Task HandlePaymentSucceededAsync(PaymentIntent intent)
         {
             var payment = await _context.Payments
@@ -81,37 +69,53 @@ namespace EventReservations.Services
 
             if (payment == null)
             {
-                _logger.LogWarning(
-                    "PaymentIntent {IntentId} sin pago asociado",
-                    intent.Id
-                );
+                _logger.LogWarning("PaymentIntent {IntentId} sin pago asociado", intent.Id);
                 return;
             }
 
-            if (payment.Status == PaymentStatuses.Succeeded)
-                return; // idempotencia de dominio
-
-            payment.Status = PaymentStatuses.Succeeded;
-            payment.PaymentDate = DateTime.UtcNow;
+            if (payment.Status != PaymentStatuses.Succeeded)
+            {
+                payment.Status = PaymentStatuses.Succeeded;
+                payment.PaymentDate = DateTime.UtcNow;
+            }
 
             var reservation = await _context.Reservations
                 .FirstOrDefaultAsync(r => r.ReservationId == payment.ReservationId);
 
-            if (reservation != null &&
-                reservation.Status == ReservationStatuses.Pending)
+            if (reservation == null)
             {
+                _logger.LogWarning("Reserva no encontrada para pago {PaymentId}", payment.PaymentId);
+                return;
+            }
+
+            if (reservation.Status == ReservationStatuses.Pending)
+            {
+                var eventModel = await _context.Events
+                    .FirstOrDefaultAsync(e => e.EventId == reservation.EventId)
+                    ?? throw new InvalidOperationException("Evento no encontrado para confirmar reserva.");
+
+                if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
+                {
+                    throw new InvalidOperationException(
+                        $"Entradas insuficientes para confirmar reserva {reservation.ReservationId} desde webhook.");
+                }
+
+                eventModel.TicketsAvailable -= reservation.NumberOfTickets;
+                if (eventModel.TicketsAvailable == 0)
+                {
+                    eventModel.Status = "SoldOut";
+                }
+
                 reservation.Status = ReservationStatuses.Confirmed;
             }
 
             _logger.LogInformation(
-                "Pago confirmado por webhook. Reserva {ReservationId}",
-                payment.ReservationId
-            );
+                "Pago confirmado por webhook. Reserva {ReservationId}, EventId {EventId}",
+                reservation.ReservationId,
+                reservation.EventId);
+            
         }
 
-        // ===============================
-        // PAYMENT FAILED
-        // ===============================
         private async Task HandlePaymentFailedAsync(PaymentIntent intent)
         {
             var payment = await _context.Payments
@@ -123,9 +127,8 @@ namespace EventReservations.Services
             payment.Status = PaymentStatuses.Failed;
 
             _logger.LogWarning(
-                "Pago fallido por webhook. PaymentIntent {IntentId}",
-                intent.Id
-            );
+                "Pago fallido por webhook. PaymentIntent {IntentId}",                
+                intent.Id);
         }
 
     }   

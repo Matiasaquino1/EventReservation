@@ -27,7 +27,7 @@ export class AdminService {
           total: normalized.length
         };
       })
-    );
+    );  
   }
 
   promoteUser(userId: number): Observable<void> {
@@ -39,11 +39,11 @@ export class AdminService {
 
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(
-      `${this.usersApiUrl}/${userId}`
+      `${this.apiUrl}/${userId}`
     );
   }
 
-  getAdminReservations(
+    getAdminReservations(
     page = 1,
     pageSize = 10,
     status?: string,
@@ -67,7 +67,6 @@ export class AdminService {
     );
   }
 
-  // Alias de compatibilidad para llamadas antiguas
   private NormalizeUser(user: any): User {
     return this.normalizeUser(user);
   }
