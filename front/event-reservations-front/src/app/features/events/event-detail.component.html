@@ -1,5 +1,9 @@
 <section class="detail-wrapper">
-  <p *ngIf="loading">Cargando evento...</p>>
+  <p *ngIf="loading" class="loading">Cargando evento...</p>
+
+  <p *ngIf="!loading && notFound" class="not-found">
+    Evento no encontrado.
+  </p>
 
   <div *ngIf="!loading && event" class="detail">
     <div class="detail-header">
