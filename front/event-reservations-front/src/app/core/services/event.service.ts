@@ -8,28 +8,31 @@ import { EventFilters } from '../models/event-filters.model';
 @Injectable({ providedIn: 'root' })
 export class EventService {
 
-  private readonly apiUrl = `${environment.apiUrl}/api/Events`;
+  private readonly apiUrl = 'https://localhost:7059/api/events';
 
   constructor(private http: HttpClient) {}
 
-  getEvents(filters: EventFilters): Observable<EventModel[]> {
+   getEvents(filters: EventFilters): Observable<EventModel[]> {
+
     let params = new HttpParams();
 
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        params = params.set(key, value.toString());
-      }
-    });
+    if (filters.location) {
+      params = params.set('location', filters.location);
+    }
 
-    return this.http.get<any[]>(this.apiUrl, { params }).pipe(
-      map(events => events.map(event => this.normalizeEvent(event)))
-    );
+    if (filters.date) {
+      params = params.set('date', filters.date);
+    }
+
+    if (filters.availability !== undefined) {
+      params = params.set('availability', filters.availability);
+    }
+
+    return this.http.get<EventModel[]>(this.apiUrl, { params });
   }
 
-  getEvent(id: number) {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map(event => this.normalizeEvent(event))
-    );
+  getEvent(id: number): Observable<EventModel> {
+    return this.http.get<EventModel>(`${this.apiUrl}/${id}`);
   }
 
   createEvent(event: Partial<EventModel>) {
