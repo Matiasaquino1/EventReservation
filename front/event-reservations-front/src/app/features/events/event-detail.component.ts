@@ -1,9 +1,11 @@
-import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { of } from 'rxjs';
 import { EventService } from '../../core/services/event.service';
-import { EventModel } from '../../core/models/event.model';
+import { switchMap } from 'rxjs/operators';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-event-detail',
@@ -12,47 +14,26 @@ import { EventModel } from '../../core/models/event.model';
   templateUrl: './event-detail.component.html',
   styleUrls: ['./event-detail.component.css']
 })
+export class EventDetailComponent {
+  private route = inject(ActivatedRoute);
+  private eventService = inject(EventService);
 
-export class EventDetailComponent implements OnInit {
+  // 1. Convertimos paramMap a Signal
+  private params = toSignal(this.route.paramMap);
 
-  private destroyRef = inject(DestroyRef);
+  // 2. Extraemos el ID
+  private eventId = computed(() => {
+    const p = this.params();
+    return p ? Number(p.get('id')) : null;
+  });
 
-  event: EventModel | null = null;
-  loading = true;
-  notFound = false;
+  // Alternativa ultra-estable con toSignal y switchMap
+   // Necesitas import { toObservable }
+  private eventId$ = toObservable(this.eventId);
 
-  constructor(
-    private route: ActivatedRoute,
-    private eventService: EventService
-  ) {}
-
-  ngOnInit(): void {
-    this.route.paramMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(params => {
-        const id = Number(params.get('id'));
-
-        if (!id || Number.isNaN(id)) {
-          this.notFound = true;
-          this.loading = false;
-          return;
-        }
-
-        this.loading = true;
-
-        this.eventService.getEvent(id)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: event => {
-              this.event = event;
-              this.notFound = false;
-              this.loading = false;
-            },
-            error: () => {
-              this.notFound = true;
-              this.loading = false;
-            }
-          });
-      });
-  }
+  eventSignal = toSignal(
+    this.eventId$.pipe(
+      switchMap(id => id ? this.eventService.getEvent(id) : of(null))
+    )
+  );
 }

@@ -1,42 +1,47 @@
 <section class="detail-wrapper">
-  <p *ngIf="loading" class="loading">Cargando evento...</p>
 
-  <p *ngIf="!loading && notFound" class="not-found">
-    Evento no encontrado.
-  </p>
+  @if (eventSignal(); as ev) {
+    <div class="detail">
+      <div class="detail-header">
+        <h1>{{ ev.title }}</h1>
+        <span class="badge" [class.sold-out]="ev.ticketsAvailable === 0">
+          {{ ev.ticketsAvailable === 0 ? 'Agotado' : 'Disponible' }}
+        </span>
+      </div>
 
-  <div *ngIf="!loading && event" class="detail">
-    <div class="detail-header">
-      <h1>{{ event.title }}</h1>
-      <span class="badge" [class.sold-out]="event.ticketsAvailable === 0">
-        {{ event.ticketsAvailable === 0 ? 'Agotado' : 'Disponible' }}
-      </span>
+      <div class="detail-meta">
+        <p class="date">📅 {{ ev.eventDate | date:'fullDate' }}</p>
+        <p class="location">📍 {{ ev.location }}</p>
+      </div>
+
+      <p class="description">
+        {{ ev.description || 'Este evento aún no tiene descripción.' }}
+      </p>
+
+      <div class="detail-info">
+        <p class="price">💲 {{ ev.price | number:'1.0-0' }}</p>
+        <p class="tickets">🎟️ Disponibles: {{ ev.ticketsAvailable }}</p>
+      </div>
+
+      <div class="detail-actions">
+        <a routerLink="/" class="back">
+          ← Volver a eventos
+        </a>
+
+        @if (ev.ticketsAvailable > 0) {
+          <a class="reserve" [routerLink]="['/reservations/create', ev.eventId]">
+            Reservar ahora
+          </a>
+        }
+      </div>
     </div>
-
-    <div class="detail-meta">
-      <p class="date">📅 {{ event.eventDate | date:'fullDate' }}</p>
-      <p class="location">📍 {{ event.location }}</p>
+  } @else if (eventSignal() === undefined) {
+    <p class="loading">Cargando evento...</p>
+  } @else {
+    <div class="error-container">
+      <p> No se pudo encontrar el evento solicitado.</p>
+      <a routerLink="/" class="back">Volver al listado</a>
     </div>
+  }
 
-    <p class="description">
-      {{ event.description || 'Este evento aún no tiene descripción.' }}
-    </p>
-
-    <div class="detail-info">
-      <p class="price">💲 {{ event.price | number:'1.0-0' }}</p>
-      <p class="tickets">🎟️ Disponibles: {{ event.ticketsAvailable }}</p>
-    </div>
-
-    <div class="detail-actions">
-      <a routerLink="/" class="back">
-        ← Volver a eventos
-      </a>
-
-      <a
-        class="reserve"
-        [routerLink]="['/reservations/create', event.eventId]">
-        Reservar ahora
-      </a>
-    </div>
-  </div>
 </section>

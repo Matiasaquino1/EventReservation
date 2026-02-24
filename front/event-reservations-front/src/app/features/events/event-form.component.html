@@ -1,0 +1,41 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="admin-form">
+  <div class="form-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Título</mat-label>
+      <input matInput formControlName="title">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha del Evento</mat-label>
+      <input matInput type="datetime-local" formControlName="eventDate">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Descripción</mat-label>
+      <textarea matInput formControlName="description" rows="4"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Ubicación</mat-label>
+      <input matInput formControlName="location">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Precio</mat-label>
+      <input matInput type="number" formControlName="price">
+      <span matPrefix>$&nbsp;</span>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tickets Totales</mat-label>
+      <input matInput type="number" formControlName="totalTickets">
+    </mat-form-field>
+  </div>
+
+  <div class="actions">
+    <button mat-button type="button" (click)="form.reset()">Limpiar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+      {{ initialData() ? 'Actualizar Evento' : 'Crear Evento' }}
+    </button>
+  </div>
+</form>

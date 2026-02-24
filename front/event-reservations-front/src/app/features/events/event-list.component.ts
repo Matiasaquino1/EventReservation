@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core'; // Añadimos signal
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
-
+import { FormsModule } from '@angular/forms';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { switchMap, map, tap } from 'rxjs/operators';
 import { EventService } from '../../core/services/event.service';
 import { EventModel } from '../../core/models/event.model';
 import { EventFilters } from '../../core/models/event-filters.model';
@@ -15,82 +15,51 @@ import { EventFilters } from '../../core/models/event-filters.model';
   templateUrl: './event-list.component.html',
   styleUrls: ['./event-list.component.css']
 })
-export class EventListComponent implements OnInit, OnDestroy {
+export class EventListComponent {
+  private eventService = inject(EventService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  events: EventModel[] = [];
-  loading = false;
-  notFound = false;
+  filters = signal<EventFilters>({
+    location: this.route.snapshot.queryParams['location'] || '',
+    date: this.route.snapshot.queryParams['date'] || '',
+    availability: this.route.snapshot.queryParams['availability'] ? Number(this.route.snapshot.queryParams['availability']) : undefined
+  });
 
-  filters: EventFilters = {
-    location: '',
-    date: '',
-    availability: undefined
-  };
+  private queryParams$ = this.route.queryParams;
+  
+  isLoading = signal(false);
 
-  private readonly destroy$ = new Subject<void>();
-  cdr: any;
-
-  constructor(
-    private eventService: EventService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.route.queryParams
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-
-        this.filters = {
+  eventsResource = toSignal(
+    this.queryParams$.pipe(
+      tap(() => this.isLoading.set(true)),
+      switchMap(params => {
+        const filtersFromUrl: EventFilters = {
           location: params['location'] || '',
           date: params['date'] || '',
-          availability: params['availability']
-            ? Number(params['availability'])
-            : undefined
+          availability: params['availability'] ? Number(params['availability']) : undefined
         };
-
-        this.loadEvents();
-      });
-  }
-
-  loadEvents(): void {
-    this.loading = true;
-    this.notFound = false;
-
-    this.eventService.getEvents(this.filters)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: events => {
-          this.events = events;
-          this.notFound = events.length === 0;
-          this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.loading = false;
-          this.notFound = true;
-        }
-      });
-  }
+        this.filters.set(filtersFromUrl);
+        return this.eventService.getEvents(filtersFromUrl);
+      }),
+      tap(() => this.isLoading.set(false))
+    ),
+    { initialValue: [] as EventModel[] }
+  );
 
   onSearch(): void {
+    const currentFilters = this.filters();
     this.router.navigate([], {
       queryParams: {
-        location: this.filters.location || null,
-        date: this.filters.date || null,
-        availability: this.filters.availability ?? null
+        location: currentFilters.location || null,
+        date: currentFilters.date || null,
+        availability: currentFilters.availability ?? null
       }
     });
   }
 
   onReset(): void {
-    this.router.navigate([], {
-      queryParams: {}
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.filters.set({ location: '', date: '', availability: undefined });
+    this.router.navigate([], { queryParams: {} });
   }
 }

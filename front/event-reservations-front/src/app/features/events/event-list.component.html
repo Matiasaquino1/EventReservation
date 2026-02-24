@@ -12,7 +12,7 @@
       id="location"
       type="text"
       placeholder="Ej. Medellín"
-      [(ngModel)]="filters.location"
+      [(ngModel)]="filters().location" 
       name="location" />
   </div>
 
@@ -21,7 +21,7 @@
     <input
       id="date"
       type="date"
-      [(ngModel)]="filters.date"
+      [(ngModel)]="filters().date"
       name="date" />
   </div>
 
@@ -32,7 +32,7 @@
       type="number"
       min="1"
       placeholder="Ej. 2"
-      [(ngModel)]="filters.availability"
+      [(ngModel)]="filters().availability"
       name="availability" />
   </div>
 
@@ -42,32 +42,36 @@
   </div>
 </form>
 
-<div class="loading" *ngIf="loading">Cargando eventos...</div>
+@if (isLoading()) {
+  <div class="loading">Cargando eventos...</div>
+} @else {
+  <div class="grid">
+    @for (event of eventsResource(); track event.eventId) {
+      <article class="card">
+        <div class="card-header">
+          <h3>{{ event.title }}</h3>
+          <span class="status" [class.sold-out]="event.ticketsAvailable === 0">
+            {{ event.ticketsAvailable === 0 ? 'Agotado' : 'Disponible' }}
+          </span>
+        </div>
+        <p class="meta">
+          <span>📍 {{ event.location }}</span>
+          <span>📅 {{ event.eventDate | date:'mediumDate' }}</span>
+        </p>
+        <p class="price">$ {{ event.price | number:'1.0-0' }}</p>
+        <p class="tickets">🎟️ {{ event.ticketsAvailable }} entradas</p>
 
-<div class="grid" *ngIf="!loading && events.length > 0">
-  <article class="card" *ngFor="let event of events">
-    <div class="card-header">
-      <h3>{{ event.title }}</h3>
-      <span class="status" [class.sold-out]="event.ticketsAvailable === 0">
-        {{ event.ticketsAvailable === 0 ? 'Agotado' : 'Disponible' }}
-      </span>
-    </div>
-    <p class="meta">
-      <span>📍 {{ event.location }}</span>
-      <span>📅 {{ event.eventDate | date:'mediumDate' }}</span>
-    </p>
-    <p class="price">$ {{ event.price | number:'1.0-0' }}</p>
-    <p class="tickets">🎟️ {{ event.ticketsAvailable }} entradas</p>
-
-    <a class="card-action" [routerLink]="['/events', event.eventId]">
-      Ver detalle
-    </a>
-  </article>
-</div>
-
-<div class="no-events" *ngIf="!loading && notFound">
-  No encontramos eventos con esos filtros. Prueba con otra búsqueda.
-</div>
+        <a class="card-action" [routerLink]="['/events', event.eventId]">
+          Ver detalle
+        </a>
+      </article>
+    } @empty {
+      <div class="no-events">
+        No encontramos eventos con esos filtros. Prueba con otra búsqueda.
+      </div>
+    }
+  </div>
+}
 
 
 

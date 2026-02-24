@@ -14,7 +14,7 @@ export class AdminService {
   constructor(private http: HttpClient) {}
 
   getUsers(page: number, limit: number): Observable<{ users: User[]; total: number }> {
-    return this.http.get<any[]>(this.usersApiUrl).pipe(
+    return this.http.get<any[]>(this.apiUrl).pipe(
       map(users => {
         const normalized = users.map(user => this.normalizeUser(user));
         const start = (page - 1) * limit;
@@ -27,6 +27,7 @@ export class AdminService {
     );
   }
 
+
   promoteUser(userId: number): Observable<void> {
     return this.http.post<void>(
       `${this.apiUrl}/promote/${userId}`,
@@ -36,7 +37,7 @@ export class AdminService {
 
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(
-      `${this.usersApiUrl}/${userId}`
+      `${this.apiUrl}/${userId}`
     );
   }
 
@@ -58,4 +59,13 @@ export class AdminService {
       { params }
     );
   }
+
+  private normalizeUser(user: any): User {
+    return {
+      id: user.id,
+      username: user.username ?? user.name ?? '',
+      email: user.email,
+      role: user.role ?? 'User',
+    };
+}
 }
