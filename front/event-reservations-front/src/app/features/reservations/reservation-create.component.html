@@ -1,38 +1,66 @@
-<p *ngIf="loading" class="loading">Cargando evento...</p>
+<section class="reservation-wrapper">
+  @if (loading()) {
+    <p class="loading">Cargando detalles del evento...</p>
+  } @else if (event(); as ev) {
+    <div class="container">
+      <header>
+        <h1>Confirmar Reserva</h1>
+        <p class="event-title">{{ ev.title }}</p>
+      </header>
 
-<div *ngIf="event && !loading" class="container">
-  <h1>{{ event.title }}</h1>
+      <div class="meta">
+        <p>📍 {{ ev.location }}</p>
+        <p>📅 {{ ev.eventDate | date:'fullDate' }}</p>
+      </div>
 
-  <div class="meta">
-    <p>📍 {{ event.location }}</p>
-    <p>📅 {{ event.eventDate | date:'fullDate' }}</p>
-  </div>
+      <div class="booking-card">
+        <div class="details">
+          <div class="info-group">
+            <span class="label">Precio unitario</span>
+            <p class="price">$ {{ ev.price | number:'1.0-0' }}</p>
+          </div>
+          <div class="info-group">
+            <span class="label">Disponibles</span>
+            <p class="stock">{{ ev.ticketsAvailable }} 🎟️</p>
+          </div>
+        </div>
 
-  <div class="details">
-    <p class="price">💲 {{ event.price | number:'1.0-0' }}</p>
-    <p>🎟️ Disponibles: {{ event.ticketsAvailable }}</p>
-  </div>
+        <div class="field-container">
+          <label for="tickets">¿Cuántas entradas deseas?</label>
+          <input
+            id="tickets"
+            type="number"
+            [(ngModel)]="numberOfTickets"
+            [max]="ev.ticketsAvailable"
+            min="1"
+            class="ticket-input">
+        </div>
 
-  <label class="field">
-    Cantidad de entradas
-    <input
-      type="number"
-      [(ngModel)]="numberOfTickets"
-      [max]="event.ticketsAvailable"
-      min="1">
-  </label>
+        <div class="total-section">
+          <span>Total a pagar</span>
+          <p class="total-amount">$ {{ totalPrice() | number:'1.0-0' }}</p>
+        </div>
 
-  <button
-    (click)="reserve()"
-    [disabled]="event.ticketsAvailable === 0 || numberOfTickets < 1">
-    Confirmar reserva
-  </button>
+        <button
+          class="btn-confirm"
+          (click)="reserve()"
+          [disabled]="ev.ticketsAvailable === 0 || numberOfTickets() < 1">
+          Finalizar Reserva
+        </button>
+      </div>
 
-  <p class="hint" *ngIf="!authService.currentUser">
-    Debes iniciar sesión antes de reservar.
-  </p>
-
-  <p class="success" *ngIf="success">Reserva creada ✔</p>
-</div>
-
-<p class="error" *ngIf="error">{{ error }}</p>
+      @if (!authService.currentUser) {
+        <p class="hint">⚠️ Debes iniciar sesión antes de reservar.</p>
+      }
+      
+      @if (error()) {
+        <p class="error-msg">{{ error() }}</p>
+      }
+    </div>
+  } @else {
+    <div class="container error-state">
+      <p>Hubo un problema al cargar el evento.</p>
+      <button (click)="router.navigate(['/'])">Volver al inicio</button>
+    </div>
+  }
+</section>

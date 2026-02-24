@@ -1,78 +1,127 @@
+.reservation-wrapper {
+  padding: 2rem 1rem;
+}
+
 .container {
-  max-width: 520px;
+  max-width: 500px;
   margin: auto;
   background: #ffffff;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
+}
+
+header h1 {
+  font-size: 1.5rem;
+  color: #1e293b;
+  margin: 0;
+}
+
+.event-title {
+  color: #1976d2;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-top: 0.25rem;
 }
 
 .meta {
-  color: #5f6b7a;
+  margin: 1.5rem 0;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed #e2e8f0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.booking-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .details {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-  margin: 1rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 12px;
 }
 
-.price {
+.label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  display: block;
+}
+
+.price, .stock {
   font-weight: 700;
-  font-size: 1.2rem;
+  color: #334155;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.ticket-input {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  font-size: 1.1rem;
   font-weight: 600;
-  margin-top: 1rem;
+  transition: border-color 0.2s;
 }
 
-input {
-  width: 100%;
-  padding: 0.65rem;
-  border-radius: 10px;
-  border: 1px solid #d8dde4;
-  background: #f9fafc;
+.ticket-input:focus {
+  outline: none;
+  border-color: #1976d2;
 }
 
-button {
+.total-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.total-amount {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.btn-confirm {
   width: 100%;
-  padding: 0.75rem;
+  padding: 1rem;
   background: #1976d2;
   color: white;
-  border-radius: 6px;
+  border-radius: 12px;
   border: none;
-  font-weight: 600;
-  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
 }
 
-button:disabled {
-  background: #9bb7d6;
+.btn-confirm:hover:not(:disabled) {
+  background: #1565c0;
+  transform: translateY(-2px);
+}
+
+.btn-confirm:disabled {
+  background: #cbd5e1;
   cursor: not-allowed;
 }
 
-.error {
-  color: #c62828;
-  margin-top: .5rem;
-}
-
-.success {
-  color: #2e7d32;
-  margin-top: .5rem;
+.error-msg {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .hint {
-  color: #6b7280;
-  margin-top: 0.75rem;
-}
-
-.loading {
   text-align: center;
-  color: #5f6b7a;
-  padding: 2rem 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 1rem;
 }

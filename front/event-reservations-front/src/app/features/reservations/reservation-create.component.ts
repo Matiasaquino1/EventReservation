@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { switchMap, of, map } from 'rxjs';
 
 import { ReservationService } from '../../core/services/reservation.service';
 import { EventService } from '../../core/services/event.service';
-import { EventModel } from '../../core/models/event.model';
 import { AuthService } from '../../core/services/auth.service';
-
 
 @Component({
   selector: 'app-reservation-create',
@@ -16,64 +16,59 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './reservation-create.component.html',
   styleUrls: ['./reservation-create.component.css']
 })
-export class ReservationCreateComponent implements OnInit {
+export class ReservationCreateComponent {
+  private route = inject(ActivatedRoute);
+  private eventService = inject(EventService);
+  private reservationService = inject(ReservationService);
+  public router = inject(Router);
+  public authService = inject(AuthService);
 
-  event: EventModel | null = null;
-  error = '';
-  numberOfTickets = 1;
-  success = false;
-  loading = true;
-  
-  constructor(
-    private route: ActivatedRoute,
-    private eventService: EventService,
-    private reservationService: ReservationService,
-    private router: Router,
-    public authService: AuthService
-  ) {}
+  // 1. Capturamos el ID desde Params o QueryParams usando Signals
+  private params = toSignal(this.route.paramMap);
+  private queryParams = toSignal(this.route.queryParamMap);
 
-  ngOnInit(): void {
-    const eventId = Number(
-      this.route.snapshot.queryParamMap.get('eventId') ??
-      this.route.snapshot.paramMap.get('eventId')
-    );
+  eventId = computed(() => {
+    const id = this.params()?.get('eventId') || this.queryParams()?.get('eventId');
+    return id ? Number(id) : null;
+  });
 
-    if (!eventId) {
-      this.error = 'Evento inválido';
-      this.loading = false;
-      return;
-    }
+  // 2. Cargamos el evento reactivamente
+  event = toSignal(
+    toObservable(this.eventId).pipe(
+      switchMap(id => {
+        if (!id) return of(null);
+        return this.eventService.getEvent(id);
+      })
+    ),
+    { initialValue: undefined } 
+  );
 
-    this.eventService.getEvent(eventId).subscribe({
-      next: event => {
-        this.event = event;
-        this.loading = false;
-      },
-      error: () => {
-        this.error = 'Evento no encontrado';
-        this.loading = false;
-      }
-    });
-  }
+  // 3. Estados de la reserva
+  numberOfTickets = signal(1);
+  error = signal('');
+  loading = computed(() => this.event() === undefined);
+
+  // 4. Lógica Pro: Cálculo de precio total automático
+  totalPrice = computed(() => {
+    const ev = this.event();
+    return ev ? ev.price * this.numberOfTickets() : 0;
+  });
 
   reserve(): void {
-    if (this.numberOfTickets < 1 || !this.event) return;
+    const currentEvent = this.event();
+    if (!currentEvent || this.numberOfTickets() < 1) return;
+
     if (!this.authService.currentUser) {
-      this.error = 'Debes iniciar sesión para reservar.';
+      this.error.set('Debes iniciar sesión para reservar.');
       return;
     }
 
     this.reservationService.createReservation({
-      eventId: this.event.eventId,
-      numberOfTickets: this.numberOfTickets
+      eventId: currentEvent.eventId,
+      numberOfTickets: this.numberOfTickets()
     }).subscribe({
-      next: () => {
-        this.success = true;
-        this.router.navigate(['/my-reservations']);
-      },
-      error: err => {
-        this.error = err.error?.message || 'Error al reservar';
-      }
+      next: () => this.router.navigate(['/my-reservations']),
+      error: (err) => this.error.set(err.error?.message || 'Error al reservar')
     });
   }
 }
