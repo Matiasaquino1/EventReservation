@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace EventReservations.Models
 {
     public class Event
@@ -13,6 +15,9 @@ namespace EventReservations.Models
         public decimal Price { get; set; }
         public int TicketsAvailable { get; set; }  // Número de entradas disponibles        
         public int TotalTickets { get; set; }
+
+        [ConcurrencyCheck]
+        public uint xmin { get; set; }
 
         public ICollection<Reservation> Reservations { get; set; }
     }

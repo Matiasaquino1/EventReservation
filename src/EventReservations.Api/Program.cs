@@ -138,10 +138,8 @@ try
 
     var app = builder.Build();
 
-    // =========================
-    // MIDDLEWARE
-    // =========================
 
+    // MIDDLEWARE
     app.UseExceptionHandler(errorApp =>
     {
         errorApp.Run(async context =>

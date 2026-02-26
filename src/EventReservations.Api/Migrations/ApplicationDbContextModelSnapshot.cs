@@ -60,6 +60,12 @@ namespace EventReservations.Migrations
                     b.Property<int>("TotalTickets")
                         .HasColumnType("integer");
 
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("EventId");
 
                     b.ToTable("Events");

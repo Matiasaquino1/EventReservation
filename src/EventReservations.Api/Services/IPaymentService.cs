@@ -8,8 +8,6 @@ namespace EventReservations.Services
     public interface IPaymentService
     {
         Task<PaymentIntent> CreatePaymentIntentAsync(int reservationId, int userId);
-        Task ProcessWebhookAsync(Stripe.Event stripeEvent);
-
         Task<Payment?> GetPaymentByReservationIdAsync(int reservationId);
         Task<IEnumerable<Payment>> GetPaymentsByUserIdAsync(int userId);
         Task<IEnumerable<Payment>> GetAllPaymentsAsync();
@@ -27,9 +25,6 @@ namespace EventReservations.Services
         private readonly IReservationService _reservationService = reservationService;
         private readonly IConfiguration _configuration = configuration;
 
-        // ===============================
-        // CREATE PAYMENT INTENT
-        // ===============================
         public async Task<PaymentIntent> CreatePaymentIntentAsync(int reservationId, int userId)
         {
             var reservation = await _reservationRepository.GetByIdAsync(reservationId)
@@ -52,7 +47,7 @@ namespace EventReservations.Services
 
             var options = new PaymentIntentCreateOptions
             {
-                Amount = (long)(reservation.Amount * 100),
+                Amount = (long)Math.Round(reservation.Amount * 100, 0),
                 Currency = "usd",
                 AutomaticPaymentMethods = new()
                 {
@@ -68,7 +63,7 @@ namespace EventReservations.Services
             var service = new PaymentIntentService();
             var intent = await service.CreateAsync(options);
 
-            // Persistimos el intent en la reserva
+            // Persiste el intent en la reserva
             reservation.PaymentIntentId = intent.Id;
             await _reservationRepository.UpdateAsync(reservation);
 
@@ -99,36 +94,6 @@ namespace EventReservations.Services
             return intent;
         }
 
-
-        // ===============================
-        // STRIPE WEBHOOK
-        // ===============================
-        public async Task ProcessWebhookAsync(Stripe.Event stripeEvent)
-        {
-            if (stripeEvent?.Data?.Object is not PaymentIntent intent)
-                throw new InvalidOperationException("Evento inválido de Stripe.");
-
-            var payment = await _paymentRepository.GetByStripeIntentIdAsync(intent.Id);
-            if (payment == null)
-                throw new KeyNotFoundException($"Pago no encontrado ({intent.Id}).");
-
-            var mappedStatus = MapStripeStatus(intent.Status);
-            payment.Status = mappedStatus;
-            payment.PaymentDate = DateTime.UtcNow;
-            await _paymentRepository.UpdateAsync(payment);
-
-            // La confirmación de reserva y decremento de tickets se hace en dominio transaccional
-            if (mappedStatus == PaymentStatuses.Succeeded)
-            {
-                await _reservationService.ConfirmPaymentAndDecrementTicketsAsync(
-                    payment.ReservationId,
-                    intent.Id);
-            }
-        }
-
-        // ===============================
-        // QUERIES
-        // ===============================
         public async Task<Payment?> GetPaymentByReservationIdAsync(int reservationId)
             => await _paymentRepository.GetByReservationIdAsync(reservationId);
 
@@ -138,9 +103,6 @@ namespace EventReservations.Services
         public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
             => await _paymentRepository.GetAllAsync();
 
-        // ===============================
-        // PRIVATE MAPPER
-        // ===============================
         private static PaymentStatuses MapStripeStatus(string status) => status switch
         {
             "succeeded" => PaymentStatuses.Succeeded,

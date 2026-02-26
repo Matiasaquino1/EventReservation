@@ -29,6 +29,10 @@ namespace EventReservations.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Event>()
+                .Property(e => e.xmin)
+                .IsRowVersion();
+
             modelBuilder.Entity<Payment>()
                 .Property(p => p.Status)
                 .HasConversion<int>();

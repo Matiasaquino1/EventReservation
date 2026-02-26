@@ -55,8 +55,9 @@ namespace EventReservations.Services
                 await _context.SaveChangesAsync();
                 await tx.CommitAsync();
             }
-            catch
+            catch (DbUpdateConcurrencyException)
             {
+                _logger.LogCritical("¡CONFLICTO DE COMPRA! El usuario pagó pero ya no hay stock para la reserva {Id}", stripeEvent.Id);
                 await tx.RollbackAsync();
                 throw;
             }

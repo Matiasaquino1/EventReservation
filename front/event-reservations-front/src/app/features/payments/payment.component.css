@@ -1,0 +1,49 @@
+.payment-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 1rem;
+}
+
+.payment-card {
+  background: white;
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.stripe-container {
+  margin: 2rem 0;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.pay-button {
+  width: 100%;
+  padding: 1rem;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pay-button:disabled {
+  background: #94a3b8;
+}
+
+.error-banner {
+  color: #ef4444;
+  background: #fef2f2;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}

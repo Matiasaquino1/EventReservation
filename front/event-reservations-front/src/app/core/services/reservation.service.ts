@@ -12,6 +12,15 @@ export class ReservationService {
   constructor(
   private http: HttpClient) {}
 
+  createPaymentIntent(reservationId: number): Observable<{ clientSecret: string }> {
+    const body = { reservationId };
+    
+    return this.http.post<{ clientSecret: string }>(
+      `${this.apiUrl}/create-payment-intent`, 
+      body
+    );
+  }
+
   createReservation(data: CreateReservation) {
     return this.http.post(this.apiUrl, data);
   }

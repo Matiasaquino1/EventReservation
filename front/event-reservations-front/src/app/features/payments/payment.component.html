@@ -1,0 +1,22 @@
+<div class="payment-wrapper">
+  <div class="payment-card">
+    <h2>Finalizar Compra</h2>
+    <p class="subtitle">Ingresa los datos de tu tarjeta para reservar.</p>
+
+    <div class="stripe-container">
+      <div #cardElement id="card-element">
+        </div>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-banner">{{ errorMessage() }}</div>
+    }
+
+    <button 
+      (click)="handleSubmit()" 
+      [disabled]="isProcessing() || !clientSecret()"
+      class="pay-button">
+      {{ isProcessing() ? 'Procesando...' : 'Pagar ahora' }}
+    </button>
+  </div>
+</div>

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260205063125_updateDb")]
-    partial class updateDb
+    [Migration("20260225235022_AddConcurrency")]
+    partial class AddConcurrency
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,6 +62,12 @@ namespace EventReservations.Migrations
 
                     b.Property<int>("TotalTickets")
                         .HasColumnType("integer");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("EventId");
 
