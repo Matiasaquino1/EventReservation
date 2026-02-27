@@ -1,0 +1,34 @@
+<div class="success-container">
+  <div class="message-header">
+    <div class="check-icon">✔</div>
+    <h1>¡Pago Confirmado!</h1>
+    <p>Tu reserva ha sido procesada con éxito.</p>
+  </div>
+
+  <div class="ticket" [class.fade-in]="showTicket()">
+    <div class="ticket-top">
+      <span class="category">Pase de Entrada</span>
+      <h2 class="event-name">Confirmación de Reserva</h2>
+      <p class="status-badge">RESERVADO</p>
+    </div>
+    
+    <div class="ticket-divider">
+      <div class="notch-left"></div>
+      <div class="dots"></div>
+      <div class="notch-right"></div>
+    </div>
+
+    <div class="ticket-bottom">
+      <p class="info">Estamos actualizando tu historial. Podrás ver tus entradas en la sección de mis reservas en unos instantes.</p>
+      
+      <div class="actions">
+        <button class="btn-primary" routerLink="/my-reservations">
+          Ver mis Reservas
+        </button>
+        <button class="btn-ghost" routerLink="/">
+          Volver al Inicio
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

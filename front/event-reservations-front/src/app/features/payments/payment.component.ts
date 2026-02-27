@@ -17,7 +17,7 @@ export class PaymentComponent implements OnInit {
   private router = inject(Router);
   private reservationService = inject(ReservationService);
 
-  // Referencia al div del HTML donde se montará la tarjeta
+  // tarjeta de pago
   cardElementRef = viewChild<ElementRef>('cardElement');
 
   // Estados con Signals
@@ -30,18 +30,24 @@ export class PaymentComponent implements OnInit {
   clientSecret = signal<string | null>(null);
 
   async ngOnInit() {
-    // 1. Inicializar Stripe con tu Public Key (la de TEST)
-    this.stripe = await loadStripe('tu_pk_test_XXXXXX');
+    // Pk de test de Stripe, en producción se debe usar una variable de entorno.
+    this.stripe = await loadStripe('pk_test_51SINgXCFUSVETYTsnDEvXAhTT5HIsqXpFH1MHSVIIetaqnWUVXoo3VfHXVXlKwfL6TB7CqFAQQnWyF8awDjW1JVK00lNk0ptpn');
     
-    // 2. Obtener el clientSecret desde tu controlador de .NET
     const reservationId = Number(this.route.snapshot.queryParamMap.get('reservationId'));
+
+    if (!reservationId) {
+    this.errorMessage.set('No se encontró el ID de la reserva.');
+    return;
+    }
     
-    this.reservationService.createPaymentIntent(reservationId).subscribe({
+    this.reservationService.createPaymentIntent(Number(reservationId)).subscribe({
       next: (res: any) => {
         this.clientSecret.set(res.clientSecret);
         this.mountCardElement();
       },
-      error: () => this.errorMessage.set('Error al inicializar el pago.')
+      error: (err) => {
+      this.errorMessage.set('Error al conectar con la pasarela de pago.');
+    }
     });
   }
 
@@ -70,7 +76,7 @@ export class PaymentComponent implements OnInit {
       payment_method: {
         card: this.card,
         billing_details: {
-          // Podrías pasar el nombre del usuario desde tu AuthService
+          // pasar el nombre del usuario desde AuthService
           name: 'Usuario Comprador' 
         }
       }
@@ -80,8 +86,6 @@ export class PaymentComponent implements OnInit {
       this.errorMessage.set(error.message || 'El pago falló');
       this.isProcessing.set(false);
     } else if (paymentIntent.status === 'succeeded') {
-      // El Webhook en .NET ya está trabajando en segundo plano.
-      // Nosotros llevamos al usuario a una página de éxito.
       this.router.navigate(['/success']);
     }
   }

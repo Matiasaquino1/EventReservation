@@ -1,0 +1,44 @@
+<section class="reservations">
+  <h2>Mis Reservas</h2>
+
+  @if (loading) {
+    <p class="loading">Cargando reservas...</p>
+  }
+
+  @if (!loading && reservations().length === 0) {
+    <div class="empty">
+      Aún no tienes reservas. Explora eventos y reserva tu lugar.
+    </div>
+  }
+
+  @for (res of reservations(); track res.reservationId) {
+    <div class="card">
+      <div>
+        <p class="title">{{ res.event?.title ?? '-' }}</p>
+        <p class="meta">Estado: {{ res.status }}</p>
+        <p class="meta">Tickets: {{ res.numberOfTickets }}</p>
+      </div>
+
+      <div class="actions">
+        @if (res.status === 'Pending') {
+          <button
+            mat-raised-button
+            color="primary"
+            class="btn-pay-late"
+            (click)="goToPay(res.reservationId)">
+            {{ isPaymentInProgress(res.reservationId) ? 'Retomar pago' : 'Pagar ahora' }}
+          </button>
+        } @else {
+          <span class="badge-success">Confirmada</span>
+        }
+
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="cancel(res.reservationId)">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  }
+</section>

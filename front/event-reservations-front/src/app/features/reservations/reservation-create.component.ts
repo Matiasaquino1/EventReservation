@@ -45,6 +45,7 @@ export class ReservationCreateComponent {
 
   // 3. Estados de la reserva
   numberOfTickets = signal(1);
+  isProcessing = signal(false);
   error = signal('');
   loading = computed(() => this.event() === undefined);
 
@@ -53,6 +54,31 @@ export class ReservationCreateComponent {
     const ev = this.event();
     return ev ? ev.price * this.numberOfTickets() : 0;
   });
+
+  goToPayment() {
+    const currentEvent = this.event();
+    if (!currentEvent) return;
+
+    this.isProcessing.set(true);
+
+    // crear la reserva y obtener el ID generado por .NET
+    this.reservationService.createReservation({
+      eventId: currentEvent.eventId,
+      numberOfTickets: this.numberOfTickets()
+    }).subscribe({
+      next: (res: any) => {
+        // 2. 'res.reservationId' es el ID de la bd que .NET nos devuelve al crear la reserva
+        this.router.navigate(['/payments/'], { 
+          queryParams: { reservationId: res.reservationId } 
+        });
+      },
+      error: (err) => {
+        this.error.set(err.error?.message || 'Error al crear la reserva');
+        this.isProcessing.set(false);
+      }
+    });
+  }
+
 
   reserve(): void {
     const currentEvent = this.event();
@@ -63,12 +89,22 @@ export class ReservationCreateComponent {
       return;
     }
 
+    this.isProcessing.set(true); // Para deshabilitar el botón y mostrar loading
+
     this.reservationService.createReservation({
       eventId: currentEvent.eventId,
       numberOfTickets: this.numberOfTickets()
     }).subscribe({
-      next: () => this.router.navigate(['/my-reservations']),
-      error: (err) => this.error.set(err.error?.message || 'Error al reservar')
-    });
+      next: (res: any) => {
+        // ✅ Ahora navegamos a pagos con el ID que nos dio el Back
+        this.router.navigate(['/payments'], { 
+          queryParams: { reservationId: res.reservationId } 
+        });
+      },
+      error: (err) => {
+        this.error.set(err.error?.message || 'Error al reservar');
+        this.isProcessing.set(false);
+      }
+    });   
   }
 }

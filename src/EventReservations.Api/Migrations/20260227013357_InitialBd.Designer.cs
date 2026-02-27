@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260225235022_AddConcurrency")]
-    partial class AddConcurrency
+    [Migration("20260227013357_InitialBd")]
+    partial class InitialBd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

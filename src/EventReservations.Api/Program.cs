@@ -6,6 +6,7 @@ using EventReservations.Repositories;
 using EventReservations.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -95,7 +96,6 @@ try
             };
         });
 
-
     // API Versioning
     builder.Services.AddApiVersioning(options =>
     {
@@ -138,6 +138,33 @@ try
 
     var app = builder.Build();
 
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        context.Database.Migrate(); // Aplica migraciones automáticamente (opcional pero recomendado)
+
+        // Verificamos si ya existe un admin
+        if (!context.Users.Any(u => u.Role == "Admin"))
+        {
+            var adminEmail = builder.Configuration["Admin:Email"] ?? "admin@gmail.com";
+            var adminPassword = builder.Configuration["Admin:Password"] ?? "123456";
+
+            var adminUser = new User
+            {
+                Email = adminEmail,
+                Name = "Administrador",
+                Role = "Admin",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+                Created = DateTime.UtcNow
+            };
+
+            context.Users.Add(adminUser);
+            context.SaveChanges();
+
+            Log.Information("Usuario Admin creado automáticamente");
+        }
+    }
 
     // MIDDLEWARE
     app.UseExceptionHandler(errorApp =>

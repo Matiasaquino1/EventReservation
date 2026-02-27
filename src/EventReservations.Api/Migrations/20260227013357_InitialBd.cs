@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     /// <inheritdoc />
-    public partial class AddConcurrency : Migration
+    public partial class InitialBd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

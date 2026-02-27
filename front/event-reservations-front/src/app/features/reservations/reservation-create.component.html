@@ -41,11 +41,11 @@
           <p class="total-amount">$ {{ totalPrice() | number:'1.0-0' }}</p>
         </div>
 
-        <button
-          class="btn-confirm"
-          (click)="reserve()"
-          [disabled]="ev.ticketsAvailable === 0 || numberOfTickets() < 1">
-          Finalizar Reserva
+        <button 
+          class="btn-confirm" 
+          (click)="goToPayment()" 
+          [disabled]="ev.ticketsAvailable === 0 || numberOfTickets() < 1 || isProcessing()">
+          {{ isProcessing() ? 'Generando reserva...' : 'Continuar con el pago' }}
         </button>
       </div>
 

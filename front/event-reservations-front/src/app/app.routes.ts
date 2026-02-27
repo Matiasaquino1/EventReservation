@@ -24,13 +24,15 @@ export const routes: Routes = [
   { path: 'my-reservations', loadComponent: () => import('./features/reservations/my-reservations.component').then(m => m.MyReservationsComponent),},
   { path: 'reservations/create', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent),},
   { path: 'reservations/create/:eventId', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent),},
+  { path: 'payments', loadComponent: () => import('./features/payments/payment.component').then(m => m.PaymentComponent),},
+  { path: 'success', loadComponent:  () => import('./features/payments/success.component').then(m => m.SuccessComponent),},
   {
     path: 'admin',
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] },
     children: [
-      { path: 'users', component: UsersComponent },
-      { path: 'reservations', component: ReservationsAdminComponent }
+      { path: 'users', loadComponent: () => import('./features/admin/users.component').then(m => m.UsersComponent) },
+      { path: 'reservations', loadComponent: () => import('./features/admin/reservations-admin.component').then(m => m.ReservationsAdminComponent) }
     ]
   },
   { path: '**', redirectTo: '' }

@@ -1,0 +1,133 @@
+.success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1rem;
+  background: #f8fafc;
+  min-height: 80vh;
+}
+
+.message-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.check-icon {
+  width: 60px;
+  height: 60px;
+  background: #22c55e;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1rem;
+}
+
+/* Ticket */
+.ticket {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ticket.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ticket-top {
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: white;
+}
+
+.category {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.status-badge {
+  display: inline-block;
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  padding: 0.25rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-top: 1rem;
+}
+
+/* Divisor con muescas */
+.ticket-divider {
+  position: relative;
+  height: 20px;
+  background: white;
+  display: flex;
+  align-items: center;
+}
+
+.dots {
+  flex: 1;
+  border-bottom: 2px dashed #e2e8f0;
+  margin: 0 15px;
+}
+
+.notch-left, .notch-right {
+  width: 20px;
+  height: 20px;
+  background: #f8fafc; /* Color del fondo de la web */
+  border-radius: 50%;
+  position: absolute;
+}
+
+.notch-left { left: -10px; }
+.notch-right { right: -10px; }
+
+.ticket-bottom {
+  padding: 2rem;
+  text-align: center;
+}
+
+.info {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.btn-primary {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  padding: 0.8rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
