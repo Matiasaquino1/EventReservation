@@ -1,22 +1,30 @@
-<div class="payment-wrapper">
-  <div class="payment-card">
-    <h2>Finalizar Compra</h2>
-    <p class="subtitle">Ingresa los datos de tu tarjeta para reservar.</p>
+<div class="payment-container">
+  <h2>Detalles de Pago</h2>
 
-    <div class="stripe-container">
-      <div #cardElement id="card-element">
-        </div>
+  <div class="payment-form">
+    <div class="form-group">
+      <label>Número de Tarjeta</label>
+      <div #cardNumber class="stripe-input"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Fecha de Vencimiento</label>
+        <div #cardExpiry class="stripe-input"></div>
+      </div>
+
+      <div class="form-group">
+        <label>CVC</label>
+        <div #cardCvc class="stripe-input"></div>
+      </div>
     </div>
 
     @if (errorMessage()) {
-      <div class="error-banner">{{ errorMessage() }}</div>
+      <div class="error-msg">{{ errorMessage() }}</div>
     }
 
-    <button 
-      (click)="handleSubmit()" 
-      [disabled]="isProcessing() || !clientSecret()"
-      class="pay-button">
-      {{ isProcessing() ? 'Procesando...' : 'Pagar ahora' }}
+    <button (click)="confirmPayment()" [disabled]="isProcessing()" class="btn-pay">
+      {{ isProcessing() ? 'Procesando Pago...' : 'Confirmar y Pagar' }}
     </button>
   </div>
 </div>

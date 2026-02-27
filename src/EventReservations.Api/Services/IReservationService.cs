@@ -16,6 +16,7 @@ namespace EventReservations.Services
         Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(string? status, int? eventId, int page,  int pageSize, string sort);
         Task<Reservation> UpdateReservationAsync(Reservation reservation);
         Task<bool> IsDuplicateReservationAsync(int userId, int eventId);
+        Task<bool> ConfirmReservationAsync(int reservationId);
         Task<Reservation> DeleteReservation(int id);
         Task<Reservation> GetReservationAsync(int id);
         Task<IEnumerable<Reservation>> GetAllReservationsAsync(string? status = null, int? eventId = null);
@@ -184,6 +185,24 @@ namespace EventReservations.Services
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<bool> ConfirmReservationAsync(int reservationId)
+        {
+            var reservation = await _context.Reservations.FindAsync(reservationId);
+
+            if (reservation == null) return false;
+
+            // Solo confirmamos si está pendiente
+            if (reservation.Status == ReservationStatuses.Pending)
+            {
+                reservation.Status = ReservationStatuses.Confirmed;
+                // Aquí podrías restar los tickets del evento si no lo hiciste al crearla
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<Reservation> GetReservationAsync(int id) 

@@ -129,7 +129,6 @@ namespace EventReservations.Controllers
         }
     }
 
-
 }
 
 

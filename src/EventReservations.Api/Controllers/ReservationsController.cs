@@ -4,11 +4,12 @@ using EventReservations.Models;  // Para Reservation
 using EventReservations.Services;  // Para IReservationService
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Stripe;  // Para Stripe integration
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging; 
-using System.Security.Claims; // Para claims de usuario
+using Stripe;  // Para Stripe integration
 using System.ComponentModel.DataAnnotations; // Para validaciones (si agrego)
+using System.Security.Claims; // Para claims de usuario
+using System.Threading.Tasks;
 
 namespace EventReservations.Controllers
 {
@@ -356,6 +357,18 @@ namespace EventReservations.Controllers
                 _logger.LogError(ex, "Error cancelando reserva {Id}", id);
                 return StatusCode(500, new { error = "Error interno del servidor." });
             }
+        }
+
+        [HttpPatch("{id}/confirm")]
+        [Authorize]
+        public async Task<IActionResult> ConfirmReservation(int id)
+        {
+            var result = await _reservationService.ConfirmReservationAsync(id);
+
+            if (!result)
+                return BadRequest(new { message = "No se pudo confirmar la reserva o ya estaba confirmada." });
+
+            return Ok(new { message = "Reserva confirmada con éxito." });
         }
     }
 }

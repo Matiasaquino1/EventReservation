@@ -8,21 +8,22 @@ import { CreateReservation } from '../models/create-reservation.model';
 @Injectable({ providedIn: 'root' })
 export class ReservationService {
   private apiUrl = `${environment.apiUrl}/api/Reservations`;
+  private paymentsApiUrl = `${environment.apiUrl}/api/payments`;
+
   
   constructor(
   private http: HttpClient) {}
 
-  createPaymentIntent(reservationId: number): Observable<{ clientSecret: string }> {
-    const body = { reservationId };
-    
-    return this.http.post<{ clientSecret: string }>(
-      `${this.apiUrl}/create-payment-intent`, 
-      body
-    );
-  }
-
   createReservation(data: CreateReservation) {
     return this.http.post(this.apiUrl, data);
+  }
+
+  createPaymentIntent(reservationId: number): Observable<{ clientSecret: string }> {
+    const body = { reservationId };
+    return this.http.post<{ clientSecret: string }>(
+      `${this.paymentsApiUrl}/create-payment-intent`, 
+      body
+    );
   }
 
   getMyReservations() {
@@ -34,6 +35,10 @@ export class ReservationService {
     if (filters?.status) params = params.set('status', filters.status);
     if (filters?.eventId) params = params.set('eventId', filters.eventId);
     return this.http.get<{ reservations: Reservation[]; total: number }>(`${environment.apiUrl}/api/Reservations`, { params });
+  }
+
+  confirmReservation(reservationId: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${reservationId}/confirm`, {});
   }
 
   cancelReservation(id: number): Observable<void> {

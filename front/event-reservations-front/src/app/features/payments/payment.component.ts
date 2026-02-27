@@ -2,7 +2,7 @@ import { Component, inject, signal, viewChild, ElementRef, OnInit } from '@angul
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { loadStripe } from '@stripe/stripe-js';
-import type { Stripe, StripeElements, StripeCardElement } from '@stripe/stripe-js';
+import type { Stripe, StripeElements, StripeCardNumberElement, StripeCardExpiryElement, StripeCardCvcElement } from '@stripe/stripe-js';
 import { ReservationService } from '../../core/services/reservation.service';
 
 @Component({
@@ -17,67 +17,80 @@ export class PaymentComponent implements OnInit {
   private router = inject(Router);
   private reservationService = inject(ReservationService);
 
-  // tarjeta de pago
-  cardElementRef = viewChild<ElementRef>('cardElement');
+  // Referencias a los contenedores del DOM
+  cardNumberRef = viewChild<ElementRef>('cardNumber');
+  cardExpiryRef = viewChild<ElementRef>('cardExpiry');
+  cardCvcRef = viewChild<ElementRef>('cardCvc');
 
-  // Estados con Signals
   stripe: Stripe | null = null;
   elements: StripeElements | null = null;
-  card: StripeCardElement | null = null;
   
+  // Elementos individuales
+  cardNumber: StripeCardNumberElement | null = null;
+  cardExpiry: StripeCardExpiryElement | null = null;
+  cardCvc: StripeCardCvcElement | null = null;
+
+  reservationId: number = 0;
   isProcessing = signal(false);
   errorMessage = signal<string | null>(null);
   clientSecret = signal<string | null>(null);
 
   async ngOnInit() {
-    // Pk de test de Stripe, en producción se debe usar una variable de entorno.
     this.stripe = await loadStripe('pk_test_51SINgXCFUSVETYTsnDEvXAhTT5HIsqXpFH1MHSVIIetaqnWUVXoo3VfHXVXlKwfL6TB7CqFAQQnWyF8awDjW1JVK00lNk0ptpn');
     
-    const reservationId = Number(this.route.snapshot.queryParamMap.get('reservationId'));
+    this.reservationId = Number(this.route.snapshot.queryParamMap.get('reservationId'));
 
-    if (!reservationId) {
-    this.errorMessage.set('No se encontró el ID de la reserva.');
-    return;
+    if (!this.reservationId) {
+      this.errorMessage.set('No se encontró el ID de la reserva.');
+      return;
     }
     
-    this.reservationService.createPaymentIntent(Number(reservationId)).subscribe({
+    this.reservationService.createPaymentIntent(this.reservationId).subscribe({
       next: (res: any) => {
         this.clientSecret.set(res.clientSecret);
-        this.mountCardElement();
+        this.mountElements();
       },
-      error: (err) => {
-      this.errorMessage.set('Error al conectar con la pasarela de pago.');
-    }
+      error: () => this.errorMessage.set('Error al conectar con la pasarela de pago.')
     });
   }
 
-  mountCardElement() {
-    if (!this.stripe || !this.cardElementRef()) return;
+  mountElements() {
+    if (!this.stripe) return;
 
     this.elements = this.stripe.elements();
-    this.card = this.elements.create('card', {
-      style: {
-        base: {
-          fontSize: '16px',
-          color: '#1e293b',
-          '::placeholder': { color: '#94a3b8' }
-        }
+    const style = {
+      base: {
+        fontSize: '16px',
+        color: '#1e293b',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        '::placeholder': { color: '#94a3b8' }
       }
-    });
-    this.card.mount(this.cardElementRef()?.nativeElement);
+    };
+
+    // Crear y montar Número de tarjeta
+    this.cardNumber = this.elements.create('cardNumber', { style });
+    this.cardNumber.mount(this.cardNumberRef()?.nativeElement);
+
+    // Crear y montar Fecha de Vencimiento
+    this.cardExpiry = this.elements.create('cardExpiry', { style });
+    this.cardExpiry.mount(this.cardExpiryRef()?.nativeElement);
+
+    // Crear y montar CVC
+    this.cardCvc = this.elements.create('cardCvc', { style });
+    this.cardCvc.mount(this.cardCvcRef()?.nativeElement);
   }
 
-  async handleSubmit() {
-    if (!this.stripe || !this.card || !this.clientSecret()) return;
+  async confirmPayment() {
+    if (!this.stripe || !this.cardNumber || !this.clientSecret()) return;
 
     this.isProcessing.set(true);
+    this.errorMessage.set(null);
 
     const { error, paymentIntent } = await this.stripe.confirmCardPayment(this.clientSecret()!, {
       payment_method: {
-        card: this.card,
+        card: this.cardNumber!,
         billing_details: {
-          // pasar el nombre del usuario desde AuthService
-          name: 'Usuario Comprador' 
+          name: 'Usuario Comprador' // Idealmente obtener de AuthService
         }
       }
     });
@@ -86,7 +99,21 @@ export class PaymentComponent implements OnInit {
       this.errorMessage.set(error.message || 'El pago falló');
       this.isProcessing.set(false);
     } else if (paymentIntent.status === 'succeeded') {
-      this.router.navigate(['/success']);
+      this.finalizeReservation();
     }
+  }
+
+  private finalizeReservation() {
+    // Llamamos al backend para actualizar el estado de la reserva
+    this.reservationService.confirmReservation(this.reservationId).subscribe({
+      next: () => {
+        this.router.navigate(['/success']);
+      },
+      error: (err: any) => {
+        console.error('Pago exitoso en Stripe, pero falló actualización en BD', err);
+        this.errorMessage.set('Pago confirmado, pero hubo un error al actualizar tu reserva. Contacta a soporte.');
+        this.isProcessing.set(false);
+      }
+    });
   }
 }
