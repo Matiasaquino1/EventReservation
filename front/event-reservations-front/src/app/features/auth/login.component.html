@@ -1,0 +1,26 @@
+<section class="auth">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-card">
+    <h1>Bienvenido de nuevo</h1>
+    <p class="subtitle">Ingresa para gestionar tus reservas.</p>
+
+    <label>
+      Email
+      <input formControlName="email" placeholder="correo@ejemplo.com" type="email" 
+             [class.invalid]="form.get('email')?.invalid && form.get('email')?.touched">
+    </label>
+
+    <label>
+      Contraseña
+      <input formControlName="password" type="password" placeholder="********"
+             [class.invalid]="form.get('password')?.invalid && form.get('password')?.touched">
+    </label>
+
+    <button type="submit" [disabled]="form.invalid || loading">
+      {{ loading ? 'Ingresando...' : 'Ingresar' }}
+    </button>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+  </form>
+</section>
