@@ -20,20 +20,20 @@ export const routes: Routes = [
   },
   { path: 'login', loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./features/auth/register.component').then(m => m.RegisterComponent) },
-  { path: 'events/:id', loadComponent: () => import('./features/events/event-detail.component').then(m => m.EventDetailComponent) },
-  { path: 'my-reservations', loadComponent: () => import('./features/reservations/my-reservations.component').then(m => m.MyReservationsComponent),},
-  { path: 'reservations/create', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent),},
-  { path: 'reservations/create/:eventId', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent),},
-  { path: 'payments', loadComponent: () => import('./features/payments/payment.component').then(m => m.PaymentComponent),},
-  { path: 'success', loadComponent:  () => import('./features/payments/success.component').then(m => m.SuccessComponent),},
+  { path: 'events/:id', loadComponent: () => import('./features/events/event-detail.component').then(m => m.EventDetailComponent), canActivate: [AuthGuard] },
+  { path: 'my-reservations', loadComponent: () => import('./features/reservations/my-reservations.component').then(m => m.MyReservationsComponent), canActivate: [AuthGuard] },
+  { path: 'reservations/create', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent), canActivate: [AuthGuard]},
+  { path: 'reservations/create/:eventId', loadComponent: () => import('./features/reservations/reservation-create.component').then(m => m.ReservationCreateComponent), canActivate: [AuthGuard]},
+  { path: 'payments', loadComponent: () => import('./features/payments/payment.component').then(m => m.PaymentComponent), canActivate: [AuthGuard]},
+  { path: 'success', loadComponent:  () => import('./features/payments/success.component').then(m => m.SuccessComponent), canActivate: [AuthGuard]},
   {
     path: 'admin',
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] },
     children: [
-      { path: 'users', loadComponent: () => import('./features/admin/users.component').then(m => m.UsersComponent) },
-      { path: 'reservations', loadComponent: () => import('./features/admin/reservations-admin.component').then(m => m.ReservationsAdminComponent) }
+      { path: 'users', loadComponent: () => import('./features/admin/users.component').then(m => m.UsersComponent), canActivate: [AuthGuard] },
+      { path: 'reservations', loadComponent: () => import('./features/admin/reservations-admin.component').then(m => m.ReservationsAdminComponent), canActivate: [AuthGuard] }
     ]
   },
-  { path: '**', redirectTo: '' }
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
 ];

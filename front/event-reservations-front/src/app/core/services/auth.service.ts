@@ -51,6 +51,30 @@ export class AuthService {
     return user?.role === role;
   }
 
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('token');
+
+    if (!token) return false;
+
+    try {
+      const decoded = jwtDecode<{ exp?: number }>(token);
+
+      if (!decoded.exp) return false;
+
+      const now = Math.floor(Date.now() / 1000);
+
+      if (decoded.exp <= now) {
+        localStorage.removeItem('token');
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      localStorage.removeItem('token');
+      return false;
+    }
+  } 
+
   get currentUser(): User | null {
     return this.currentUserSubject.value;
   }

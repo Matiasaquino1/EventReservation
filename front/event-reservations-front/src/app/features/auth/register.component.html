@@ -1,0 +1,34 @@
+<section class="auth">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-card">
+    <h1>Crea tu cuenta</h1>
+    <p class="subtitle">Empieza a reservar eventos en minutos.</p>
+
+    <label>
+      Nombre de usuario
+      <input formControlName="name" placeholder="Tu nombre">
+    </label>
+
+    <label>
+      Email
+      <input formControlName="email" placeholder="correo@ejemplo.com" type="email">
+      @if (form.get('email')?.errors?.['email'] && form.get('email')?.touched) {
+        <span class="val-error">Formato de email inválido</span>
+      }
+    </label>
+
+    <label>
+      Contraseña
+      <input formControlName="password" type="password" placeholder="Mínimo 6 caracteres">
+      @if (form.get('password')?.errors?.['minlength'] && form.get('password')?.touched) {
+        <span class="val-error">Debe tener al menos 6 caracteres</span>
+      }
+    </label>
+
+    <button type="submit" [disabled]="form.invalid || loading">
+      {{ loading ? 'Registrando...' : 'Registrarme' }}
+    </button>
+
+    @if (error) { <p class="error">{{ error }}</p> }
+    @if (success) { <p class="success">Cuenta creada. Redirigiendo...</p> }
+  </form>
+</section>
