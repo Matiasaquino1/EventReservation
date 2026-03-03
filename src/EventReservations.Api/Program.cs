@@ -31,10 +31,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog();
 
-    // =========================
     // SERVICES
-    // =========================
-
     builder.Services.AddControllers();
 
     // DbContext

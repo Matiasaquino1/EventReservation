@@ -34,7 +34,7 @@ export class ReservationService {
     let params = new HttpParams().set('page', page).set('limit', limit);
     if (filters?.status) params = params.set('status', filters.status);
     if (filters?.eventId) params = params.set('eventId', filters.eventId);
-    return this.http.get<{ reservations: Reservation[]; total: number }>(`${environment.apiUrl}/api/Reservations`, { params });
+    return this.http.get<{ reservations: Reservation[]; total: number }>(`${this.apiUrl}`, { params });
   }
 
   confirmReservation(reservationId: number): Observable<any> {
@@ -42,17 +42,17 @@ export class ReservationService {
   }
 
   cancelReservation(id: number): Observable<void> {
-    return this.http.put<void>(`${environment.apiUrl}/api/Reservations/${id}/cancel`, {});
+    return this.http.patch<void>(`${this.apiUrl}/${id}/cancel`, {});
   }
 
   forceConfirm(eventId: number) {
     return this.http.post(
-      `${environment.apiUrl}/api/Admin/events/${eventId}/force-confirm`,
+      `${this.apiUrl}/Admin/events/${eventId}/force-confirm`,
       {}
     );
   }
 
   getPaymentIntent(id: number): Observable<{clientSecret: string}> {
-    return this.http.get<{clientSecret: string}>(`${this.apiUrl}/api/Reservations/${id}/payment-intent`);
+    return this.http.get<{clientSecret: string}>(`${this.apiUrl}/${id}/payment-intent`);
   }
 }

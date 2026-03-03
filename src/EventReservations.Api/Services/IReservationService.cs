@@ -4,6 +4,7 @@ using EventReservations.Models;
 using EventReservations.Repositories;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 using System.Threading.Tasks;
 
 namespace EventReservations.Services
@@ -86,19 +87,32 @@ namespace EventReservations.Services
 
         public async Task<Reservation> CancelReservationAsync(int id)
         {
-            var reservation = await _reservationRepository.GetByIdAsync(id)
-                ?? throw new InvalidOperationException("Reserva no encontrada.");
+            var reservation = await _reservationRepository.GetByIdAsync(id);
 
-            if (reservation.Status != ReservationStatuses.Pending)
-                throw new InvalidOperationException("Solo se pueden cancelar reservas pendientes.");
+            if (reservation.Status != ReservationStatuses.Pending && reservation.Status != ReservationStatuses.Confirmed)
+            {
+                throw new InvalidOperationException("Solo reservas pendientes o confirmadas pueden cancelarse.");
+            }
+
+            if (!string.IsNullOrEmpty(reservation.PaymentIntentId))
+            {
+                var service = new PaymentIntentService();
+
+                try
+                {
+                    await service.CancelAsync(reservation.PaymentIntentId);
+                }
+                catch (StripeException)
+                {
+                }
+            }
 
             reservation.Status = ReservationStatuses.Cancelled;
+
             await _reservationRepository.UpdateAsync(reservation);
 
             return reservation;
         }
-
-
 
         public async Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId)
         {

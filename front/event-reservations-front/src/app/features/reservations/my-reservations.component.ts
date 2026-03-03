@@ -11,7 +11,8 @@ import { Router } from '@angular/router';
   templateUrl: './my-reservations.component.html',
   styleUrls: ['./my-reservations.component.css']
 })
-export class MyReservationsComponent implements OnInit {
+export class MyReservationsComponent 
+implements OnInit {
   private reservationService = inject(ReservationService);
   private router = inject(Router);
   
@@ -35,17 +36,27 @@ export class MyReservationsComponent implements OnInit {
       }
     });
   }
-  cancel(id: number) {
-    if (confirm('¿Estás seguro de que quieres cancelar esta reserva?')) {
-      this.reservationService.cancelReservation(id).subscribe({
-        next: () => this.loadReservations(), 
-        error: () => alert('Error al cancelar')
-      });
+
+  cancelReservation(id: number) {
+  if (confirm('¿Estás seguro de que deseas cancelar esta reserva?')) {
+    console.log('ID que llega:', id);
+    this.reservationService.cancelReservation(id).subscribe({
+      next: () => {
+        this.reservations.update(res => 
+          res.map(r => 
+            r.reservationId === id 
+              ? { ...r, status: 'Cancelled' } 
+              : r
+          )
+        );
+      },
+      error: () => alert('No se pudo cancelar la reserva.')
+    });
     }
   }
 
   goToPay(id: number) {
-    this.router.navigate(['/payment'], { queryParams: { reservationId: id } });
+    this.router.navigate(['/payments'], { queryParams: { reservationId: id } });
   }
 
   getStatusClass(status: string) {

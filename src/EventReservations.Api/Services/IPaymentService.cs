@@ -12,7 +12,7 @@ namespace EventReservations.Services
         Task<Payment?> GetPaymentByReservationIdAsync(int reservationId);
         Task<IEnumerable<Payment>> GetPaymentsByUserIdAsync(int userId);
         Task<IEnumerable<Payment>> GetAllPaymentsAsync();
-
+        Task<string> GetExistingOrNewClientSecretAsync(int reservationId, int userId);
     }
 
     public class PaymentService(
@@ -43,8 +43,6 @@ namespace EventReservations.Services
                 var existingService = new PaymentIntentService();
                 return await existingService.GetAsync(reservation.PaymentIntentId);
             }
-
-            StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
 
             var options = new PaymentIntentCreateOptions
             {
@@ -95,35 +93,76 @@ namespace EventReservations.Services
             return intent;
         }
 
-        public async Task<string> GetExistingOrNewClientSecretAsync(Reservation reservation)
+        public async Task<string> GetExistingOrNewClientSecretAsync(int reservationId, int userId)
         {
+            var reservation = await _reservationRepository.GetByIdAsync(reservationId)
+                ?? throw new InvalidOperationException("Reserva no encontrada.");
+
+            if (reservation.UserId != userId)
+                throw new UnauthorizedAccessException();
+
+            if (reservation.Status != ReservationStatuses.Pending)
+                throw new InvalidOperationException("La reserva no puede pagarse.");
+
+            var service = new PaymentIntentService();
+
             if (!string.IsNullOrEmpty(reservation.PaymentIntentId))
             {
-                var existing = await _paymentRepository.GetByStripeIntentIdAsync(reservation.PaymentIntentId);
+                var existingIntent = await service.GetAsync(reservation.PaymentIntentId);
 
-                // Si sigue siendo usable, lo reutilizamos
-                if (existing.Status != "succeeded" && existing.Status != "canceled")
+                if (existingIntent.Status != "succeeded" &&
+                    existingIntent.Status != "canceled")
                 {
-                    return existing.ClientSecret;
+                    return existingIntent.ClientSecret;
                 }
             }
 
-            // Creamos uno nuevo si no existe o no es reutilizable
-            var intent = await _paymentIntentService.CreateAsync(new PaymentIntentCreateOptions
+            var options = new PaymentIntentCreateOptions
             {
-                Amount = reservation.TotalAmountCents,
-                Currency = "usd", // o "ars" si estás cobrando en pesos
+                Amount = (long)Math.Round(reservation.Amount * 100, 0),
+                Currency = "usd",
+                AutomaticPaymentMethods = new()
+                {
+                    Enabled = true
+                },
                 Metadata = new Dictionary<string, string>
                 {
-                    { "reservationId", reservation.Id.ToString() },
-                    { "userId", reservation.UserId }
+                    ["reservationId"] = reservationId.ToString(),
+                    ["userId"] = userId.ToString()
                 }
-            });
+            };
 
-            reservation.StripePaymentIntentId = intent.Id;
-            await _context.SaveChangesAsync();
+            var newIntent = await service.CreateAsync(options);
 
-            return intent.ClientSecret;
+            reservation.PaymentIntentId = newIntent.Id;
+            await _reservationRepository.UpdateAsync(reservation);
+
+            var existingPayment = await _paymentRepository.GetByReservationIdAsync(reservationId);
+
+            if (existingPayment is null)
+            {
+                await _paymentRepository.AddAsync(new Payment
+                {
+                    ReservationId = reservationId,
+                    Amount = reservation.Amount,
+                    Status = PaymentStatuses.Pending,
+                    StripePaymentIntentId = newIntent.Id
+                });
+            }
+            else
+            {
+                existingPayment.StripePaymentIntentId = newIntent.Id;
+                existingPayment.Amount = reservation.Amount;
+
+                if (existingPayment.Status != PaymentStatuses.Succeeded)
+                {
+                    existingPayment.Status = PaymentStatuses.Pending;
+                }
+
+                await _paymentRepository.UpdateAsync(existingPayment);
+            }
+
+            return newIntent.ClientSecret;
         }
 
 
@@ -136,14 +175,7 @@ namespace EventReservations.Services
         public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
             => await _paymentRepository.GetAllAsync();
 
-        private static PaymentStatuses MapStripeStatus(string status) => status switch
-        {
-            "succeeded" => PaymentStatuses.Succeeded,
-            "processing" => PaymentStatuses.Processing,
-            "requires_payment_method" => PaymentStatuses.Failed,
-            "canceled" => PaymentStatuses.Canceled,
-            _ => PaymentStatuses.Pending
-        };
+
     }
 }
 

@@ -14,20 +14,8 @@
 
   <div class="reservations-grid">
     @for (res of reservations(); track res.id) {
-      <div class="res-card">
-        <div class="res-actions">
-          @if (res.status === 'Pending') {
-            <button class="btn-pay" (click)="goToPay(res.id)">
-              Pagar Ahora
-            </button>
-          }
-          @if (res.status === 'Confirmed') {
-            <button class="btn-cancel" (click)="cancel(res.id)">
-              Cancelar Reserva
-            </button>
-          }
-        </div>
-      </div>
+      <div class="res-card" [ngClass]="getStatusClass(res.status)">
+        
         <div class="res-header">
           <span class="status-badge" [ngClass]="getStatusClass(res.status)">
             {{ res.status }}
@@ -41,8 +29,22 @@
         </div>
 
         <div class="res-footer">
-          <small>ID de Reserva: #{{ res.id }}</small>
+          <small>ID de Reserva: #{{ res.reservationId }}</small>
         </div>
-      } 
+
+        <div class="res-actions">
+          @if (res.status === 'Pending') {
+            <button class="btn-pay" (click)="goToPay(res.reservationId)">
+              Pagar Ahora
+            </button>
+          }
+          @if (res.status === 'Confirmed') {
+            <button class="btn-cancel" (click)="cancelReservation(res.reservationId)">
+              Cancelar Reserva
+            </button>
+          }
+        </div>
+
+      </div> } 
   </div>
 </div>

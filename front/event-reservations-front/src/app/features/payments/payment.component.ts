@@ -30,27 +30,38 @@ export class PaymentComponent implements OnInit {
   cardExpiry: StripeCardExpiryElement | null = null;
   cardCvc: StripeCardCvcElement | null = null;
 
-  reservationId: number = 0;
+  reservationId = signal<number | null>(null);
   isProcessing = signal(false);
   errorMessage = signal<string | null>(null);
   clientSecret = signal<string | null>(null);
 
   async ngOnInit() {
-    this.stripe = await loadStripe('pk_test_51SINgXCFUSVETYTsnDEvXAhTT5HIsqXpFH1MHSVIIetaqnWUVXoo3VfHXVXlKwfL6TB7CqFAQQnWyF8awDjW1JVK00lNk0ptpn');
-    
-    this.reservationId = Number(this.route.snapshot.queryParamMap.get('reservationId'));
 
-    if (!this.reservationId) {
-      this.errorMessage.set('No se encontró el ID de la reserva.');
-      return;
+  this.stripe = await loadStripe('pk_test_51SINgXCFUSVETYTsnDEvXAhTT5HIsqXpFH1MHSVIIetaqnWUVXoo3VfHXVXlKwfL6TB7CqFAQQnWyF8awDjW1JVK00lNk0ptpn');
+
+  const idFromUrl = this.route.snapshot.queryParamMap.get('reservationId');
+  const id = Number(idFromUrl);
+
+  if (!id || isNaN(id)) {
+    this.errorMessage.set('No se encontró un ID de reserva válido.');
+    return;
+  }
+  this.reservationId.set(id);
+
+  this.reservationService.getPaymentIntent(id).subscribe({
+    next: (res: any) => {
+      const secret = res.clientSecret || res.ClientSecret;     
+      if (secret) {
+        this.clientSecret.set(secret);
+        this.mountElements(); 
+      } else {
+        this.errorMessage.set('El servidor no devolvió el secreto de pago.');
+      }
+    },
+    error: (err) => {
+      this.errorMessage.set('Error al recuperar el intento de pago.');
+      console.error('Error en getPaymentIntent:', err);
     }
-    
-    this.reservationService.createPaymentIntent(this.reservationId).subscribe({
-      next: (res: any) => {
-        this.clientSecret.set(res.clientSecret);
-        this.mountElements();
-      },
-      error: () => this.errorMessage.set('Error al conectar con la pasarela de pago.')
     });
   }
 
@@ -67,15 +78,12 @@ export class PaymentComponent implements OnInit {
       }
     };
 
-    // Crear y montar Número de tarjeta
     this.cardNumber = this.elements.create('cardNumber', { style });
     this.cardNumber.mount(this.cardNumberRef()?.nativeElement);
 
-    // Crear y montar Fecha de Vencimiento
     this.cardExpiry = this.elements.create('cardExpiry', { style });
     this.cardExpiry.mount(this.cardExpiryRef()?.nativeElement);
 
-    // Crear y montar CVC
     this.cardCvc = this.elements.create('cardCvc', { style });
     this.cardCvc.mount(this.cardCvcRef()?.nativeElement);
   }
@@ -90,7 +98,7 @@ export class PaymentComponent implements OnInit {
       payment_method: {
         card: this.cardNumber!,
         billing_details: {
-          name: 'Usuario Comprador' // Idealmente obtener de AuthService
+          name: 'Usuario Comprador' 
         }
       }
     });
@@ -104,8 +112,13 @@ export class PaymentComponent implements OnInit {
   }
 
   private finalizeReservation() {
-    // Llamamos al backend para actualizar el estado de la reserva
-    this.reservationService.confirmReservation(this.reservationId).subscribe({
+    const id = this.reservationId();
+    if (!id) {
+      this.errorMessage.set('No se encontró el ID de la reserva.');
+      this.isProcessing.set(false);
+      return;
+    }
+    this.reservationService.confirmReservation(id).subscribe({
       next: () => {
         this.router.navigate(['/success']);
       },
