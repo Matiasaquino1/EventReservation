@@ -1,58 +1,77 @@
-.reservations {
-  max-width: 720px;
-  margin: 0 auto;
+.container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+
+.reservations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.card {
-  border: 1px solid #e2e8f0;
-  padding: 1rem 1.5rem;
-  margin: 1rem 0;
-  border-radius: 14px;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
-}
-
-.title {
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.meta {
-  color: #64748b;
-  margin: 0.15rem 0;
-}
-
-.loading {
-  color: #5f6b7a;
-  padding: 1.5rem 0;
-}
-
-.empty {
-  padding: 1.5rem;
-  background: #f8fafc;
+.res-card {
+  background: white;
   border-radius: 12px;
-  color: #64748b;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  border-left: 5px solid #cbd5e1;
+  transition: transform 0.2s;
 }
 
-.actions {
+.res-card:hover { transform: translateY(-5px); }
+
+.res-header {
   display: flex;
-  gap: 0.75rem;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 1rem;
 }
 
-.badge-success {
-  background: #dcfce7;
-  color: #166534;
-  padding: 0.35rem 0.75rem;
+.status-badge {
+  padding: 0.25rem 0.75rem;
   border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.btn-pay-late {
-  white-space: nowrap;
+.res-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
 }
+
+.btn-pay {
+  background-color: #22c55e;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  flex: 1;
+}
+
+.btn-cancel {
+  background-color: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  flex: 1;
+}
+
+.btn-cancel:hover {
+  background-color: #fef2f2;
+}
+
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-confirmed { background: #dcfce7; color: #166534; border-color: #166534; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
+
+.res-card:has(.status-confirmed) { border-left-color: #22c55e; }
+
+h3 { margin: 0; color: #1e293b; font-size: 1.25rem; }
+.price { color: #64748b; font-weight: 600; margin-top: 0.5rem; }

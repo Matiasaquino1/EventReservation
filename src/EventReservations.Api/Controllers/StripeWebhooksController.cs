@@ -1,6 +1,8 @@
-﻿using EventReservations.Services;
+﻿using EventReservations.Models;
+using EventReservations.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Stripe;
 
 namespace EventReservations.Controllers

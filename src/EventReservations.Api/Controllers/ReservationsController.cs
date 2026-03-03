@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
-using EventReservations.Dto;  // Para ReservationDto
-using EventReservations.Models;  // Para Reservation
-using EventReservations.Services;  // Para IReservationService
+using EventReservations.Dto;
+using EventReservations.Models;
+using EventReservations.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging; 
-using Stripe;  // Para Stripe integration
-using System.ComponentModel.DataAnnotations; // Para validaciones (si agrego)
-using System.Security.Claims; // Para claims de usuario
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace EventReservations.Controllers
 {
@@ -369,6 +365,28 @@ namespace EventReservations.Controllers
                 return BadRequest(new { message = "No se pudo confirmar la reserva o ya estaba confirmada." });
 
             return Ok(new { message = "Reserva confirmada con éxito." });
+        }
+
+
+        [HttpGet("{id}/payment-intent")]
+        [Authorize]
+        public async Task<IActionResult> GetPaymentIntent(int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var reservation = await _context.Reservations
+                .Include(r => r.Event)
+                .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+
+            if (reservation == null)
+                return NotFound("Reserva no encontrada.");
+
+            if (reservation.Status != "Pending")
+                return BadRequest("La reserva no está pendiente de pago.");
+
+            var clientSecret = await _paymentService.GetExistingOrNewClientSecretAsync(reservation);
+
+            return Ok(new { clientSecret });
         }
     }
 }
