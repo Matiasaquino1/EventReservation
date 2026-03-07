@@ -144,15 +144,15 @@ namespace EventReservations.Services
             return updated;
         }
 
-        public async Task ConfirmPaymentAndDecrementTicketsAsync(
-                int reservationId,
-                string stripePaymentIntentId)
+        public async Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId, string stripePaymentIntentId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                var reservation = await _reservationRepository.GetByIdAsync(reservationId)
+                var reservation = await _context.Reservations
+                    .Include(r => r.Event) 
+                    .FirstOrDefaultAsync(r => r.ReservationId == reservationId)
                     ?? throw new InvalidOperationException("Reserva no encontrada.");
 
                 // Idempotencia
@@ -160,20 +160,18 @@ namespace EventReservations.Services
                     return;
 
                 if (reservation.Status != ReservationStatuses.Pending)
-                    throw new InvalidOperationException("Reserva inválida.");
+                    throw new InvalidOperationException("La reserva no se puede confirmar: estado inválido.");
 
-                var eventModel = await _eventRepository.GetByIdAsync(reservation.EventId)
-                    ?? throw new InvalidOperationException("Evento no encontrado.");
+                if (reservation.Event == null)
+                    throw new InvalidOperationException("Evento no encontrado.");
 
-                if (eventModel.TicketsAvailable < reservation.NumberOfTickets)
+                if (reservation.Event.TicketsAvailable < reservation.NumberOfTickets)
                     throw new InvalidOperationException("Entradas insuficientes.");
 
                 var payment = await _context.Payments.FirstOrDefaultAsync(p =>
                     p.ReservationId == reservationId &&
-                    p.StripePaymentIntentId == stripePaymentIntentId);
-
-                if (payment == null)
-                    throw new InvalidOperationException("Pago no encontrado.");
+                    p.StripePaymentIntentId == stripePaymentIntentId)
+                    ?? throw new InvalidOperationException("Pago no encontrado.");
 
                 if (payment.Status == PaymentStatuses.Succeeded)
                     return;
@@ -181,23 +179,20 @@ namespace EventReservations.Services
                 payment.Status = PaymentStatuses.Succeeded;
                 payment.PaymentDate = DateTime.UtcNow;
 
-                eventModel.TicketsAvailable -= reservation.NumberOfTickets;
-                if (eventModel.TicketsAvailable == 0)
-                    eventModel.Status = "SoldOut";
+                reservation.Event.TicketsAvailable -= reservation.NumberOfTickets;
+                if (reservation.Event.TicketsAvailable == 0)
+                    reservation.Event.Status = "SoldOut";
 
                 reservation.Status = ReservationStatuses.Confirmed;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-
-                _logger.LogInformation(
-                    "Reserva {ReservationId} confirmada y stock descontado.",
-                    reservationId);
             }
-            catch
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw;
+                _logger.LogError(ex, "Error crítico en ConfirmPaymentAndDecrementTicketsAsync para la reserva {Id}", reservationId);
+                throw; // Relanzo para que el controlador reciba la excepción
             }
         }
 
@@ -211,7 +206,6 @@ namespace EventReservations.Services
             if (reservation.Status == ReservationStatuses.Pending)
             {
                 reservation.Status = ReservationStatuses.Confirmed;
-                // Aquí podrías restar los tickets del evento si no lo hiciste al crearla
                 await _context.SaveChangesAsync();
                 return true;
             }

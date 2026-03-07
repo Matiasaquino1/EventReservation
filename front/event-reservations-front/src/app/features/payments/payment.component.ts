@@ -25,50 +25,49 @@ export class PaymentComponent implements OnInit {
   stripe: Stripe | null = null;
   elements: StripeElements | null = null;
   
-  // Elementos individuales
   cardNumber: StripeCardNumberElement | null = null;
   cardExpiry: StripeCardExpiryElement | null = null;
   cardCvc: StripeCardCvcElement | null = null;
 
   reservationId = signal<number | null>(null);
+  paymentIntentId = signal<string | null>(null); 
   isProcessing = signal(false);
   errorMessage = signal<string | null>(null);
   clientSecret = signal<string | null>(null);
 
   async ngOnInit() {
+    this.stripe = await loadStripe('pk_test_51SINgXCFUSVETYTsnDEvXAhTT5HIsqXpFH1MHSVIIetaqnWUVXoo3VfHXVXlKwfL6TB7CqFAQQnWyF8awDjW1JVK00lNk0ptpn');
 
-  this.stripe = await loadStripe('pk_test_51SINgXCFUSVETYTsnDEvXAhTT5HIsqXpFH1MHSVIIetaqnWUVXoo3VfHXVXlKwfL6TB7CqFAQQnWyF8awDjW1JVK00lNk0ptpn');
+    const idFromUrl = this.route.snapshot.queryParamMap.get('reservationId');
+    const id = Number(idFromUrl);
 
-  const idFromUrl = this.route.snapshot.queryParamMap.get('reservationId');
-  const id = Number(idFromUrl);
-
-  if (!id || isNaN(id)) {
-    this.errorMessage.set('No se encontró un ID de reserva válido.');
-    return;
-  }
-  this.reservationId.set(id);
-
-  this.reservationService.getPaymentIntent(id).subscribe({
-    next: (res: any) => {
-      const secret = res.clientSecret || res.ClientSecret;     
-      if (secret) {
-        this.clientSecret.set(secret);
-        this.mountElements(); 
-      } else {
-        this.errorMessage.set('El servidor no devolvió el secreto de pago.');
-      }
-    },
-    error: (err) => {
-      this.errorMessage.set('Error al recuperar el intento de pago.');
-      console.error('Error en getPaymentIntent:', err);
+    if (!id || isNaN(id)) {
+      this.errorMessage.set('No se encontró un ID de reserva válido.');
+      return;
     }
+    this.reservationId.set(id);
+
+    this.reservationService.getPaymentIntent(id).subscribe({
+      next: (res: any) => {
+        const secret = res.clientSecret || res.ClientSecret;     
+        if (secret) {
+          this.clientSecret.set(secret);
+          this.mountElements();
+        } else {
+          this.errorMessage.set('El servidor no devolvió el secreto de pago.');
+        }
+      },
+      error: (err) => {
+        this.errorMessage.set('Error al recuperar el intento de pago.');
+        console.error('Error en getPaymentIntent:', err);
+      }
     });
   }
 
   mountElements() {
-    if (!this.stripe) return;
+    if (!this.stripe || !this.clientSecret()) return;
 
-    this.elements = this.stripe.elements();
+    this.elements = this.stripe.elements({ clientSecret: this.clientSecret()! });
     const style = {
       base: {
         fontSize: '16px',
@@ -97,34 +96,40 @@ export class PaymentComponent implements OnInit {
     const { error, paymentIntent } = await this.stripe.confirmCardPayment(this.clientSecret()!, {
       payment_method: {
         card: this.cardNumber!,
-        billing_details: {
-          name: 'Usuario Comprador' 
-        }
+        billing_details: { name: 'Usuario Comprador' }
       }
     });
 
     if (error) {
       this.errorMessage.set(error.message || 'El pago falló');
       this.isProcessing.set(false);
-    } else if (paymentIntent.status === 'succeeded') {
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      this.paymentIntentId.set(paymentIntent.id);
+      
       this.finalizeReservation();
     }
   }
 
   private finalizeReservation() {
     const id = this.reservationId();
-    if (!id) {
-      this.errorMessage.set('No se encontró el ID de la reserva.');
+    const piId = this.paymentIntentId(); 
+
+    if (!id || !piId) {
+      this.errorMessage.set('Error interno: Faltan datos de confirmación.');
       this.isProcessing.set(false);
       return;
     }
-    this.reservationService.confirmReservation(id).subscribe({
+
+    const confirmDto = { paymentIntentId: piId };
+
+    this.reservationService.confirmReservation(id, confirmDto).subscribe({
       next: () => {
+        this.isProcessing.set(false);
         this.router.navigate(['/success']);
       },
-      error: (err: any) => {
-        console.error('Pago exitoso en Stripe, pero falló actualización en BD', err);
-        this.errorMessage.set('Pago confirmado, pero hubo un error al actualizar tu reserva. Contacta a soporte.');
+      error: (err) => {
+        console.error('Error en confirmación:', err);
+        this.errorMessage.set(err.error?.message || 'Pago exitoso, pero hubo un error al actualizar el stock.');
         this.isProcessing.set(false);
       }
     });

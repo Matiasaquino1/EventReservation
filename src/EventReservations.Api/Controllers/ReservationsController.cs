@@ -278,14 +278,21 @@ namespace EventReservations.Controllers
 
         [HttpPatch("{id}/confirm")]
         [Authorize]
-        public async Task<IActionResult> ConfirmReservation(int id)
+        public async Task<IActionResult> ConfirmReservation(int id, [FromBody] ConfirmPaymentDto dto)
         {
-            var result = await _reservationService.ConfirmReservationAsync(id);
-
-            if (!result)
-                return BadRequest(new { message = "No se pudo confirmar la reserva o ya estaba confirmada." });
-
-            return Ok(new { message = "Reserva confirmada con éxito." });
+            try
+            {
+                await _reservationService.ConfirmPaymentAndDecrementTicketsAsync(id, dto.PaymentIntentId);
+                return Ok(new { message = "Reserva confirmada y stock descontado." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Conflict(new { message = "El cupo fue tomado por otro usuario. Intentá de nuevo." });
+            }
         }
 
 

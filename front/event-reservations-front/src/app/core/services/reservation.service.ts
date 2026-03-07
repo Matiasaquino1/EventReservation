@@ -37,7 +37,7 @@ export class ReservationService {
     return this.http.get<{ reservations: Reservation[]; total: number }>(`${this.apiUrl}`, { params });
   }
 
-  confirmReservation(reservationId: number): Observable<any> {
+  confirmReservation(reservationId: number, confirmPaymentDto: { paymentIntentId: string; }): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${reservationId}/confirm`, {});
   }
 

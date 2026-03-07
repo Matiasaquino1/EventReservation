@@ -37,7 +37,6 @@ namespace EventReservations.Services
             if (reservation.Status != ReservationStatuses.Pending)
                 throw new InvalidOperationException("La reserva no puede pagarse.");
 
-            // Idempotencia
             if (!string.IsNullOrEmpty(reservation.PaymentIntentId))
             {
                 var existingService = new PaymentIntentService();
@@ -62,11 +61,9 @@ namespace EventReservations.Services
             var service = new PaymentIntentService();
             var intent = await service.CreateAsync(options);
 
-            // Persiste el intent en la reserva
             reservation.PaymentIntentId = intent.Id;
             await _reservationRepository.UpdateAsync(reservation);
 
-            // Persistimos (o reutilizamos) el pago para que webhook/dominio tengan trazabilidad
             var existingPayment = await _paymentRepository.GetByReservationIdAsync(reservationId);
             if (existingPayment is null)
             {
