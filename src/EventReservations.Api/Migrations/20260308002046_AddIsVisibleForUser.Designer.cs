@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260227013357_InitialBd")]
-    partial class InitialBd
+    [Migration("20260308002046_AddIsVisibleForUser")]
+    partial class AddIsVisibleForUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,6 +124,9 @@ namespace EventReservations.Migrations
 
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsVisibleForUser")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("NumberOfTickets")
                         .HasColumnType("integer");

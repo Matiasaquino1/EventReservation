@@ -13,6 +13,7 @@ namespace EventReservations.Services
     {
         Task<Reservation> CreateReservationAsync(Reservation reservation, bool checkAvailability = true);
         Task<Reservation> CancelReservationAsync(int id);
+        Task HideReservationAsync(int id);
         Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId);
         Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(string? status, int? eventId, int page,  int pageSize, string sort);
         Task<Reservation> UpdateReservationAsync(Reservation reservation);
@@ -33,7 +34,7 @@ namespace EventReservations.Services
         /// <param name="status">Filtro opcional por estado de la reserva (e.g., "Pending", "Confirmed"). Si es null o vacío, no filtra.</param>
         /// <param name="eventId">Filtro opcional por ID de evento. Si es null, no filtra.</param>
         /// <returns>Un objeto PagedResponseDto con la lista de reservas, página actual, tamaño de página y total de elementos.</returns>
-        Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId);
+        Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId);     
     }
 
     public class ReservationService : IReservationService
@@ -114,6 +115,18 @@ namespace EventReservations.Services
             return reservation;
         }
 
+        public async Task HideReservationAsync(int id)
+        {
+            var reservation = await _reservationRepository.GetByIdAsync(id)
+                ?? throw new InvalidOperationException("Reserva no encontrada.");
+
+            if (reservation.Status != ReservationStatuses.Cancelled)
+                throw new InvalidOperationException("Solo se pueden ocultar reservas canceladas.");
+
+            reservation.IsVisibleForUser = false;
+            await _reservationRepository.UpdateAsync(reservation);
+        }
+
         public async Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId)
         {
             return await _reservationRepository.GetReservationsByUserAsync(userId);
@@ -170,8 +183,20 @@ namespace EventReservations.Services
 
                 var payment = await _context.Payments.FirstOrDefaultAsync(p =>
                     p.ReservationId == reservationId &&
-                    p.StripePaymentIntentId == stripePaymentIntentId)
-                    ?? throw new InvalidOperationException("Pago no encontrado.");
+                    p.StripePaymentIntentId == stripePaymentIntentId);
+                
+                if (payment == null)
+                {
+                    payment = new Payment
+                    {
+                        ReservationId = reservationId,
+                        StripePaymentIntentId = stripePaymentIntentId, 
+                        Status = PaymentStatuses.Pending,
+                        Amount = reservation.Amount,
+                        PaymentDate = DateTime.UtcNow
+                    };
+                    _context.Payments.Add(payment);
+                }
 
                 if (payment.Status == PaymentStatuses.Succeeded)
                     return;

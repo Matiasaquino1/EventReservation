@@ -31,7 +31,7 @@ namespace EventReservations.Repositories
         
         public async Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId)
         {
-            return await _context.Reservations.Where(r => r.UserId == userId).ToListAsync();
+            return await _context.Reservations.Where(r => r.UserId == userId && r.IsVisibleForUser).ToListAsync();
         }
 
         /// <summary>

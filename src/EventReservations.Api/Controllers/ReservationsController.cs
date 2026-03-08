@@ -307,5 +307,20 @@ namespace EventReservations.Controllers
 
             return Ok(new { clientSecret });
         }
+
+        [HttpPatch("{id}/hide")]
+        [Authorize]
+        public async Task<IActionResult> HideReservation(int id)
+        {
+            try
+            {
+                await _reservationService.HideReservationAsync(id);
+                return Ok(new { message = "Reserva ocultada." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

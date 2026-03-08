@@ -14,7 +14,7 @@ namespace EventReservations.Models
         public DateTime CreatedAt { get; set; } //Fecha de creada/realizada la reserva
         public int NumberOfTickets { get; set; } // Cantidad de tickets
         public decimal Amount { get; set; }  // Monto del pago
-
+        public bool IsVisibleForUser { get; set; } = true;
 
         public User User { get; set; }
         public Event Event { get; set; }

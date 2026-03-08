@@ -30,7 +30,7 @@ export class PaymentComponent implements OnInit {
   cardCvc: StripeCardCvcElement | null = null;
 
   reservationId = signal<number | null>(null);
-  paymentIntentId = signal<string | null>(null); 
+  stripePaymentIntentId = signal<string | null>(null); 
   isProcessing = signal(false);
   errorMessage = signal<string | null>(null);
   clientSecret = signal<string | null>(null);
@@ -93,6 +93,21 @@ export class PaymentComponent implements OnInit {
     this.isProcessing.set(true);
     this.errorMessage.set(null);
 
+    const { paymentIntent: existingPI, error: retrieveError } = 
+      await this.stripe.retrievePaymentIntent(this.clientSecret()!);
+
+    if (retrieveError) {
+      this.errorMessage.set(retrieveError.message || 'Error al verificar el pago.');
+      this.isProcessing.set(false);
+      return;
+    }
+
+    if (existingPI?.status === 'succeeded') {
+      this.stripePaymentIntentId.set(existingPI.id);
+      this.finalizeReservation();
+      return;
+    }
+
     const { error, paymentIntent } = await this.stripe.confirmCardPayment(this.clientSecret()!, {
       payment_method: {
         card: this.cardNumber!,
@@ -103,16 +118,15 @@ export class PaymentComponent implements OnInit {
     if (error) {
       this.errorMessage.set(error.message || 'El pago falló');
       this.isProcessing.set(false);
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      this.paymentIntentId.set(paymentIntent.id);
-      
+    } else if (paymentIntent?.status === 'succeeded') {
+      this.stripePaymentIntentId.set(paymentIntent.id);
       this.finalizeReservation();
     }
   }
 
   private finalizeReservation() {
     const id = this.reservationId();
-    const piId = this.paymentIntentId(); 
+    const piId = this.stripePaymentIntentId(); 
 
     if (!id || !piId) {
       this.errorMessage.set('Error interno: Faltan datos de confirmación.');

@@ -55,4 +55,8 @@ export class ReservationService {
   getPaymentIntent(id: number): Observable<{clientSecret: string}> {
     return this.http.get<{clientSecret: string}>(`${this.apiUrl}/${id}/payment-intent`);
   }
+
+  hideReservation(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/hide`, {});
+  }
 }

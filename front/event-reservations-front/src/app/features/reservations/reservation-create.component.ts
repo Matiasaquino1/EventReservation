@@ -96,7 +96,6 @@ export class ReservationCreateComponent {
       numberOfTickets: this.numberOfTickets()
     }).subscribe({
       next: (res: any) => {
-        // ✅ Ahora navegamos a pagos con el ID que nos dio el Back
         this.router.navigate(['/payments'], { 
           queryParams: { reservationId: res.reservationId } 
         });

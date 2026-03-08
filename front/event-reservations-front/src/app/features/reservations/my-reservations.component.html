@@ -1,50 +1,52 @@
 <div class="container">
-  <h2>Mis Reservas</h2>
+  <div class="page-header">
+    <h2>Mis Reservas</h2>
+  </div>
 
   @if (loading()) {
-    <div class="loading-state">Cargando tus aventuras...</div>
-  }
-
-  @if (!loading() && reservations().length === 0) {
-    <div class="empty-state">
-      <p>Aún no tienes reservas realizadas.</p>
-      <button routerLink="/">Explorar Eventos</button>
-    </div>
+    <div class="loading-state">Cargando...</div>
   }
 
   <div class="reservations-grid">
-    @for (res of reservations(); track res.id) {
-      <div class="res-card" [ngClass]="getStatusClass(res.status)">
+    @for (res of reservations(); track res.reservationId) {
+      <div class="res-card" [ngClass]="'status-' + res.status.toLowerCase()">
         
         <div class="res-header">
-          <span class="status-badge" [ngClass]="getStatusClass(res.status)">
-            {{ res.status }}
+          <span class="status-badge" [ngClass]="'status-' + res.status.toLowerCase()">
+            {{ getStatusLabel(res.status) }}
           </span>
-          <span class="res-date">{{ res.createdAt | date:'dd/MM/yyyy' }}</span>
-        </div>
-        
-        <div class="res-body">
-          <h3>{{ res.eventName }}</h3>
-          <p class="price">Total: {{ res.totalAmount | currency }}</p>
+          <small>{{ res.createdAt | date:'dd/MM/yyyy' }}</small>
         </div>
 
-        <div class="res-footer">
-          <small>ID de Reserva: #{{ res.reservationId }}</small>
+        <div class="res-body">
+          <h3>{{ res.eventName }}</h3>
+          <p class="price">{{ res.totalAmount | currency }}</p>
+          <small>{{ res.numberOfTickets }} entrada(s)</small>
         </div>
 
         <div class="res-actions">
           @if (res.status === 'Pending') {
             <button class="btn-pay" (click)="goToPay(res.reservationId)">
-              Pagar Ahora
+              Pagar
+            </button>
+            <button class="btn-cancel" (click)="cancelReservation(res.reservationId)">
+              Cancelar
             </button>
           }
+
           @if (res.status === 'Confirmed') {
             <button class="btn-cancel" (click)="cancelReservation(res.reservationId)">
               Cancelar Reserva
             </button>
           }
-        </div>
 
-      </div> } 
+          @if (res.status === 'Cancelled') {
+            <button class="btn-hide" (click)="hideReservation(res.reservationId)">
+              🗑️ Borrar Historial
+            </button>
+          }
+        </div>
+      </div>
+    }
   </div>
 </div>

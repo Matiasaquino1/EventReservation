@@ -1,12 +1,10 @@
 .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-
 .reservations-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
-
 .res-card {
   background: white;
   border-radius: 12px;
@@ -14,17 +12,18 @@
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
   border-left: 5px solid #cbd5e1;
   transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px; /* Un alto mínimo para que todas se vean parejas */
 }
-
 .res-card:hover { transform: translateY(-5px); }
-
 .res-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
-
 .status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
@@ -33,12 +32,25 @@
   text-transform: uppercase;
 }
 
+/* Colores de estados */
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-confirmed { background: #dcfce7; color: #166534; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
+
+/* Bordes laterales dinámicos */
+.res-card.status-confirmed { border-left-color: #22c55e; }
+.res-card.status-pending { border-left-color: #f59e0b; }
+.res-card.status-cancelled { border-left-color: #ef4444; }
+
+h3 { margin: 0; color: #1e293b; font-size: 1.25rem; }
+.price { color: #64748b; font-weight: 600; margin-top: 0.5rem; }
+
 .res-actions {
   display: flex;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: auto; 
   padding-top: 15px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #f1f5f9;
 }
 
 .btn-pay {
@@ -51,7 +63,6 @@
   font-weight: 600;
   flex: 1;
 }
-
 .btn-cancel {
   background-color: transparent;
   color: #ef4444;
@@ -62,40 +73,20 @@
   font-weight: 600;
   flex: 1;
 }
+.btn-cancel:hover { background-color: #fef2f2; }
 
-.btn-cancel:hover {
-  background-color: #fef2f2;
-}
-
-.loading-state, .empty-state {
-  text-align: center;
-  padding: 3rem;
+.btn-hide {
+  background-color: #f1f5f9;
   color: #64748b;
+  border: 1px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  flex: 1;
+  transition: all 0.2s;
 }
-
-.res-card.status-confirmed { border-left-color: #22c55e; }
-.res-card.status-pending { border-left-color: #f59e0b; }
-.res-card.status-cancelled { border-left-color: #ef4444; }
-
-.res-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.btn-hide:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
 }
-
-.res-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: auto; 
-  padding-top: 15px;
-  border-top: 1px solid #f1f5f9;
-}
-
-.status-pending { background: #fef3c7; color: #92400e; }
-.status-confirmed { background: #dcfce7; color: #166534; border-color: #166534; }
-.status-cancelled { background: #fee2e2; color: #991b1b; }
-
-.res-card:has(.status-confirmed) { border-left-color: #22c55e; }
-
-h3 { margin: 0; color: #1e293b; font-size: 1.25rem; }
-.price { color: #64748b; font-weight: 600; margin-top: 0.5rem; }

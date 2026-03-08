@@ -122,6 +122,9 @@ namespace EventReservations.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsVisibleForUser")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("NumberOfTickets")
                         .HasColumnType("integer");
 
