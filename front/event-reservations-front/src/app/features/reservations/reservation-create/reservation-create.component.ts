@@ -5,9 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { switchMap, of, map } from 'rxjs';
 
-import { ReservationService } from '../../core/services/reservation.service';
-import { EventService } from '../../core/services/event.service';
-import { AuthService } from '../../core/services/auth.service';
+import { ReservationService } from '../../../core/services/reservation.service';
+import { EventService } from '../../../core/services/event.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-reservation-create',

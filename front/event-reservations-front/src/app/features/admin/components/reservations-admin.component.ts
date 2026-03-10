@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ReservationService } from '../../core/services/reservation.service';
-import { AdminService } from '../../core/services/admin.service';
-import { Reservation } from '../../core/models/reservation.model';
+import { ReservationService } from '../../../core/services/reservation.service';
+import { AdminService } from '../../../core/services/admin.service';
+import { Reservation } from '../../../core/models/reservation.model';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';

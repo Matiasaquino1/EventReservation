@@ -5,9 +5,9 @@ import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 
-import { EventService } from '../../core/services/event.service';
-import { EventFormComponent } from '../events/event-form.component';
-import { EventModel } from '../../core/models/event.model';
+import { EventService } from '../../../core/services/event.service';
+import { EventFormComponent } from '../../events/event-form/event-form.component';
+import { EventModel } from '../../../core/models/event.model';
 
 @Component({
   selector: 'app-event-admin',

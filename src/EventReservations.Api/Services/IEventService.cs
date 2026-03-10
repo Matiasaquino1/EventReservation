@@ -103,6 +103,7 @@ namespace EventReservations.Services
             public async Task<IEnumerable<Event>> GetAllAsync() => await _eventRepository.GetAllAsync();
 
             public async Task<Event?> GetEventByIdAsync(int id) => await _eventRepository.GetByIdAsync(id);
-        }
+
+    }
 }
 

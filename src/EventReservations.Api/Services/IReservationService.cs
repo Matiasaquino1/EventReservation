@@ -15,6 +15,7 @@ namespace EventReservations.Services
         Task<Reservation> CancelReservationAsync(int id);
         Task HideReservationAsync(int id);
         Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId);
+        Task<IEnumerable<Reservation>> GetReservationsByEventIdAsync(int eventId);
         Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(string? status, int? eventId, int page,  int pageSize, string sort);
         Task<Reservation> UpdateReservationAsync(Reservation reservation);
         Task<bool> IsDuplicateReservationAsync(int userId, int eventId);
@@ -34,7 +35,7 @@ namespace EventReservations.Services
         /// <param name="status">Filtro opcional por estado de la reserva (e.g., "Pending", "Confirmed"). Si es null o vacío, no filtra.</param>
         /// <param name="eventId">Filtro opcional por ID de evento. Si es null, no filtra.</param>
         /// <returns>Un objeto PagedResponseDto con la lista de reservas, página actual, tamaño de página y total de elementos.</returns>
-        Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId);     
+        Task<PagedResponseDto<Reservation>> GetPagedReservationsAsync(int page, int pageSize, string sort, string status, int? eventId);  
     }
 
     public class ReservationService : IReservationService
@@ -130,6 +131,21 @@ namespace EventReservations.Services
         public async Task<IEnumerable<Reservation>> GetReservationsByUserAsync(int userId)
         {
             return await _reservationRepository.GetReservationsByUserAsync(userId);
+        }
+
+        public async Task<IEnumerable<Reservation>> GetReservationsByEventIdAsync(int eventId)
+        {
+            try
+            {
+                var reservations = await _reservationRepository.GetByEventIdWithUserAsync(eventId);
+                _logger.LogInformation("Se obtuvieron {Count} reservas para el evento {EventId}", reservations.Count(), eventId);
+                return reservations;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener reservas por evento {EventId}", eventId);
+                throw;
+            }
         }
 
         public async Task<(IEnumerable<Reservation> Data, int TotalRecords)> GetAdminReservationsAsync(

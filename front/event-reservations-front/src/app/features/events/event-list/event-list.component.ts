@@ -4,9 +4,9 @@ import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { switchMap, map, tap } from 'rxjs/operators';
-import { EventService } from '../../core/services/event.service';
-import { EventModel } from '../../core/models/event.model';
-import { EventFilters } from '../../core/models/event-filters.model';
+import { EventService } from '../../../core/services/event.service';
+import { EventModel } from '../../../../app/core/models/event.model';
+import { EventFilters } from '../../../../app/core/models/event-filters.model';
 
 @Component({
   selector: 'app-event-list',

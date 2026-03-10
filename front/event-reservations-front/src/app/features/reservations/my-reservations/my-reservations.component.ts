@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { ReservationService } from '../../core/services/reservation.service'; // ajustá el path si es necesario
+import { ReservationService } from '../../../core/services/reservation.service'; // ajustá el path si es necesario
 
 @Component({
   selector: 'app-my-reservations',
@@ -61,19 +61,23 @@ export class MyReservationsComponent implements OnInit {
   }
 
   hideReservation(id: number) {
+  const message = '¿Estás seguro de que deseas borrar esta reserva de tu historial? Esta acción no se puede deshacer.';
+  
+  if (confirm(message)) {
     this.hiding.set(id);
 
     this.reservationService.hideReservation(id).subscribe({
       next: () => {
-        // Remover de la vista localmente
         this.reservations.update(res => res.filter(r => r.reservationId !== id));
         this.hiding.set(null);
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error al ocultar:', err);
         alert('No se pudo ocultar la reserva. Intentá de nuevo.');
         this.hiding.set(null);
       }
     });
+    }
   }
 
   goToPay(id: number) {

@@ -127,6 +127,14 @@ namespace EventReservations.Repositories
             return await q.ToListAsync();
         }
 
+        public async Task<IEnumerable<Reservation>> GetByEventIdWithUserAsync(int eventId)
+        {
+            return await _context.Reservations
+                .Include(r => r.User) 
+                .Where(r => r.EventId == eventId && r.IsVisibleForUser) 
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+        }
 
         /// <summary>
         /// Implementa GetPagedReservationsAsync: Construye una consulta paginada con filtros y orden directamente en el repository.

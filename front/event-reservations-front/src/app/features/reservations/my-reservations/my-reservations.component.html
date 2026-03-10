@@ -41,8 +41,16 @@
           }
 
           @if (res.status === 'Cancelled') {
-            <button class="btn-hide" (click)="hideReservation(res.reservationId)">
-              🗑️ Borrar Historial
+            <button 
+              class="btn-hide" 
+              (click)="hideReservation(res.reservationId)"
+              [disabled]="hiding() === res.reservationId">
+              
+              @if (hiding() === res.reservationId) {
+                <span>⌛ Borrando...</span>
+              } @else {
+                <span>🗑️ Borrar Historial</span>
+              }
             </button>
           }
         </div>

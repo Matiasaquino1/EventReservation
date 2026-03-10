@@ -4,8 +4,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
-import { User } from '../../core/models/user.model';
-import { AdminService } from '../../core/services/admin.service';
+import { User } from '../../../core/models/user.model';
+import { AdminService } from '../../../core/services/admin.service';
 
 @Component({
   selector: 'app-users',

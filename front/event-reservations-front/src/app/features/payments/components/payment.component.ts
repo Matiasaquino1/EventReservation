@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { loadStripe } from '@stripe/stripe-js';
 import type { Stripe, StripeElements, StripeCardNumberElement, StripeCardExpiryElement, StripeCardCvcElement } from '@stripe/stripe-js';
-import { ReservationService } from '../../core/services/reservation.service';
+import { ReservationService } from '../../../core/services/reservation.service';
 
 @Component({
   selector: 'app-payment',

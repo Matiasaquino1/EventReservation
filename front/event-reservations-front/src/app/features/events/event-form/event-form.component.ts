@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
-import { EventModel } from '../../core/models/event.model';
+import { EventModel } from '../../../core/models/event.model';
 
 @Component({
   selector: 'app-event-form',

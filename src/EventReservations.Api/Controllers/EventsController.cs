@@ -192,5 +192,24 @@ namespace EventReservations.Controllers
 
             return Ok(summary);
         }
+
+        [HttpGet("{id}/attendees")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetEventAttendees(int id)
+        {
+            var reservations = await _reservationService.GetReservationsByEventIdAsync(id); 
+
+            var attendees = reservations
+                .Where(r => r.Status == ReservationStatuses.Confirmed)
+                .Select(static r => new {
+                    r.User.Name, 
+                    r.User.Email,
+                    r.NumberOfTickets,
+                    r.CreatedAt,
+                    r.ReservationId
+                });
+
+            return Ok(attendees);
+        }
     }
 }

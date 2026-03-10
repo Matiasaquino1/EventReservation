@@ -5,8 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 
-import { EventService } from '../../core/services/event.service';
-import { EventModel } from '../../core/models/event.model';
+import { EventService } from '../../../core/services/event.service';
+import { EventModel } from '../../../core/models/event.model';
 
 @Component({
   selector: 'app-event-admin',

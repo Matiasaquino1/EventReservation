@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
-import { EventService } from '../../core/services/event.service';
+import { EventService } from '../../../core/services/event.service';
 import { switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
 
