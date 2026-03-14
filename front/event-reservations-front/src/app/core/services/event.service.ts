@@ -35,6 +35,12 @@ export class EventService {
     return this.http.get<EventModel>(`${this.apiUrl}/${id}`);
   }
 
+  getAllEvents(): Observable<EventModel[]> {
+    return this.http.get<EventModel[]>(this.apiUrl).pipe(
+      map(events => events.map(e => this.normalizeEvent(e)))
+    );
+  }
+
   createEvent(event: Partial<EventModel>) {
     return this.http.post<EventModel>(this.apiUrl, event);
   }
@@ -46,6 +52,10 @@ export class EventService {
   deleteEvent(id: number) {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  getEventAttendees(eventId: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/${eventId}/attendees`);
+}
 
   private normalizeEvent(event: any): EventModel {
     return {

@@ -1,12 +1,15 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { EventService } from '../../../core/services/event.service'; // Ajustá la ruta
+import { EventService } from '../../../core/services/event.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-event-attendees',
   templateUrl: './event-attendees.component.html',
-  styleUrls: ['./event-attendees.component.css']
+  styleUrls: ['./event-attendees.component.css'],
+  imports: [CommonModule]
 })
+
 export class EventAttendeesComponent implements OnInit {
   attendees = signal<any[]>([]);
   loading = signal(false);

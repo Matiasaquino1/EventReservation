@@ -1,0 +1,67 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <div>
+      <h2>Gestión de Eventos</h2>
+      <p class="subtitle">Administra la disponibilidad, precios y estados de tus eventos.</p>
+    </div>
+    <button class="btn-primary" routerLink="/admin/events/new">
+      <span class="icon">+</span> Nuevo Evento
+    </button>
+  </div>
+
+  <div class="table-container">
+    @if (loading()) {
+      <div class="loading-state">Cargando eventos...</div>
+    } @else {
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Fecha</th>
+            <th>Precio</th>
+            <th>Stock (Disp/Total)</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (event of events(); track event.eventId) {
+            <tr>
+              <td><span class="id-badge">#{{ event.eventId }}</span></td>
+              <td class="event-title">{{ event.title }}</td>
+              <td>{{ event.eventDate | date:'dd/MM/yyyy' }}</td>
+              <td>{{ event.price | currency }}</td>
+              <td>
+                <div class="stock-info">
+                  <progress [value]="event.ticketsAvailable" [max]="event.totalTickets"></progress>
+                  <small>{{ event.ticketsAvailable }} / {{ event.totalTickets }}</small>
+                </div>
+              </td>
+              <td>
+                <span class="status-pill" [ngClass]="event.status.toLowerCase()">
+                  {{ event.status }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button class="btn-icon view" (click)="goToAttendees(event.eventId)" title="Ver Asistentes">
+                  👥
+                </button>
+                <button class="btn-icon edit" (click)="goToEdit(event.eventId)" title="Editar Evento">
+                  ✏️
+                </button>
+                <button class="btn-icon delete" (click)="deleteEvent(event.eventId)" title="Eliminar">
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-state">No se encontraron eventos registrados.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<div class="form-container">
+  <div class="form-header">
+    <button class="btn-back" routerLink="/admin/management">← Volver</button>
+    <h2>{{ isEditMode() ? 'Editar Evento' : 'Nuevo Evento' }}</h2>
+  </div>
+
+  <div class="card-form">
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-grid">
+        <div class="field full-width">
+          <label>Título del Evento</label>
+          <input type="text" formControlName="title" placeholder="Ej: Tech Conference 2026">
+        </div>
+
+        <div class="field full-width">
+          <label>Descripción</label>
+          <textarea formControlName="description" rows="4" placeholder="Detalles del evento..."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Fecha y Hora</label>
+          <input type="datetime-local" formControlName="eventDate">
+        </div>
+
+        <div class="field">
+          <label>Ubicación</label>
+          <input type="text" formControlName="location" placeholder="Ciudad, Estadio o Link">
+        </div>
+
+        <div class="field">
+          <label>Precio ($)</label>
+          <input type="number" formControlName="price">
+        </div>
+
+        <div class="field">
+          <label>Tickets Totales</label>
+          <input type="number" formControlName="totalTickets">
+        </div>
+
+        <div class="field">
+          <label>Estado</label>
+          <select formControlName="status">
+            <option value="Active">Activo</option>
+            <option value="Paused">Pausado</option>
+            <option value="Cancelled">Cancelado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-ghost" routerLink="/admin/management">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="eventForm.invalid || loading()">
+          {{ loading() ? 'Guardando...' : (isEditMode() ? 'Actualizar Evento' : 'Crear Evento') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

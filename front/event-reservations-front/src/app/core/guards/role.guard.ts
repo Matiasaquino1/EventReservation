@@ -1,23 +1,20 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-@Injectable({ providedIn: 'root' })
-export class RoleGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+export const RoleGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  
+  // Obtenemos los roles permitidos desde la data de la ruta
+  const expectedRoles = route.data['roles'] as Array<string>;
+  const userRole = authService.getUserRole(); // Debes implementar este método en tu AuthService
 
-  canActivate(route: ActivatedRouteSnapshot): boolean {
-  const user = this.authService.currentUser;
-  const requiredRoles = route.data['roles'] as string[];
-
-  if (!user) {
-    this.router.navigate(['/login']);
+  if (!authService.isAuthenticated() || !expectedRoles.includes(userRole)) {
+    alert('No tienes permisos para acceder a esta sección');
+    router.navigate(['/']);
     return false;
   }
 
-  if (requiredRoles.includes(user.role)) return true;
-
-  this.router.navigate(['/']);
-  return false;
-  }
-}
+  return true;
+};

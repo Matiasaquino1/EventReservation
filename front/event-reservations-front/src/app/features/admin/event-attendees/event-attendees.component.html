@@ -1,0 +1,37 @@
+<div class="admin-container">
+  <div class="header-actions">
+    <button class="btn-back" routerLink="/admin/events">← Volver</button>
+    <h2>Lista de Asistentes</h2>
+  </div>
+
+  <div class="admin-card-table">
+    @if (loading()) {
+      <div class="loading-padding">Cargando asistentes...</div>
+    } @else {
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Email</th>
+            <th>Entradas</th>
+            <th>Fecha Reserva</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of attendees(); track user.reservationId) {
+            <tr>
+              <td class="font-bold">{{ user.fullName }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.numberOfTickets }}</td>
+              <td>{{ user.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="empty-msg">No hay asistentes confirmados para este evento.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

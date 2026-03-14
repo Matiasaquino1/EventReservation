@@ -1,0 +1,129 @@
+.admin-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.admin-header h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.subtitle {
+  color: #5f6b7a;
+  margin-top: 0.35rem;
+}
+
+.table-container {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(224, 231, 239, 0.5);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.admin-table th {
+  background: #f9fafc;
+  padding: 1rem;
+  text-align: left;
+  color: #475569;
+  font-weight: 600;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.admin-table td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.event-title {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.id-badge {
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-pill {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.status-pill.active { background: #dcfce7; color: #15803d; }
+.status-pill.paused { background: #fee2e2; color: #b91c1c; }
+
+
+.actions-cell {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  border: 1px solid #e2e8f0;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.btn-icon:hover {
+  background: #f8fafc;
+  transform: translateY(-2px);
+}
+
+.btn-icon.delete:hover { border-color: #fca5a5; background: #fef2f2; }
+.btn-icon.edit:hover { border-color: #bae6fd; background: #f0f9ff; }
+
+.stock-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 100px;
+}
+
+progress {
+  width: 100%;
+  height: 6px;
+  border-radius: 10px;
+}
+
+progress::-webkit-progress-bar { background-color: #f1f5f9; border-radius: 10px; }
+progress::-webkit-progress-value { background-color: #3b82f6; border-radius: 10px; }
+
+.btn-primary {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}

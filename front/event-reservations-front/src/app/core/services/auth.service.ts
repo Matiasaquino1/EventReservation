@@ -46,6 +46,14 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
+  getUserRole(): string {
+  const token = localStorage.getItem('token');
+  if (!token) return '';
+  
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  return payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || '';
+  }
+
   hasRole(role: string): boolean {
     const user = this.currentUserSubject.value;
     return user?.role === role;

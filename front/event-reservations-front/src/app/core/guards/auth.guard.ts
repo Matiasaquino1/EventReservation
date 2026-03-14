@@ -10,8 +10,7 @@ export const AuthGuard: CanActivateFn = (route, state) => {
     return true; // Deja pasar
   }
 
-  // Si no está logueado, lo mandamos al login
-  // Opcional: guardamos la URL para redirigirlo después de loguearse
+  // Si no está logueado, lo manda al login y guardo la URL a la que intentaba acceder
   router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
   return false;
 };
