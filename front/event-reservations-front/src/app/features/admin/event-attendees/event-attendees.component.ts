@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { EventService } from '../../../core/services/event.service';
 import { CommonModule } from '@angular/common';
 
@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-event-attendees',
   templateUrl: './event-attendees.component.html',
   styleUrls: ['./event-attendees.component.css'],
-  imports: [CommonModule]
+  imports: [CommonModule, RouterModule]
 })
 
 export class EventAttendeesComponent implements OnInit {

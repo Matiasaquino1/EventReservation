@@ -1,0 +1,62 @@
+<nav class="nav-container">
+  <a routerLink="/" class="logo">
+    <span class="logo-icon">🎟️</span>
+    <span class="logo-text">EventReservations</span>
+  </a>
+
+  <div class="nav-content">
+    <div class="navigation-pill">
+
+      <div class="group-links">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          Eventos
+        </a>
+
+        <a routerLink="/my-reservations"
+           *ngIf="authService.currentUser"
+           routerLinkActive="active">
+          Mis Reservas
+        </a>
+      </div>
+
+      <span class="divider" *ngIf="authService.hasRole('Admin')"></span>
+
+      <div class="group-links admin-zone" *ngIf="authService.hasRole('Admin')">
+        <a routerLink="/admin/management" routerLinkActive="active">Gestión</a>
+        <a routerLink="/admin/users" routerLinkActive="active">Usuarios</a>
+        <a routerLink="/admin/reservations" routerLinkActive="active">Ventas</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="user-actions">
+    <ng-container *ngIf="authService.currentUser as user; else guestMode">
+      
+      <div class="user-profile">
+
+        <div class="avatar">
+          {{user.username.charAt(0).toUpperCase()}}
+        </div>
+
+        <span class="welcome-text">
+          {{ user.username }}
+        </span>
+
+        <button class="btn-logout" (click)="onLogout()">
+          Salir
+        </button>
+
+      </div>
+
+    </ng-container>
+
+    <ng-template #guestMode>
+      <div class="auth-buttons">
+        <a routerLink="/login" class="btn-login">Ingresar</a>
+        <a routerLink="/register" class="btn-register">Crear cuenta</a>
+      </div>
+    </ng-template>
+
+  </div>
+</nav>

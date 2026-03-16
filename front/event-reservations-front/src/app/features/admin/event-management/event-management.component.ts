@@ -1,12 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { EventService } from '../../../core/services/event.service'; 
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-event-management',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './event-management.component.html',
   styleUrls: ['./event-management.component.css']
 })

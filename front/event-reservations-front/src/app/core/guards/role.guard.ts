@@ -11,6 +11,7 @@ export const RoleGuard: CanActivateFn = (route, state) => {
   const userRole = authService.getUserRole(); // Debes implementar este método en tu AuthService
 
   if (!authService.isAuthenticated() || !expectedRoles.includes(userRole)) {
+    console.log('Bloqueado por Rol');
     alert('No tienes permisos para acceder a esta sección');
     router.navigate(['/']);
     return false;
