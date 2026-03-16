@@ -33,3 +33,6 @@ Administradores: Panel de control total para crear, editar, pausar o cancelar ev
 Gestión de Inventario: Control automático de disponibilidad de tickets (TicketsAvailable) al crear o modificar eventos.
 
 Diseño UX: Navbar persistente con acceso rápido a funciones según el rol del usuario.
+
+👤 Autor
+Matias Aquino - [LinkedIn](https://www.linkedin.com/in/matias-aquino-988752187/) - Portfolio
