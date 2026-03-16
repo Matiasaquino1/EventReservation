@@ -1,38 +1,27 @@
-EventReservations - Sistema de Gestión de Reservas
-EventReservations es una plataforma integral para la publicación, búsqueda y reserva de eventos en tiempo real. El proyecto aplica una arquitectura moderna desacoplada, utilizando .NET para el procesamiento robusto de datos y Angular para una experiencia de usuario fluida y reactiva.
+# EventReservations - Full Stack Platform
 
-🚀 Tecnologías Utilizadas
-Backend (.NET 8)
-Entity Framework Core: Gestión de base de datos con PostgreSQL.
+Plataforma integral para la reserva de eventos con procesamiento de pagos y panel de administración. Este proyecto demuestra una implementación moderna de arquitectura desacoplada.
 
-AutoMapper: Mapeo eficiente entre Entidades y DTOs.
+## 🏗️ Estructura del Proyecto
+El proyecto se divide en dos grandes módulos:
 
-ASP.NET Core Identity: Seguridad y autenticación basada en roles (Admin, Organizer, User).
+* **/frontend**: Aplicación SPA construida con Angular 17+ utilizando Signals para una reactividad óptima.
+* **/backend**: API REST robusta construida con .NET 8, PostgreSQL y arquitectura de servicios.
 
-Arquitectura: Repository Pattern y servicios desacoplados.
+## 🚀 Tecnologías Destacadas
+* **Frontend:** Angular, RxJS, Signals, Tailwind/CSS Moderno.
+* **Backend:** .NET 8, Entity Framework Core, ASP.NET Identity.
+* **Pagos:** Integración con **Stripe API** para procesamiento de transacciones seguras.
+* **Base de Datos:** PostgreSQL con soporte para Timezones.
 
-Frontend (Angular 17+)
-Signals: Gestión de estado reactiva y eficiente.
+## ⚙️ Configuración Rápida
+Cada módulo tiene su propio archivo de documentación detallado. Por favor, consulte los siguientes enlaces para instrucciones de instalación específicas:
 
-Standalone Components: Arquitectura moderna sin módulos pesados.
+1.  [Documentación del Frontend](./frontend/README.md)
+2.  [Documentación del Backend](./backend/README.md)
 
-RxJS: Manejo de flujos de datos asíncronos y filtros dinámicos.
-
-CSS Moderno: Diseño responsivo con Flexbox y una estética de "píldora" unificada.
-
-Base de Datos
-PostgreSQL: Almacenamiento relacional con manejo de zonas horarias (UTC).
-
-✨ Características Principales
-Buscador Inteligente: Filtros combinados por título, ubicación y fecha.
-
-Sistema de Roles: * Usuarios: Pueden ver eventos y gestionar sus propias reservas.
-
-Administradores: Panel de control total para crear, editar, pausar o cancelar eventos.
-
-Gestión de Inventario: Control automático de disponibilidad de tickets (TicketsAvailable) al crear o modificar eventos.
-
-Diseño UX: Navbar persistente con acceso rápido a funciones según el rol del usuario.
+---
+*Desarrollado como proyecto de portfolio para demostrar capacidades Full-Stack.*
 
 👤 Autor
 Matias Aquino - [LinkedIn](https://www.linkedin.com/in/matias-aquino-988752187/) - Portfolio
