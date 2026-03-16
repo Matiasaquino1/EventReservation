@@ -18,7 +18,7 @@ El proyecto se divide en dos grandes módulos:
 Cada módulo tiene su propio archivo de documentación detallado. Por favor, consulte los siguientes enlaces para instrucciones de instalación específicas:
 
 1.  [Documentación del Frontend](./event-reservations-front/README.md)
-2.  [Documentación del Backend](./backend/README.md)
+2.  [Documentación del Backend](./src/EventReservations.Api/README.md)
 
 ---
 *Desarrollado como proyecto de portfolio para demostrar capacidades Full-Stack.*
