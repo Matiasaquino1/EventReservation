@@ -11,7 +11,7 @@ namespace EventReservations.Services
         Task<Event> GetEventAsync(int id);
         Task<Event> UpdateEventAsync(Event eventModel);
         Task DeleteEventAsync(int id);
-        Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability);
+        Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability, string title);
         Task<Event> ForceConfirmEventAsync(int id);
         Task<IEnumerable<Event>> GetAllAsync();
         Task<Event?> GetEventByIdAsync(int id);
@@ -52,6 +52,7 @@ namespace EventReservations.Services
 
             public async Task<Event> UpdateEventAsync(Event eventModel)
             {
+                
                 if (eventModel == null) throw new ArgumentNullException(nameof(eventModel));
 
                 var existing = await _eventRepository.GetByIdAsync(eventModel.EventId);
@@ -84,9 +85,9 @@ namespace EventReservations.Services
                 _logger.LogInformation("Event deleted {EventId}", id);
             }
 
-            public async Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability)
+            public async Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability, string title)
             {
-                return await _eventRepository.GetEventsWithFiltersAsync(date, location, availability);
+                return await _eventRepository.GetEventsWithFiltersAsync(date, location, availability, title);
             }
 
             public async Task<Event> ForceConfirmEventAsync(int id)

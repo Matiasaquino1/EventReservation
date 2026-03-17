@@ -47,7 +47,6 @@ export class EventFormComponent implements OnInit {
     this.loading.set(true);
     this.eventService.getEvent(id).subscribe({
       next: (event) => {
-        // Formatear fecha para el input datetime-local
         const formattedDate = event.eventDate 
           ? new Date(event.eventDate).toISOString().slice(0, 16) 
           : '';
@@ -66,22 +65,27 @@ export class EventFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.eventForm.invalid) return;
+  if (this.eventForm.invalid) return;
 
-    this.loading.set(true);
-    const formData = { ...this.eventForm.value };
+  this.loading.set(true);
+  
+  // 1. Clono los valores del formulario
+  const formData = { ...this.eventForm.value };
+  
+  // Agrego el ID manualmente para que .NET lo encuentre
+  if (this.isEditMode()) {
+    formData.eventId = this.eventId; 
+  }
+
+  // 3. Formato ISO para el backend
+  formData.eventDate = new Date(formData.eventDate).toISOString();
+  
+  const request$ = this.isEditMode() 
+    ? this.eventService.updateEvent(this.eventId!, formData)
+    : this.eventService.createEvent(formData);
     
-    // Formato ISO para el backend
-    formData.eventDate = new Date(formData.eventDate).toISOString();
-
-    const request$ = this.isEditMode() 
-      ? this.eventService.updateEvent(this.eventId!, formData)
-      : this.eventService.createEvent(formData);
-
     request$.subscribe({
-      next: () => {
-        this.router.navigate(['/admin/management']);
-      },
+      next: () => this.router.navigate(['/admin/management']),
       error: (err) => {
         console.error(err);
         alert('Ocurrió un error al guardar.');

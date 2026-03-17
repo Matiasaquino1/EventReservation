@@ -9,6 +9,6 @@
         public decimal? Price { get; set; }
         public int? TotalTickets { get; set; } 
         public string? Status { get; set; }
-        public int Id { get; internal set; }
+        public int EventId { get; set; }
     }
 }

@@ -21,6 +21,7 @@ export class EventListComponent {
   private router = inject(Router);
 
   filters = signal<EventFilters>({
+    title: this.route.snapshot.queryParams['title'] || '',
     location: this.route.snapshot.queryParams['location'] || '',
     date: this.route.snapshot.queryParams['date'] || '',
     availability: this.route.snapshot.queryParams['availability'] ? Number(this.route.snapshot.queryParams['availability']) : undefined
@@ -35,6 +36,7 @@ export class EventListComponent {
       tap(() => this.isLoading.set(true)),
       switchMap(params => {
         const filtersFromUrl: EventFilters = {
+          title: params['title'] || '',
           location: params['location'] || '',
           date: params['date'] || '',
           availability: params['availability'] ? Number(params['availability']) : undefined
@@ -51,6 +53,7 @@ export class EventListComponent {
     const currentFilters = this.filters();
     this.router.navigate([], {
       queryParams: {
+        title: currentFilters.title || null,
         location: currentFilters.location || null,
         date: currentFilters.date || null,
         availability: currentFilters.availability ?? null
@@ -59,7 +62,7 @@ export class EventListComponent {
   }
 
   onReset(): void {
-    this.filters.set({ location: '', date: '', availability: undefined });
+    this.filters.set({ title: '', location: '', date: '', availability: undefined });
     this.router.navigate([], { queryParams: {} });
   }
 }

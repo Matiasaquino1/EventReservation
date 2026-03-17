@@ -23,7 +23,7 @@ export class ReservationCreateComponent {
   public router = inject(Router);
   public authService = inject(AuthService);
 
-  // 1. Capturamos el ID desde Params o QueryParams usando Signals
+  // 1. Captura el ID desde Params o QueryParams usando Signals
   private params = toSignal(this.route.paramMap);
   private queryParams = toSignal(this.route.queryParamMap);
 
@@ -32,7 +32,7 @@ export class ReservationCreateComponent {
     return id ? Number(id) : null;
   });
 
-  // 2. Cargamos el evento reactivamente
+  // 2. Cargamos el evento 
   event = toSignal(
     toObservable(this.eventId).pipe(
       switchMap(id => {
@@ -43,13 +43,13 @@ export class ReservationCreateComponent {
     { initialValue: undefined } 
   );
 
-  // 3. Estados de la reserva
+  // 3. Estados de la reserva y manejo de errores
   numberOfTickets = signal(1);
   isProcessing = signal(false);
   error = signal('');
   loading = computed(() => this.event() === undefined);
 
-  // 4. Lógica Pro: Cálculo de precio total automático
+  // 4. Cálculo de precio total automático
   totalPrice = computed(() => {
     const ev = this.event();
     return ev ? ev.price * this.numberOfTickets() : 0;

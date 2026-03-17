@@ -13,21 +13,20 @@ export class EventService {
   constructor(private http: HttpClient) {}
 
    getEvents(filters: EventFilters): Observable<EventModel[]> {
-
     let params = new HttpParams();
 
+    if (filters.title) {
+      params = params.set('title', filters.title);
+    }
     if (filters.location) {
       params = params.set('location', filters.location);
     }
-
     if (filters.date) {
       params = params.set('date', filters.date);
     }
-
     if (filters.availability !== undefined) {
       params = params.set('availability', filters.availability);
     }
-
     return this.http.get<EventModel[]>(this.apiUrl, { params });
   }
 
@@ -46,7 +45,8 @@ export class EventService {
   }
 
   updateEvent(id: number, event: Partial<EventModel>) {
-    return this.http.put<EventModel>(`${this.apiUrl}/${id}`, event);
+    const payload = { ...event, eventId: id }; 
+    return this.http.put<EventModel>(`${this.apiUrl}/${id}`, payload);
   }
 
   deleteEvent(id: number) {

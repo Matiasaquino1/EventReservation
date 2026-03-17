@@ -37,10 +37,9 @@
           <label>Tickets Totales</label>
           <input type="number" formControlName="totalTickets">
         </div>
-
-        <div class="field">
-          <label>Estado</label>
-          <select formControlName="status">
+        <div class="field" *ngIf="isEditMode()">
+          <label>Estado del Evento</label>
+          <select formControlName="status" class="form-control">
             <option value="Active">Activo</option>
             <option value="Paused">Pausado</option>
             <option value="Cancelled">Cancelado</option>

@@ -11,9 +11,13 @@ namespace EventReservations.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability)
+        public async Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability, string title)
         {
             var query = _context.Events.AsQueryable();
+            if (!string.IsNullOrEmpty(title))
+            {
+                query = query.Where(e => e.Title.ToLower().Contains(title.ToLower()));
+            }
             if (date.HasValue)
             {
                 query = query.Where(e => e.EventDate.HasValue && e.EventDate.Value.Date == date.Value.Date);

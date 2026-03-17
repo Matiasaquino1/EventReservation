@@ -7,6 +7,16 @@
 
 <form class="filters" (ngSubmit)="onSearch()">
   <div class="filter-field">
+    <label for="title">Buscar por título</label>
+    <input
+      id="title"
+      type="text"
+      placeholder="Ej. Concierto de Rock"
+      [(ngModel)]="filters().title" 
+      name="title" />
+  </div>
+  
+  <div class="filter-field">
     <label for="location">Ubicación</label>
     <input
       id="location"

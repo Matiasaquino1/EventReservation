@@ -7,7 +7,7 @@
         public string? Description { get; set; }
         public DateTime? EventDate { get; set; }
         public string Location { get; set; } = string.Empty;
-        public string Status { get; set; } = "Active";
+        public string Status { get; set; } 
         public decimal Price { get; set; }
         public int TotalTickets { get; set; }
         public int TicketsAvailable { get; set; }

@@ -6,7 +6,7 @@ namespace EventReservations.Repositories
     {
         Task<Event> GetByIdAsync(int id);
         Task<Event> AddAsync(Event eventModel);
-        Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability);
+        Task<IEnumerable<Event>> GetEventsWithFiltersAsync(DateTime? date, string location, int? availability, string title);
         Task<Event> ForceConfirmEventAsync(int id);
         Task<Event> UpdateAsync(Event eventModel);
         Task DeleteAsync(int id);

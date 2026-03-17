@@ -46,6 +46,7 @@ namespace EventReservations.Controllers
         /// <param name="date">Filtrar por fecha (opcional).</param>
         /// <param name="location">Filtrar por ubicación (opcional).</param>
         /// <param name="availability">Filtrar por disponibilidad de entradas (opcional).</param>
+        /// <param name="title"></param>
         /// <returns>Lista de eventos en formato DTO.</returns>
         /// <response code="200">Eventos obtenidos correctamente.</response>
         /// <response code="500">Error interno del servidor.</response>
@@ -54,9 +55,11 @@ namespace EventReservations.Controllers
         public async Task<ActionResult<IEnumerable<EventDto>>> GetEvents(
             [FromQuery] DateTime? date = null,
             [FromQuery] string? location = null,
-            [FromQuery] int? availability = null)
+            [FromQuery] int? availability = null,
+            [FromQuery] string? title = null)
+
         {
-            var events = await _eventService.GetEventsWithFiltersAsync(date, location, availability);
+            var events = await _eventService.GetEventsWithFiltersAsync(date, location, availability, title);
             var eventDtos = _mapper.Map<IEnumerable<EventDto>>(events);
 
             _logger.LogInformation("Eventos obtenidos: {Count} registros", events.Count());
@@ -129,11 +132,11 @@ namespace EventReservations.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult<EventDto>> UpdateEvent([FromRoute] int id, [FromBody] UpdateEventDto updateDto)
         {
-            updateDto.Id = id;
             var eventModel = _mapper.Map<Event>(updateDto);
+            eventModel.EventId = id;
             var updatedEvent = await _eventService.UpdateEventAsync(eventModel);
 
-            if (updatedEvent == null)
+            if (updatedEvent == null) 
             {
                 _logger.LogWarning("Evento no encontrado para actualización: {Id}", id);
                 return NotFound(new { error = "Evento no encontrado." });
