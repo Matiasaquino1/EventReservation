@@ -49,6 +49,21 @@ namespace EventReservations.Repositories
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
+        public async Task<(List<User>, int)> GetUsersAsync(int page, int limit)
+        {
+            var query = _context.Users
+                .Include(u => u.Reservations) // las reservas
+                    .ThenInclude(r => r.Event) // Y el detalle del evento para saber el título
+                .AsQueryable();
+
+            var total = await query.CountAsync();
+            var users = await query
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToListAsync();
+
+            return (users, total);
+        }
 
         public async Task SaveChangesAsync()
         {

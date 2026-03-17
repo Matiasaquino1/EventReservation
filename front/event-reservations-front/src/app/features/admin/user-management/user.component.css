@@ -1,0 +1,15 @@
+.container { padding: 2rem; }
+
+table { width: 100%; background: white; border-radius: 8px; overflow: hidden; }
+
+.role-badge { 
+    padding: 4px 8px; 
+    border-radius: 6px; 
+    font-size: 12px; 
+    font-weight: bold;
+}
+.admin { background: #fee2e2; color: #991b1b; }
+
+.user { background: #e0f2fe; color: #075985; }
+
+.ticket-list { font-size: 0.85rem; color: #475569; }

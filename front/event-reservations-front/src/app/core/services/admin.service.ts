@@ -13,21 +13,6 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  getUsers(page: number, limit: number): Observable<{ users: User[]; total: number }> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(users => {
-        const normalized = users.map(user => this.normalizeUser(user));
-        const start = (page - 1) * limit;
-        const pagedUsers = normalized.slice(start, start + limit);
-        return {
-          users: pagedUsers,
-          total: normalized.length
-        };
-      })
-    );
-  }
-
-
   promoteUser(userId: number): Observable<void> {
     return this.http.post<void>(
       `${this.apiUrl}/promote/${userId}`,
@@ -57,6 +42,20 @@ export class AdminService {
     return this.http.get<{ data: Reservation[]; page: number; pageSize: number; totalCount: number }>(
       `${this.apiUrl}/reservations`,
       { params }
+    );
+  }
+
+  getUsers(page: number, limit: number): Observable<{ users: User[]; total: number }> {
+    const params = new HttpParams()
+    .set('page', page.toString())
+    .set('limit', limit.toString());
+
+    return this.http.get<{ users: any[], total: number }>(`${this.apiUrl}/users`, { params }).pipe(
+      map(response => ({
+        // Mapeamos cada usuario a nuestro modelo User, normalizando campos si es necesario
+        users: response.users.map(u => this.normalizeUser(u)),
+        total: response.total
+      }))
     );
   }
 

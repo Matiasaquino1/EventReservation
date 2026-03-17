@@ -40,12 +40,16 @@ export const routes: Routes = [
         path: 'events/edit/:id', 
         loadComponent: () => import('./features/admin/event-form/event-form.component').then(m => m.EventFormComponent) 
       },
+
       { 
         path: 'events/:id/attendees', 
         loadComponent: () => import('./features/admin/event-attendees/event-attendees.component').then(m => m.EventAttendeesComponent) 
       },
       // Otros componentes de admin
-      { path: 'users', loadComponent: () => import('./features/admin/components/users.component').then(m => m.UsersComponent) },
+      {
+        path: 'users', 
+        loadComponent: () => import('./features/admin/user-management/users.component').then(m => m.UsersComponent)
+      },
       { path: 'reservations', loadComponent: () => import('./features/admin/components/reservations-admin.component').then(m => m.ReservationsAdminComponent) }
     ]
   },

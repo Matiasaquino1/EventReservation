@@ -20,6 +20,7 @@ namespace EventReservations.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
+        private readonly IUserService _userService;
         private readonly IReservationService _reservationService;
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
@@ -27,13 +28,14 @@ namespace EventReservations.Controllers
         private readonly ApplicationDbContext _context;
 
 
-        public AdminController(IReservationService reservationService, IEventService eventService, IMapper mapper, ILogger<AdminController> logger, ApplicationDbContext dbContext)
+        public AdminController(IReservationService reservationService, IEventService eventService, IMapper mapper, ILogger<AdminController> logger, ApplicationDbContext dbContext, IUserService userService)
         {
             _reservationService = reservationService;
             _eventService = eventService;
             _mapper = mapper;
             _logger = logger;
             _context = dbContext;
+            _userService = userService;
         }
 
         /// <summary>
@@ -46,6 +48,22 @@ namespace EventReservations.Controllers
             var paged = await _reservationService.GetPagedReservationsAsync(page, pageSize, sort, status, eventId);
             var dtos = _mapper.Map<IEnumerable<AdminReservationDto>>(paged.Data);
             return Ok(new PagedResponseDto<AdminReservationDto> { Data = dtos, Page = paged.Page, PageSize = paged.PageSize, TotalCount = paged.TotalCount });
+        }
+
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int limit = 10)
+        {
+            // El servicio debe devolver los objetos ya paginados y el conteo total
+            var (users, totalCount) = await _userService.GetUsersPagedAsync(page, limit);
+
+            // Mapeamos a nuestro DTO que incluye las reservas
+            var userDtos = _mapper.Map<List<UserAdminDto>>(users);
+
+            return Ok(new
+            {
+                Users = userDtos,
+                Total = totalCount
+            });
         }
 
 

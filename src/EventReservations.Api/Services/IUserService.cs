@@ -1,5 +1,7 @@
-﻿using EventReservations.Models;
+﻿using EventReservations.Data;
+using EventReservations.Models;
 using EventReservations.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventReservations.Services
 {
@@ -9,14 +11,18 @@ namespace EventReservations.Services
         Task<User?> GetByIdAsync(int id);
         Task UpdateAsync(User user);
         Task DeleteAsync(User user);
+        Task<(IEnumerable<User> Users, int TotalCount)> GetUsersPagedAsync(int page, int limit);
     }
 
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
 
-        public UserService(IUserRepository userRepository)
+        private readonly ApplicationDbContext _context;
+
+        public UserService(IUserRepository userRepository, ApplicationDbContext context)
         {
+            _context = context;
             _userRepository = userRepository;
         }
 
@@ -40,6 +46,27 @@ namespace EventReservations.Services
         {
             await _userRepository.DeleteAsync(user);
             await _userRepository.SaveChangesAsync();
+        }
+
+        public async Task<(IEnumerable<User> Users, int TotalCount)> GetUsersPagedAsync(int page, int limit)
+        {
+            var query = _context.Users
+                .Include(u => u.Reservations)
+                    .ThenInclude(r => r.Event)
+                .AsNoTracking() 
+                .AsQueryable();
+
+            //  Obtener el total de registros antes de paginar
+            var totalCount = await query.CountAsync();
+
+            // paginación (Skip y Take)
+            var users = await query
+                .OrderBy(u => u.UserId) 
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToListAsync();
+
+            return (users, totalCount);
         }
     }
 

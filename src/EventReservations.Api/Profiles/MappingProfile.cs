@@ -18,6 +18,7 @@ namespace EventReservations.Profiles
             CreateMap<UpdateEventDto, Event>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Event, UpdateEventDto>();
+            CreateMap<Event, string>().ConvertUsing(src => src.Title);
 
             // RESERVATIONS
             CreateMap<Reservation, ReservationDto>()
@@ -34,6 +35,20 @@ namespace EventReservations.Profiles
                 .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
                 .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.EventId))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
+
+            // Mapeo para el detalle de la reserva dentro de la lista de usuarios
+            CreateMap<Reservation, UserReservationDto>()
+                .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
+                .ForMember(dest => dest.EventTitle, opt => opt.MapFrom(src => src.Event.Title))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.ReservationDate, opt => opt.MapFrom(src => src.ReservationDate));
+
+            // Mapeo para el detalle del usuario dentro de la lista de reservas
+            CreateMap<User, UserAdminDto>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.Reservations, opt => opt.MapFrom(src => src.Reservations));
 
 
             // USERS
