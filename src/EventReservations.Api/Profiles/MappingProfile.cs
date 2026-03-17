@@ -45,7 +45,7 @@ namespace EventReservations.Profiles
 
             // Mapeo para el detalle del usuario dentro de la lista de reservas
             CreateMap<User, UserAdminDto>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Reservations, opt => opt.MapFrom(src => src.Reservations))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
                 .ForMember(dest => dest.Reservations, opt => opt.MapFrom(src => src.Reservations));

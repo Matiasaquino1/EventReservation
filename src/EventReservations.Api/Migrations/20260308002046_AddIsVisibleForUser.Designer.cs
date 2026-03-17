@@ -194,7 +194,7 @@ namespace EventReservations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("username")
                         .IsRequired()
                         .HasColumnType("text");
 

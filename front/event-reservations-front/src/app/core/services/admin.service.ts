@@ -62,7 +62,7 @@ export class AdminService {
   private normalizeUser(user: any): User {
     return {
       id: user.id,
-      username: user.username ?? user.name ?? '',
+      username: user.name || user.username || 'Sin nombre',
       email: user.email,
       role: user.role ?? 'User',
     };

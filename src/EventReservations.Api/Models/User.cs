@@ -7,7 +7,7 @@ namespace EventReservations.Models
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public String Role { get; set; } = "User";
-        public string Name { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
         public DateTime Created { get; set; } = DateTime.UtcNow;
 
         public ICollection<Reservation> Reservations { get; set; }

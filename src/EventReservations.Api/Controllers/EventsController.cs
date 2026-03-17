@@ -205,7 +205,7 @@ namespace EventReservations.Controllers
             var attendees = reservations
                 .Where(r => r.Status == ReservationStatuses.Confirmed)
                 .Select(static r => new {
-                    r.User.Name, 
+                    r.User.Username, 
                     r.User.Email,
                     r.NumberOfTickets,
                     r.CreatedAt,

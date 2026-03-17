@@ -150,7 +150,7 @@ try
             var adminUser = new User
             {
                 Email = adminEmail,
-                Name = "Administrador",
+                Username = "Administrador",
                 Role = "Admin",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
                 Created = DateTime.UtcNow

@@ -30,7 +30,7 @@ namespace EventReservations.Services
 
             var user = new User
             {
-                Name = dto.Name,
+                Username = dto.Name,
                 Email = dto.Email,
                 Role = "User",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),

@@ -33,7 +33,9 @@ export class UsersComponent implements OnInit {
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
-    this.loadUsers();
+    setTimeout(() => {
+      this.loadUsers();
+    });
   }
 
   loadUsers(): void {
@@ -57,6 +59,10 @@ export class UsersComponent implements OnInit {
   }
 
   getEventTitles(user: any): string {
+    console.log('Usuario en tabla:', user);
+    if (!user.reservations || user.reservations.length === 0) {
+    return 'Sin reservas';
+    }
     return user.reservations
       .map((r: any) => r.eventTitle || r.eventId)
       .join(', ');

@@ -56,7 +56,7 @@ namespace EventReservations.Controllers
                 return NotFound(new { error = "Usuario no encontrado." });
 
             // Actualización controlada
-            user.Name = dto.Name;
+            user.Username = dto.Name;
             user.Email = dto.Email;
             user.Role = dto.Role;
 

@@ -19,14 +19,17 @@
         </ng-container>
 
         <ng-container matColumnDef="tickets">
-          <th mat-header-cell *matHeaderCellDef>Entradas / Reservas</th>
-          <td mat-cell *matCellDef="let user">
-            <div *ngIf="user.reservations?.length; else noTickets" class="ticket-list">
-              {{ user.reservations.length }} reserva(s) 
-              <small>({{ getEventTitles(user) }})</small>
-            </div>
-            <ng-template #noTickets><small class="text-muted">Sin reservas</small></ng-template>
-          </td>
+            <th mat-header-cell *matHeaderCellDef>Entradas</th>
+            <td mat-cell *matCellDef="let user">
+                <div *ngIf="user.reservations && user.reservations.length > 0; else noTickets">
+                <span class="badge-tickets">{{ user.reservations.length }} tickets</span>
+                <br>
+                <small class="text-muted">{{ getEventTitles(user) }}</small>
+                </div>
+                <ng-template #noTickets>
+                <span class="text-muted">Sin entradas</span>
+                </ng-template>
+            </td>
         </ng-container>
 
         <ng-container matColumnDef="actions">

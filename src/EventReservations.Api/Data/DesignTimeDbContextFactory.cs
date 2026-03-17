@@ -9,7 +9,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
     public ApplicationDbContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseNpgsql("Host=localhost;Database=eventreservations;Username=postgres;Password=2092")
+            .UseNpgsql("Host=localhost;Database=eventreservations;username=postgres;Password=2092")
             .Options;
 
         return new ApplicationDbContext(options);
