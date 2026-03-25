@@ -1,11 +1,40 @@
 <div class="container">
-  <div class="page-header">
-    <h2>Mis Reservas</h2>
-  </div>
 
-  @if (loading()) {
-    <div class="loading-state">Cargando...</div>
-  }
+  <div class="reservations-container">
+    <h2>Mis Reservas</h2>
+
+    @if (reservations().length > 0) {
+      <div class="filter-container">
+        <mat-chip-listbox (change)="setFilter($event.value)">
+          <mat-chip-option value="All" selected>Todas</mat-chip-option>
+          <mat-chip-option value="Confirmed">Confirmadas</mat-chip-option>
+          <mat-chip-option value="Pending">Pendientes</mat-chip-option>
+          <mat-chip-option value="Cancelled">Canceladas</mat-chip-option>
+        </mat-chip-listbox>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } 
+    @else if (filteredReservations().length > 0) {
+      <div class="reservations-grid">
+        @for (res of filteredReservations(); track res.reservationId) {
+          <div class="res-card" [ngClass]="'status-' + res.status.toLowerCase()">
+            </div>
+        }
+      </div>
+    }
+    @else {
+      <div class="empty-state">
+        <mat-icon>event_busy</mat-icon>
+        <h3>No se encontraron reservas</h3>
+        <button mat-raised-button color="primary" routerLink="/">Ver Eventos</button>
+      </div>
+    }
+  </div>
 
   <div class="reservations-grid">
     @for (res of reservations(); track res.reservationId) {

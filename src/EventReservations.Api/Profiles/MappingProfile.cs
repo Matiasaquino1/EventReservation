@@ -59,6 +59,7 @@ namespace EventReservations.Profiles
             CreateMap<User, LoginResponseDto>();
             CreateMap<UserDto, User>()
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
+            CreateMap<User, UserAdminDto>();
 
 
             // PAYMENTS

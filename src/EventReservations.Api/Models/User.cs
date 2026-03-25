@@ -1,5 +1,4 @@
-﻿
-namespace EventReservations.Models
+﻿namespace EventReservations.Models
 {
     public class User
     {

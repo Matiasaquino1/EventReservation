@@ -1,12 +1,17 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ReservationService } from '../../../core/services/reservation.service'; // ajustá el path si es necesario
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
+
 
 @Component({
   selector: 'app-my-reservations',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, DatePipe],
+  imports: [CommonModule, CurrencyPipe, DatePipe, MatButtonModule, RouterLink, MatIconModule, MatProgressSpinnerModule, MatChipsModule],
   templateUrl: './my-reservations.component.html',
   styleUrl: './my-reservations.component.css'
 })
@@ -19,6 +24,7 @@ export class MyReservationsComponent implements OnInit {
   error = signal<string | null>(null);
   cancelling = signal<number | null>(null); // ID de la reserva que se está cancelando
   hiding = signal<number | null>(null);     // ID de la reserva que se está ocultando
+  filterStatus = signal<string>('All');
 
   ngOnInit() {
     this.loadReservations();
@@ -78,6 +84,17 @@ export class MyReservationsComponent implements OnInit {
       }
     });
     }
+  }
+
+  filteredReservations = computed(() => {
+    const currentFilter = this.filterStatus();
+    const allReservations = this.reservations();
+    if (currentFilter === 'All') return allReservations;
+    return allReservations.filter(r => r.status === currentFilter);
+  });
+  
+  setFilter(status: string) {
+    this.filterStatus.set(status);
   }
 
   goToPay(id: number) {

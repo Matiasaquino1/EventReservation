@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventReservations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260317071619_SyncUserFields")]
-    partial class SyncUserFields
+    [Migration("20260320210335_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
