@@ -5,6 +5,7 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
 import { Reservation } from '../models/reservation.model';
+import { DashboardStats } from '../models/admin-stats.model';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -57,6 +58,10 @@ export class AdminService {
         total: response.total
       }))
     );
+  }
+
+  getDashboardStats(): Observable<DashboardStats> {
+    return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard-stats`);
   }
 
   private normalizeUser(user: any): User {

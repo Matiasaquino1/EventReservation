@@ -45,6 +45,10 @@ export const routes: Routes = [
         path: 'events/:id/attendees', 
         loadComponent: () => import('./features/admin/event-attendees/event-attendees.component').then(m => m.EventAttendeesComponent) 
       },
+      {
+        path: 'dashboard-stats',
+        loadComponent: () => import('./features/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+      },
       // Otros componentes de admin
       {
         path: 'users', 

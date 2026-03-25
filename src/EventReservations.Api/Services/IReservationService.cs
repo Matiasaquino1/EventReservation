@@ -91,6 +91,8 @@ namespace EventReservations.Services
         {
             var reservation = await _reservationRepository.GetByIdAsync(id);
 
+            if (reservation == null) return null;
+
             if (reservation.Status != ReservationStatuses.Pending && reservation.Status != ReservationStatuses.Confirmed)
             {
                 throw new InvalidOperationException("Solo reservas pendientes o confirmadas pueden cancelarse.");
@@ -99,18 +101,17 @@ namespace EventReservations.Services
             if (!string.IsNullOrEmpty(reservation.PaymentIntentId))
             {
                 var service = new PaymentIntentService();
+                try { await service.CancelAsync(reservation.PaymentIntentId); }
+                catch (StripeException) { }
+            }
 
-                try
-                {
-                    await service.CancelAsync(reservation.PaymentIntentId);
-                }
-                catch (StripeException)
-                {
-                }
+            if (reservation.Event != null)
+            {
+                reservation.Event.TicketsAvailable += reservation.NumberOfTickets;
+                _logger.LogInformation("Stock restaurado para el evento {EventId}", reservation.EventId);
             }
 
             reservation.Status = ReservationStatuses.Cancelled;
-
             await _reservationRepository.UpdateAsync(reservation);
 
             return reservation;

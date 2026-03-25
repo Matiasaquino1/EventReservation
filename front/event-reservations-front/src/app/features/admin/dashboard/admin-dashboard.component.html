@@ -1,0 +1,122 @@
+<div class="dashboard-wrapper">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="header-left">
+      <span class="eyebrow">Administración</span>
+      <h1>Panel de Control</h1>
+      <p class="subtitle">Resumen general de actividad y métricas</p>
+    </div>
+    <div class="header-date">
+      <mat-icon>calendar_today</mat-icon>
+      <span>{{ today | date:'EEEE, d MMMM y' : '' : 'es-AR' }}</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="state-container">
+      <div class="custom-spinner"></div>
+      <p>Cargando datos...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (hasError()) {
+    <div class="state-container error">
+      <mat-icon>error_outline</mat-icon>
+      <p>No se pudieron cargar las estadísticas.</p>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (stats(); as data) {
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+
+      <div class="kpi-card card-users">
+        <div class="kpi-top">
+          <div class="kpi-icon"><mat-icon>group</mat-icon></div>
+          <span class="kpi-trend"><mat-icon>trending_up</mat-icon> activos</span>
+        </div>
+        <div class="kpi-value">{{ data.totalUsers | number }}</div>
+        <div class="kpi-label">Usuarios Registrados</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 72%"></div></div>
+      </div>
+
+      <div class="kpi-card card-reservations">
+        <div class="kpi-top">
+          <div class="kpi-icon"><mat-icon>confirmation_number</mat-icon></div>
+          <span class="kpi-trend"><mat-icon>trending_up</mat-icon> total</span>
+        </div>
+        <div class="kpi-value">{{ data.totalReservations | number }}</div>
+        <div class="kpi-label">Reservas Realizadas</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 58%"></div></div>
+      </div>
+
+      <div class="kpi-card card-revenue">
+        <div class="kpi-top">
+          <div class="kpi-icon"><mat-icon>payments</mat-icon></div>
+          <span class="kpi-trend"><mat-icon>trending_up</mat-icon> ingresos</span>
+        </div>
+        <div class="kpi-value">{{ data.totalRevenue | currency:'ARS':'symbol':'1.0-0' }}</div>
+        <div class="kpi-label">Recaudación Total</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 88%"></div></div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-grid">
+
+      <!-- Chart -->
+      <div class="glass-card chart-card">
+        <div class="glass-card-header">
+          <div>
+            <h2>Ventas por Evento</h2>
+            <p>Top eventos con mayor cantidad de entradas vendidas</p>
+          </div>
+          <span class="pill">{{ data.topEvents.length }} eventos</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas #eventChart></canvas>
+        </div>
+      </div>
+
+      <!-- Ranking -->
+      <div class="glass-card ranking-card">
+        <div class="glass-card-header">
+          <div>
+            <h2>Ranking</h2>
+            <p>Por volumen de ventas</p>
+          </div>
+        </div>
+        <ul class="ranking-list">
+          @for (event of data.topEvents; track event.eventName; let i = $index) {
+            <li class="rank-item">
+              <span class="rank-pos"
+                [class.gold]="i === 0"
+                [class.silver]="i === 1"
+                [class.bronze]="i === 2">
+                {{ i + 1 }}
+              </span>
+              <div class="rank-detail">
+                <span class="rank-name">{{ event.eventName }}</span>
+                <div class="rank-track">
+                  <div
+                    class="rank-fill"
+                    [style.width.%]="getEventPercentage(event.ticketCount, data.topEvents)">
+                  </div>
+                </div>
+              </div>
+              <span class="rank-tickets">{{ event.ticketCount }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+
+    </div>
+  }
+
+</div>

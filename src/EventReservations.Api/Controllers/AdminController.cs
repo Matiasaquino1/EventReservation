@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using EventReservations.Data;
 using EventReservations.Dto;
+using EventReservations.Models;
 using EventReservations.Profiles;
 using EventReservations.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -138,6 +140,36 @@ namespace EventReservations.Controllers
             var updated = await _eventService.UpdateEventAsync(ev);
             var dtoOut = _mapper.Map<EventDto>(updated);
             return Ok(dtoOut);
+        }
+
+        [HttpGet("dashboard-stats")]
+        public async Task<ActionResult<AdminDashboardDto>> GetDashboardStats()
+        {
+            var stats = new AdminDashboardDto
+            {
+                TotalUsers = await _context.Users.CountAsync(),
+
+                TotalReservations = await _context.Reservations
+                    .Where(r => r.Status != ReservationStatuses.Cancelled)
+                    .CountAsync(),
+
+                TotalRevenue = await _context.Reservations
+                    .Where(r => r.Status == ReservationStatuses.Confirmed)
+                    .SumAsync(r => r.Amount),
+
+                TopEvents = await _context.Reservations
+                    .GroupBy(r => r.Event.Title)
+                    .Select(g => new EventStatDto
+                    {
+                        EventName = g.Key,
+                        TicketCount = g.Sum(r => r.NumberOfTickets)
+                    })
+                    .OrderByDescending(x => x.TicketCount)
+                    .Take(5)
+                    .ToListAsync()
+            };
+
+            return Ok(stats);
         }
     }
 }

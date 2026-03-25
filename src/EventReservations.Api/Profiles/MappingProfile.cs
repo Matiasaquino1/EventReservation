@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using EventReservations.Models;  // Para los modelos
-using EventReservations.Dto;   // Para los DTOs
+using EventReservations.Models;  
+using EventReservations.Dto;   
 
 namespace EventReservations.Profiles
 {
