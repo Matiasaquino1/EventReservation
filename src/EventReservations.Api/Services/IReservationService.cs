@@ -244,7 +244,6 @@ namespace EventReservations.Services
 
             if (reservation == null) return false;
 
-            // Solo confirma si está pendiente
             if (reservation.Status == ReservationStatuses.Pending)
             {
                 reservation.Status = ReservationStatuses.Confirmed;

@@ -6,6 +6,7 @@ import {
   ElementRef,
   inject,
   signal,
+  effect
 } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -41,12 +42,22 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('eventChart');
   private chart: Chart | null = null;
 
+  constructor() {
+    effect(() => {
+      const data = this.stats();
+      const canvas = this.chartCanvas();
+      
+      if (data && canvas) {
+        setTimeout(() => this.createChart(data.topEvents), 50);
+      }
+    });
+  }
+
   ngOnInit() {
     this.adminService.getDashboardStats().subscribe({
       next: (data) => {
         this.stats.set(data);
         this.isLoading.set(false);
-        setTimeout(() => this.createChart(data.topEvents), 150);
       },
       error: () => {
         this.isLoading.set(false);

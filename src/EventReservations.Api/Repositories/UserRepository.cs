@@ -52,8 +52,8 @@ namespace EventReservations.Repositories
         public async Task<(List<User>, int)> GetUsersAsync(int page, int limit)
         {
             var query = _context.Users
-                .Include(u => u.Reservations) // las reservas
-                    .ThenInclude(r => r.Event) // Y el detalle del evento para saber el título
+                .Include(u => u.Reservations) 
+                .ThenInclude(r => r.Event) 
                 .AsQueryable();
 
             var total = await query.CountAsync();

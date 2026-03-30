@@ -48,7 +48,8 @@ namespace EventReservations.Profiles
                 .ForMember(dest => dest.Reservations, opt => opt.MapFrom(src => src.Reservations))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
-                .ForMember(dest => dest.Reservations, opt => opt.MapFrom(src => src.Reservations));
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
 
 
             // USERS

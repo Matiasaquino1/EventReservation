@@ -54,7 +54,9 @@ export const routes: Routes = [
         path: 'users', 
         loadComponent: () => import('./features/admin/user-management/users.component').then(m => m.UsersComponent)
       },
-      { path: 'reservations', loadComponent: () => import('./features/admin/components/reservations-admin.component').then(m => m.ReservationsAdminComponent) }
+      { path: 'ventas', 
+        loadComponent: () => import('./features/admin/Ventas-management/ventas-admin.component').then(m => m.VentasAdminComponent) 
+      }
     ]
   },
   

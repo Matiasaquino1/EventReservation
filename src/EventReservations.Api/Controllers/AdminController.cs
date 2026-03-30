@@ -43,7 +43,7 @@ namespace EventReservations.Controllers
         /// <summary>
         /// Obtiene una lista de reservas con filtros opcionales para administración.
         /// </summary>
-        [HttpGet("reservations")]
+        [HttpGet("ventas")]
         public async Task<ActionResult<PagedResponseDto<AdminReservationDto>>> GetAdminReservations(
             [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string sort = "desc", [FromQuery] string status = null, [FromQuery] int? eventId = null)
         {
@@ -55,10 +55,7 @@ namespace EventReservations.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int limit = 10)
         {
-            // El servicio debe devolver los objetos ya paginados y el conteo total
             var (users, totalCount) = await _userService.GetUsersPagedAsync(page, limit);
-
-            // Mapeamos a nuestro DTO que incluye las reservas
             var userDtos = _mapper.Map<List<UserAdminDto>>(users);
 
             return Ok(new

@@ -84,9 +84,11 @@ namespace EventReservations.Repositories
                 .ToListAsync();  
         }
 
-        public async Task<Reservation> GetByIdAsync(int id)
+        public async Task<Reservation?> GetByIdAsync(int id)
         {
-            return await _context.Reservations.FindAsync(id);
+            return await _context.Reservations
+                .Include(r => r.Event)
+                .FirstOrDefaultAsync(r => r.ReservationId == id);
         }
         public async Task<Reservation> AddAsync(Reservation reservation)
         {

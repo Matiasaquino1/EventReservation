@@ -1,0 +1,181 @@
+<div class="admin-container">
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="header-left">
+      <span class="eyebrow">Administración</span>
+      <h1>Registro de Ventas</h1>
+      <p class="subtitle">Historial detallado de transacciones y estados de pago</p>
+    </div>
+
+    <div class="header-right">
+      <!-- Summary pills -->
+      <div class="summary-pills">
+        <div class="summary-pill confirmed">
+          <span class="pill-dot"></span>
+          <span class="pill-label">Confirmados</span>
+          <span class="pill-count">{{ confirmedCount }}</span>
+        </div>
+        <div class="summary-pill pending">
+          <span class="pill-dot"></span>
+          <span class="pill-label">Pendientes</span>
+          <span class="pill-count">{{ pendingCount }}</span>
+        </div>
+        <div class="summary-pill cancelled">
+          <span class="pill-dot"></span>
+          <span class="pill-label">Cancelados</span>
+          <span class="pill-count">{{ cancelledCount }}</span>
+        </div>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-wrap">
+        <mat-icon class="filter-icon">tune</mat-icon>
+        <select class="native-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+          <option value="">Todos los estados</option>
+          <option value="Confirmed">Confirmados</option>
+          <option value="Pending">Pendientes</option>
+          <option value="Cancelled">Cancelados</option>
+        </select>
+        <mat-icon class="chevron-icon">expand_more</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="glass-card table-card">
+
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="state-overlay">
+        <div class="custom-spinner"></div>
+        <p>Cargando transacciones...</p>
+      </div>
+    }
+
+    <!-- Empty -->
+    @if (!isLoading && reservations.length === 0) {
+      <div class="state-overlay">
+        <div class="empty-icon">🧾</div>
+        <p>No se encontraron transacciones.</p>
+      </div>
+    }
+
+    <!-- Table -->
+    @if (!isLoading && reservations.length > 0) {
+      <div class="table-scroll">
+        <table class="sales-table">
+          <thead>
+            <tr>
+              <th>Ref.</th>
+              <th>Cliente</th>
+              <th>Evento</th>
+              <th>Tickets</th>
+              <th>Monto</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th class="center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (res of reservations; track res.reservationId) {
+              <tr class="table-row" [class.row-pending]="res.status === 'Pending'">
+
+                <!-- Ref -->
+                <td>
+                  <span class="id-badge">#{{ res.reservationId }}</span>
+                </td>
+
+                <!-- Client -->
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar">{{ res.user?.username?.charAt(0)?.toUpperCase() || '?' }}</div>
+                    <div class="user-info">
+                      <span class="user-name">{{ res.user?.username || 'Usuario' }}</span>
+                      <span class="user-email">{{ res.user?.email }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Event -->
+                <td>
+                  <div class="event-cell">
+                    <span class="event-name">{{ res.event?.title || 'Evento' }}</span>
+                    @if (res.event?.date) {
+                      <span class="event-date">{{ res.event.date | date:'dd MMM y' }}</span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Tickets -->
+                <td>
+                  <div class="ticket-count">
+                    <mat-icon>confirmation_number</mat-icon>
+                    {{ res.quantity ?? res.tickets ?? 1 }}
+                  </div>
+                </td>
+
+                <!-- Amount -->
+                <td>
+                  <span class="amount-text">{{ res.totalAmount | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <span class="status-pill" [class]="'status-' + res.status.toLowerCase()">
+                    <span class="status-dot"></span>
+                    {{ statusLabel(res.status) }}
+                  </span>
+                </td>
+
+                <!-- Date -->
+                <td>
+                  <span class="date-text">{{ res.createdAt | date:'dd/MM/yy' }}</span>
+                  <span class="time-text">{{ res.createdAt | date:'HH:mm' }}</span>
+                </td>
+
+                <!-- Actions -->
+                <td class="center">
+                  @if (res.status === 'Pending') {
+                    <button
+                      class="action-btn validate"
+                      title="Validar pago manualmente"
+                      (click)="confirmManual(res.reservationId)">
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Validar</span>
+                    </button>
+                  } @else {
+                    <span class="no-action">—</span>
+                  }
+                </td>
+
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer totals -->
+      <div class="table-footer">
+        <span class="footer-label">{{ total }} transacciones en total</span>
+        <span class="footer-revenue">
+          <mat-icon>payments</mat-icon>
+          Recaudado: <strong>{{ totalRevenue | currency:'ARS':'symbol':'1.0-0' }}</strong>
+        </span>
+      </div>
+    }
+
+  </div>
+
+  <!-- Paginator -->
+  <div class="paginator-wrap">
+    <mat-paginator
+      [length]="total"
+      [pageSize]="limit"
+      [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+
+</div>

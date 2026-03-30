@@ -50,18 +50,14 @@ namespace EventReservations.Services
 
         public async Task<(IEnumerable<User> Users, int TotalCount)> GetUsersPagedAsync(int page, int limit)
         {
-            var query = _context.Users
+            var totalCount = await _context.Users.CountAsync();
+
+            // Query con carga de datos para los resultados
+            var users = await _context.Users
                 .Include(u => u.Reservations)
                     .ThenInclude(r => r.Event)
-                .AsNoTracking() 
-                .AsQueryable();
-
-            //  Obtener el total de registros antes de paginar
-            var totalCount = await query.CountAsync();
-
-            // paginación (Skip y Take)
-            var users = await query
-                .OrderBy(u => u.UserId) 
+                .AsNoTracking()
+                .OrderBy(u => u.UserId)
                 .Skip((page - 1) * limit)
                 .Take(limit)
                 .ToListAsync();

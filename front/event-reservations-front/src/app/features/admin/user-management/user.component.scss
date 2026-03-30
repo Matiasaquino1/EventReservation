@@ -1,0 +1,536 @@
+
+// --- Tokens (idénticos al dashboard) ---
+$violet:      #7c3aed;
+$violet-l:    #ede9fe;
+$blue:        #2563eb;
+$blue-l:      #dbeafe;
+$emerald:     #059669;
+$emerald-l:   #d1fae5;
+$red:         #dc2626;
+$red-l:       #fee2e2;
+$amber:       #d97706;
+$amber-l:     #fef3c7;
+$text-h:      #1e293b;
+$text-b:      #475569;
+$text-m:      #94a3b8;
+$border-soft: rgba(255, 255, 255, 0.75);
+
+// Avatar palette — rotatoria por índice
+$avatars: (#7c3aed, #2563eb, #059669, #d97706, #db2777, #0891b2);
+
+// Glass mixin — coherente con el dashboard
+@mixin glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid $border-soft;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    0 8px 32px rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+}
+
+/* Reemplazá todo tu .css por este que usa variables nativas */
+:host {
+  --violet: #7c3aed;
+  --violet-l: #ede9fe;
+  --text-h: #1e293b;
+  --text-m: #94a3b8;
+  --text-b: #475569;
+  --red: #dc2626;
+  --red-l: #fee2e2;
+}
+
+.admin-container {
+  padding: 32px 36px 48px;
+  max-width: 1280px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Glass effect corregido para CSS nativo */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+}
+
+/* Fix para los iconos de Material */
+mat-icon {
+  vertical-align: middle;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.role-pill.admin {
+  background-color: var(--violet-l);
+  color: var(--violet);
+}
+
+.res-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #2563eb);
+  transition: width 0.8s ease;
+}
+
+// ============================================================
+//  Container
+// ============================================================
+.admin-container {
+  padding: 32px 36px 48px;
+  max-width: 1280px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: $text-h;
+}
+
+// ============================================================
+//  Header
+// ============================================================
+.admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  .header-left {
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: $violet;
+      background: $violet-l;
+      border: 1px solid rgba($violet, 0.2);
+      padding: 3px 12px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+      font-weight: 800;
+      color: $text-h;
+      margin: 0 0 6px;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      color: $text-m;
+      font-size: 0.88rem;
+      margin: 0;
+    }
+  }
+}
+
+.mini-stat {
+  @include glass;
+  padding: 12px 24px;
+  border-radius: 14px;
+  text-align: center;
+
+  .mini-stat-value {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $text-h;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .mini-stat-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: $text-m;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+}
+
+// ============================================================
+//  Glass Card Table
+// ============================================================
+.glass-card.table-card {
+  @include glass;
+  overflow: hidden;
+  animation: fadeUp 0.45s ease both;
+  min-height: 200px;
+  position: relative;
+}
+
+// ============================================================
+//  States
+// ============================================================
+.state-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 72px 24px;
+  color: $text-m;
+  font-size: 0.9rem;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.4;
+}
+
+.custom-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba($violet, 0.15);
+  border-top-color: $violet;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ============================================================
+//  Table
+// ============================================================
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead tr {
+    background: rgba(249, 250, 252, 0.8);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  th {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: $text-m;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    white-space: nowrap;
+
+    &.center { text-align: center; }
+  }
+
+  td {
+    padding: 16px 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.045);
+    vertical-align: middle;
+
+    &.center { text-align: center; }
+  }
+
+  tbody tr.table-row {
+    transition: background 0.18s ease;
+
+    &:hover { background: rgba($violet, 0.03); }
+    &:last-child td { border-bottom: none; }
+  }
+}
+
+// ============================================================
+//  User Cell
+// ============================================================
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $violet, $blue);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba($violet, 0.3);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.user-name {
+  font-weight: 700;
+  color: $text-h;
+  font-size: 0.9rem;
+}
+
+.id-badge {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.05);
+  color: $text-m;
+  padding: 1px 7px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+// ============================================================
+//  Email
+// ============================================================
+.email-text {
+  color: $text-b;
+  font-size: 0.875rem;
+}
+
+// ============================================================
+//  Reservations Cell
+// ============================================================
+.reservation-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 150px;
+}
+
+.res-top {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.res-count {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: $text-h;
+  letter-spacing: -0.02em;
+}
+
+.res-label {
+  font-size: 0.75rem;
+  color: $text-m;
+}
+
+.res-bar-track {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.res-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $violet, $blue);
+  border-radius: 999px;
+  max-width: 100%;
+  transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.res-event {
+  font-size: 0.75rem;
+  color: $text-m;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+
+  em {
+    font-style: normal;
+    color: $violet;
+    font-weight: 600;
+    margin-left: 2px;
+  }
+}
+
+.no-activity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  color: $text-m;
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+}
+
+// ============================================================
+//  Role Pill
+// ============================================================
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &.admin {
+    background: $violet-l;
+    color: $violet;
+    border: 1px solid rgba($violet, 0.2);
+  }
+
+  &.user {
+    background: rgba(0, 0, 0, 0.04);
+    color: $text-b;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+  }
+}
+
+// ============================================================
+//  Action Buttons
+// ============================================================
+.actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 7px 13px 7px 9px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: $text-b;
+  transition: all 0.18s ease;
+  font-family: inherit;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  // Solo ícono cuando no hay texto (delete)
+  &:not(.promote) {
+    padding: 7px;
+    span { display: none; }
+  }
+
+  &.promote {
+    background: $violet-l;
+    color: $violet;
+    border-color: rgba($violet, 0.2);
+
+    &:hover {
+      background: rgba($violet, 0.15);
+      border-color: rgba($violet, 0.35);
+      box-shadow: 0 4px 12px rgba($violet, 0.2);
+    }
+  }
+
+  &.delete {
+    color: $text-m;
+
+    &:hover {
+      background: $red-l;
+      color: $red;
+      border-color: rgba($red, 0.25);
+      box-shadow: 0 4px 12px rgba($red, 0.12);
+    }
+  }
+}
+
+// ============================================================
+//  Paginator
+// ============================================================
+.paginator-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+
+  mat-paginator {
+    @include glass;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: $text-b;
+
+    // Override Angular Material paginator colors
+    ::ng-deep {
+      .mat-mdc-paginator-container {
+        padding: 4px 8px;
+        min-height: 48px;
+      }
+
+      .mat-mdc-select-value-text,
+      .mat-mdc-paginator-range-label {
+        color: $text-b;
+        font-size: 0.82rem;
+      }
+
+      .mat-mdc-icon-button {
+        color: $text-b;
+
+        &:disabled { opacity: 0.3; }
+        &:not(:disabled):hover { color: $violet; }
+      }
+    }
+  }
+}
+
+// ============================================================
+//  Animations
+// ============================================================
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ============================================================
+//  Responsive
+// ============================================================
+@media (max-width: 768px) {
+  .admin-container { padding: 20px 16px 40px; }
+
+  .admin-header { flex-direction: column; align-items: flex-start; }
+
+  .users-table th,
+  .users-table td { padding: 12px 12px; }
+
+  .action-btn.promote span { display: none; }
+  .action-btn.promote { padding: 7px; }
+}

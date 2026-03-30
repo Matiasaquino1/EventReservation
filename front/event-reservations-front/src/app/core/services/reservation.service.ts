@@ -46,10 +46,8 @@ export class ReservationService {
   }
 
   forceConfirm(eventId: number) {
-    return this.http.post(
-      `${this.apiUrl}/Admin/events/${eventId}/force-confirm`,
-      {}
-    );
+    return this.http.patch(
+      `${this.apiUrl}/${eventId}/force-confirm`, {});
   }
 
   getPaymentIntent(id: number): Observable<{clientSecret: string}> {

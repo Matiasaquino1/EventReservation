@@ -1,11 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatExpansionModule } from '@angular/material/expansion';
-
-import { User } from '../../../core/models/user.model';
+import { MatIconModule } from '@angular/material/icon';
 import { AdminService } from '../../../core/services/admin.service';
 
 @Component({
@@ -13,64 +9,59 @@ import { AdminService } from '../../../core/services/admin.service';
   standalone: true,
   imports: [
     CommonModule,
-    MatTableModule,
-    MatButtonModule,
     MatPaginatorModule,
-    MatExpansionModule
+    MatIconModule,
   ],
   templateUrl: './user.component.html',
-  styleUrls: ['./user.component.css']
+  styleUrls: ['./user.component.scss'],
 })
 export class UsersComponent implements OnInit {
+  private adminService = inject(AdminService);
+  private cdr = inject(ChangeDetectorRef);
 
   users: any[] = [];
-  displayedColumns = ['username', 'email', 'tickets', 'role', 'actions'];
-
-  page = 1;
+  page  = 1;
   limit = 10;
   total = 0;
-
-  constructor(private adminService: AdminService) {}
+  isLoading = true;
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.loadUsers();
-    });
+    this.loadUsers();
   }
 
   loadUsers(): void {
-    this.adminService.getUsers(this.page, this.limit)
-      .subscribe(res => {
+    this.isLoading = true;
+    this.adminService.getUsers(this.page, this.limit).subscribe({
+      next: (res) => {
         this.users = res.users;
         this.total = res.total;
-      });
+        this.isLoading = false;
+        this.cdr.detectChanges(); // <--- ESTO obliga a Angular a pintar los datos
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   promote(userId: number): void {
-    this.adminService.promoteUser(userId)
-      .subscribe(() => this.loadUsers());
+    if (!confirm('¿Promover a este usuario a Admin?')) return;
+    this.adminService.promoteUser(userId).subscribe(() => this.loadUsers());
   }
 
   remove(userId: number): void {
-    if (!confirm('¿Eliminar usuario?')) return;
-
-    this.adminService.deleteUser(userId)
-      .subscribe(() => this.loadUsers());
-  }
-
-  getEventTitles(user: any): string {
-    console.log('Usuario en tabla:', user);
-    if (!user.reservations || user.reservations.length === 0) {
-    return 'Sin reservas';
-    }
-    return user.reservations
-      .map((r: any) => r.eventTitle || r.eventId)
-      .join(', ');
+    if (!confirm('¿Eliminar usuario permanentemente?')) return;
+    this.adminService.deleteUser(userId).subscribe(() => this.loadUsers());
   }
 
   onPageChange(event: PageEvent): void {
-    this.page = event.pageIndex + 1;
+    this.page  = event.pageIndex + 1;
     this.limit = event.pageSize;
     this.loadUsers();
+  }
+
+  resPercent(count: number): number {
+    return Math.min(Math.round((count / 10) * 100), 100);
   }
 }

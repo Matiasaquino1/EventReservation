@@ -41,7 +41,7 @@ export class AdminService {
     if (eventId) params = params.set('eventId', eventId);
 
     return this.http.get<{ data: Reservation[]; page: number; pageSize: number; totalCount: number }>(
-      `${this.apiUrl}/reservations`,
+      `${this.apiUrl}/ventas`,
       { params }
     );
   }
@@ -62,6 +62,10 @@ export class AdminService {
 
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard-stats`);
+  }
+
+  getEventAttendees(eventId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/events/${eventId}/attendees`);
   }
 
   private normalizeUser(user: any): User {

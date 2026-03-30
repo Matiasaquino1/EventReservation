@@ -264,9 +264,12 @@ namespace EventReservations.Controllers
                     return NotFound(new { error = "Reserva no encontrada." });
                 }
 
+                if (reservation.Status == ReservationStatuses.Cancelled)
+                    return BadRequest("La reserva ya se encuentra cancelada.");
+
                 var dto = _mapper.Map<ReservationDto>(updated);
                 _logger.LogInformation("Reserva cancelada: {Id}", id);
-                return Ok(dto);
+                return Ok(dto);            
             }
             catch (Exception ex)
             {
@@ -292,6 +295,28 @@ namespace EventReservations.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 return Conflict(new { message = "El cupo fue tomado por otro usuario. Intentá de nuevo." });
+            }
+        }
+
+        [HttpPatch("{id}/force-confirm")]
+        public async Task<IActionResult> ForceConfirm(int id)
+        {
+            try
+            {
+                // Delegamos la lógica al servicio
+                var result = await _reservationService.ConfirmReservationAsync(id);
+
+                if (!result)
+                {
+                    return NotFound(new { message = $"No se encontró la reserva #{id}" });
+                }
+
+                return Ok(new { message = "Reserva confirmada correctamente" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al confirmar la reserva {Id}", id);
+                return StatusCode(500, "Error interno al procesar la confirmación");
             }
         }
 
