@@ -2,6 +2,7 @@
 using EventReservations.Dto;
 using EventReservations.Models;
 using EventReservations.Repositories;
+using EventReservations.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
@@ -44,17 +45,20 @@ namespace EventReservations.Services
         private readonly IReservationRepository _reservationRepository;
         private readonly IEventRepository _eventRepository;
         private readonly ILogger<ReservationService> _logger;
+        private readonly IEmailService _emailService;
 
         public ReservationService(
             ApplicationDbContext context,
             IReservationRepository reservationRepository,
             IEventRepository eventRepository,
+            IEmailService emailService,
             ILogger<ReservationService> logger)
         {
             _context = context;
             _reservationRepository = reservationRepository;
             _eventRepository = eventRepository;
             _logger = logger;
+            _emailService = emailService;
         }
 
         public async Task<Reservation> CreateReservationAsync(
@@ -176,82 +180,138 @@ namespace EventReservations.Services
 
         public async Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId, string stripePaymentIntentId)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            ConfirmationEmailDataDto? emailData = null;
 
-            try
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                var reservation = await _context.Reservations
-                    .Include(r => r.Event) 
-                    .FirstOrDefaultAsync(r => r.ReservationId == reservationId)
-                    ?? throw new InvalidOperationException("Reserva no encontrada.");
-
-                // Idempotencia
-                if (reservation.Status == ReservationStatuses.Confirmed)
-                    return;
-
-                if (reservation.Status != ReservationStatuses.Pending)
-                    throw new InvalidOperationException("La reserva no se puede confirmar: estado inválido.");
-
-                if (reservation.Event == null)
-                    throw new InvalidOperationException("Evento no encontrado.");
-
-                if (reservation.Event.TicketsAvailable < reservation.NumberOfTickets)
-                    throw new InvalidOperationException("Entradas insuficientes.");
-
-                var payment = await _context.Payments.FirstOrDefaultAsync(p =>
-                    p.ReservationId == reservationId &&
-                    p.StripePaymentIntentId == stripePaymentIntentId);
-                
-                if (payment == null)
+                try
                 {
-                    payment = new Payment
+                    var reservation = await _context.Reservations
+                        .Include(r => r.Event)
+                        .Include(r => r.User)
+                        .FirstOrDefaultAsync(r => r.ReservationId == reservationId)
+                        ?? throw new InvalidOperationException("Reserva no encontrada.");
+
+                    // Idempotencia
+                    if (reservation.Status == ReservationStatuses.Confirmed)
+                        return;
+
+                    if (reservation.Status != ReservationStatuses.Pending)
+                        throw new InvalidOperationException("La reserva no se puede confirmar: estado inválido.");
+
+                    if (reservation.Event == null)
+                        throw new InvalidOperationException("Evento no encontrado.");
+
+                    if (reservation.Event.TicketsAvailable < reservation.NumberOfTickets)
+                        throw new InvalidOperationException("Entradas insuficientes.");
+
+                    var payment = await _context.Payments.FirstOrDefaultAsync(p =>
+                        p.ReservationId == reservationId &&
+                        p.StripePaymentIntentId == stripePaymentIntentId);
+
+                    if (payment == null)
                     {
-                        ReservationId = reservationId,
-                        StripePaymentIntentId = stripePaymentIntentId, 
-                        Status = PaymentStatuses.Pending,
+                        payment = new Payment
+                        {
+                            ReservationId = reservationId,
+                            StripePaymentIntentId = stripePaymentIntentId,
+                            Status = PaymentStatuses.Pending,
+                            Amount = reservation.Amount,
+                            PaymentDate = DateTime.UtcNow
+                        };
+                        _context.Payments.Add(payment);
+                    }
+
+                    if (payment.Status == PaymentStatuses.Succeeded)
+                        return;
+
+                    payment.Status = PaymentStatuses.Succeeded;
+                    payment.PaymentDate = DateTime.UtcNow;
+
+                    reservation.Event.TicketsAvailable -= reservation.NumberOfTickets;
+                    if (reservation.Event.TicketsAvailable == 0)
+                        reservation.Event.Status = "SoldOut";
+
+                    reservation.Status = ReservationStatuses.Confirmed;
+
+                    await _context.SaveChangesAsync();
+
+                    // Prepara los datos del email pero no envia todavía, para que el envío no forme parte de la transacción.
+                    emailData = new ConfirmationEmailDataDto
+                    {
+                        ToEmail = reservation.User.Email,
+                        UserName = reservation.User.Username,
+                        EventTitle = reservation.Event.Title,
+                        EventDate = (DateTime)reservation.Event.EventDate,
+                        NumberOfTickets = reservation.NumberOfTickets,
                         Amount = reservation.Amount,
-                        PaymentDate = DateTime.UtcNow
+                        ReservationId = reservation.ReservationId
                     };
-                    _context.Payments.Add(payment);
+
+                    await transaction.CommitAsync();
                 }
-
-                if (payment.Status == PaymentStatuses.Succeeded)
-                    return;
-
-                payment.Status = PaymentStatuses.Succeeded;
-                payment.PaymentDate = DateTime.UtcNow;
-
-                reservation.Event.TicketsAvailable -= reservation.NumberOfTickets;
-                if (reservation.Event.TicketsAvailable == 0)
-                    reservation.Event.Status = "SoldOut";
-
-                reservation.Status = ReservationStatuses.Confirmed;
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError(ex, "Error crítico en ConfirmPaymentAndDecrementTicketsAsync para la reserva {Id}", reservationId);
+                    throw;
+                }
             }
-            catch (Exception ex)
+
+            // Email por fuera de la transacción para no afectar el flujo principal en caso de error en el envío.
+            if (emailData != null)
             {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, "Error crítico en ConfirmPaymentAndDecrementTicketsAsync para la reserva {Id}", reservationId);
-                throw; // Relanzo para que el controlador reciba la excepción
+                try
+                {
+                    _logger.LogInformation("Enviando mail de confirmación para reserva #{Id}...", emailData.ReservationId);
+                    await _emailService.SendConfirmationEmailAsync(emailData);
+                }
+                catch (Exception ex)
+                {
+                    // Logueamos el error pero no lanzamos excepción para que el cliente
+                    // reciba su OK, ya que la plata se cobró y la DB se actualizó.
+                    _logger.LogError(ex, "La reserva se confirmó pero falló el envío del mail para la reserva {Id}", reservationId);
+                }
             }
         }
 
-        public async Task<bool> ConfirmReservationAsync(int reservationId)
+        public async Task<bool> ConfirmReservationAsync(int id)
         {
-            var reservation = await _context.Reservations.FindAsync(reservationId);
+            var reservation = await _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Event)
+                .FirstOrDefaultAsync(r => r.ReservationId == id);
 
-            if (reservation == null) return false;
-
-            if (reservation.Status == ReservationStatuses.Pending)
+            if (reservation == null)
             {
-                reservation.Status = ReservationStatuses.Confirmed;
-                await _context.SaveChangesAsync();
-                return true;
+                return false;
             }
 
-            return false;
+            reservation.Status = ReservationStatuses.Confirmed;
+            await _context.SaveChangesAsync();
+
+            try
+            {
+                _logger.LogInformation("Enviando mail post-pago Stripe para reserva {Id}...", id);
+
+                var emailData = new ConfirmationEmailDataDto
+                {
+                    ToEmail = reservation.User.Email,
+                    UserName = reservation.User.Username,
+                    EventTitle = reservation.Event.Title,
+                    EventDate = (DateTime)reservation.Event.EventDate,       
+                    NumberOfTickets = reservation.NumberOfTickets,
+                    Amount = reservation.Amount,
+                    ReservationId = reservation.ReservationId
+                };
+
+                await _emailService.SendConfirmationEmailAsync(emailData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error enviando mail tras pago Stripe para reserva {Id}", id);
+            }
+            return true;
         }
 
         public async Task<Reservation> GetReservationAsync(int id) 

@@ -1,34 +1,57 @@
-<div class="success-container">
-  <div class="message-header">
-    <div class="check-icon">✔</div>
-    <h1>¡Pago Confirmado!</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ticket Confirmación de Pago</title>
+</head>
+
+<body>
+<div class="sc">
+  <div class="header">
+    <div class="check">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h1>¡Pago confirmado!</h1>
     <p>Tu reserva ha sido procesada con éxito.</p>
   </div>
 
-  <div class="ticket" [class.fade-in]="showTicket()">
-    <div class="ticket-top">
-      <span class="category">Pase de Entrada</span>
-      <h2 class="event-name">Confirmación de Reserva</h2>
-      <p class="status-badge">RESERVADO</p>
-    </div>
-    
-    <div class="ticket-divider">
-      <div class="notch-left"></div>
-      <div class="dots"></div>
-      <div class="notch-right"></div>
+  <div class="ticket">
+    <div class="t-top">
+      <span class="cat">Pase de entrada</span>
+      <h2>Confirmación de reserva</h2>
+      <p class="badge">RESERVADO</p>
     </div>
 
-    <div class="ticket-bottom">
-      <p class="info">Estamos actualizando tu historial. Podrás ver tus entradas en la sección de mis reservas en unos instantes.</p>
-      
+    <div class="divider"><div class="dashes"></div></div>
+
+    <div class="t-body">
+      <div class="email-row">
+        <div class="mail-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="m22 7-10 7L2 7"/>
+          </svg>
+        </div>
+        <div>
+          <h3>¡Revisá tu casilla de correo!</h3>
+          <p>Te enviamos tu <strong>entrada oficial</strong> con el <strong>código QR</strong> adjunto.</p>
+        </div>
+      </div>
+
+      <p class="info-text">
+        Presentá el <strong>QR</strong> de tu email el día del evento.<br>
+        También podés descargarlo desde tu historial.
+      </p>
+
       <div class="actions">
-        <button class="btn-primary" routerLink="/my-reservations">
-          Ver mis Reservas
-        </button>
-        <button class="btn-ghost" routerLink="/">
-          Volver al Inicio
-        </button>
+        <button [routerLink]="['/my-reservations']" class="btn-p">Ver mis reservas</button>
+        <button [routerLink]="['/']" class="btn-g">Volver al inicio</button>
       </div>
     </div>
   </div>
 </div>
+</body>
+</html>

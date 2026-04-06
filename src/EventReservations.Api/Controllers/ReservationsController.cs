@@ -303,7 +303,6 @@ namespace EventReservations.Controllers
         {
             try
             {
-                // Delegamos la lógica al servicio
                 var result = await _reservationService.ConfirmReservationAsync(id);
 
                 if (!result)
@@ -311,6 +310,7 @@ namespace EventReservations.Controllers
                     return NotFound(new { message = $"No se encontró la reserva #{id}" });
                 }
 
+                Console.WriteLine("Llegué al final del endpoint");
                 return Ok(new { message = "Reserva confirmada correctamente" });
             }
             catch (Exception ex)

@@ -19,7 +19,6 @@
 }
 
 h1 { margin: 0; font-size: 1.8rem; color: #1e293b; }
-
 .subtitle { margin-bottom: 0.5rem; color: #64748b; }
 
 label {
@@ -87,4 +86,3 @@ button:disabled {
   border-radius: 8px;
   text-align: center;
 }
-    

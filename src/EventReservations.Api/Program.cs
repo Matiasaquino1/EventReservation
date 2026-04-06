@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Stripe;
+using Resend;
 using System.Net;
 using System.Reflection;
 using System.Security.Claims;
@@ -33,6 +34,25 @@ try
 
     // SERVICES
     builder.Services.AddControllers();
+    builder.Services.AddOptions();
+
+    //Resend
+    var resendSection = builder.Configuration.GetSection("Resend");
+    // Intentamos leer del JSON, si viene nulo, usamos la cadena de texto directo
+    var apiKey = resendSection["ApiToken"]
+                 ?? resendSection["ApiKey"]
+                 ?? "re_GfaVrW9b_FRNTePcpM7nuSXHj5mYnyWiM"; // Tu Key acá
+    Console.WriteLine($"[DEBUG] Intentando cargar Resend con Key: {(string.IsNullOrEmpty(apiKey) ? "VACÍA ❌" : "OK ✅")}");
+    Console.WriteLine($"ENV: {builder.Environment.EnvironmentName}");
+    Console.WriteLine(builder.Configuration["Resend:ApiKey"]);
+
+
+    builder.Services.Configure<ResendClientOptions>(options => {
+        options.ApiToken = apiKey;
+    });
+
+    builder.Services.AddHttpClient<IResend, ResendClient>();
+    builder.Services.AddTransient<IResend, ResendClient>();
 
     // DbContext
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -53,6 +73,7 @@ try
     builder.Services.AddScoped<IPaymentService, PaymentService>();
     builder.Services.AddSingleton<IJwtService, JwtService>();
     builder.Services.AddScoped<IStripeWebhookService, StripeWebhookService>();
+    builder.Services.AddScoped<IEmailService, EmailService>();
 
     // AutoMapper
     builder.Services.AddAutoMapper(typeof(MappingProfile));
