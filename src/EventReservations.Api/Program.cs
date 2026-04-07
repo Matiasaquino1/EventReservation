@@ -51,8 +51,10 @@ try
     builder.Services.AddTransient<IResend, ResendClient>();
 
     // DbContext
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseNpgsql(connectionString));
 
     // Repositories
     builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -156,7 +158,7 @@ try
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        context.Database.Migrate(); // Aplica migraciones automáticamente (opcional pero recomendado)
+        context.Database.Migrate(); 
 
         // Verificamos si ya existe un admin
         if (!context.Users.Any(u => u.Role == "Admin"))
