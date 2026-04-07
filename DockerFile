@@ -6,10 +6,10 @@ COPY ["src/EventReservations/EventReservations.csproj", "EventReservations/"]
 
 RUN dotnet restore "EventReservations/EventReservations.csproj"
 
-# 3. Copiam todo el contenido de la raíz (incluyendo src y test)
+# 3. Copiam todo el contenido de la raíz (incluyendo src y tests)
 COPY . .
 
-WORKDIR "/src/src/EventReservations"
+WORKDIR "/src/src/EventReservations.Api"
 RUN dotnet build "EventReservations.csproj" -c Release -o /app/build
 
 # ETAPA 2: Publicación
