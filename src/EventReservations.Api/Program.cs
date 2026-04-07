@@ -182,6 +182,20 @@ try
         }
     }
 
+    // Render (Migraciones automáticas)
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+    }
+
+    // Health Render
+    app.MapGet("/health", async (ApplicationDbContext db) =>
+    {
+        var canConnect = await db.Database.CanConnectAsync();
+        return canConnect ? Results.Ok("Healthy") : Results.Problem("DB down");
+    });
+
     // MIDDLEWARE
     app.UseExceptionHandler(errorApp =>
     {
