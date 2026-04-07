@@ -1,5 +1,4 @@
 ﻿using Resend;
-using QRCoder;
 using EventReservations.Dto;
 
 namespace EventReservations.Services
@@ -12,49 +11,32 @@ namespace EventReservations.Services
     public class EmailService : IEmailService
     {
         private readonly IResend _resend;
+        private readonly IConfiguration _config;
 
-        public EmailService(IResend resend)
+        public EmailService(IResend resend, IConfiguration config)
         {
             _resend = resend;
+            _config = config;
         }
 
         public async Task SendConfirmationEmailAsync(ConfirmationEmailDataDto data)
         {
-            // 1. Generamos los bytes del QR
-            var qrBytes = GenerateQrBytes(data.ReservationId);
+            var baseUrl = _config["App:BaseUrl"];
+            string qrUrl = $"{baseUrl}api/reservations/qr/{data.ReservationToken}";
 
             var message = new EmailMessage
             {
                 From = "onboarding@resend.dev",
                 To = data.ToEmail,
                 Subject = $"¡Reserva Confirmada: {data.EventTitle}!",
-                HtmlBody = BuildHtmlBody(data, "cid:qrcode_reserva"), 
-                Attachments = new List<EmailAttachment>
-                {
-                    new EmailAttachment
-                    {
-                        Filename = "codigo_qr.png",
-                        Content = qrBytes, 
-                        ContentId = "qrcode_reserva", 
-                        ContentType = "image/png"
-                    }
-                }
+                HtmlBody = BuildHtmlBody(data, qrUrl)
             };
 
             await _resend.EmailSendAsync(message);
         }
 
-        private static byte[] GenerateQrBytes(int reservationId)
-        {
-            var qrContent = $"https://tuapp.com/validate/{reservationId}";
-            using var qrGenerator = new QRCodeGenerator();
-            using var qrCodeData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
-            using var qrCode = new PngByteQRCode(qrCodeData);
 
-            return qrCode.GetGraphic(8); 
-        }
-
-        private static string BuildHtmlBody(Dto.ConfirmationEmailDataDto data, string qrBase64)
+        private static string BuildHtmlBody(ConfirmationEmailDataDto data, string qrUrl)
         {
             return $@"
             <div style='font-family: sans-serif; max-width: 600px; margin: 0 auto; 
@@ -103,7 +85,7 @@ namespace EventReservations.Services
                             <br>
                             <strong>Es único e intransferible.</strong>
                         </p>
-                        <img src='cid:qrcode_reserva' 
+                        <img src='{qrUrl}' 
                             alt='Código QR de entrada'
                             style='width: 200px; height: 200px; border: 4px solid #1976d2; 
                                    border-radius: 8px; padding: 8px;' />

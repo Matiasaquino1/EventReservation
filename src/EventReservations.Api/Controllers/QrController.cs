@@ -1,26 +1,36 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using EventReservations.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QRCoder;
+
 
 namespace EventReservations.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("qr")]
     public class QrController : ControllerBase
     {
-        [HttpGet("{reservationId}/qr")]
-        [AllowAnonymous] 
-        public IActionResult GetQr(int reservationId)
+        private readonly IReservationService _reservationService;
+
+        public QrController(
+            IReservationService reservationService
+            )
         {
-            var qrContent = $"https://tuapp.com/validate/{reservationId}";
+            _reservationService = reservationService;
+        }
 
-            using var qrGenerator = new QRCodeGenerator();
-            using var qrCodeData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
-            using var qrCode = new PngByteQRCode(qrCodeData);
-
-            var pngBytes = qrCode.GetGraphic(8);
-
-            return File(pngBytes, "image/png");
+        [HttpGet("qr/{token}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetQrByToken(Guid token)
+        {
+            try
+            {
+                var imageBytes = await _reservationService.GenerateQrCodeBytesByTokenAsync(token);
+                return File(imageBytes, "image/png");
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }

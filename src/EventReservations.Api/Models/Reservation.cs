@@ -4,7 +4,7 @@ namespace EventReservations.Models
     public class Reservation
     {
         public int ReservationId { get; set; }
-
+        public Guid ReservationToken { get; set; } = Guid.NewGuid();
         public int UserId { get; set; }  // Relación con User
         public int EventId { get; set; }  // Relación con Event
         public string? PaymentIntentId { get; set; } // ID del intento de pago en Stripe

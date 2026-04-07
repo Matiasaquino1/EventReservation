@@ -23,6 +23,7 @@ namespace EventReservations.Profiles
             // RESERVATIONS
             CreateMap<Reservation, ReservationDto>()
                 .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
+                .ForMember(dest => dest.ReservationToken, opt => opt.MapFrom(src => src.ReservationToken))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.EventId))
                 .ReverseMap();
@@ -39,6 +40,7 @@ namespace EventReservations.Profiles
             // Mapeo para el detalle de la reserva dentro de la lista de usuarios
             CreateMap<Reservation, UserReservationDto>()
                 .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
+                .ForMember(dest => dest.ReservationToken, opt => opt.MapFrom(src => src.ReservationToken))
                 .ForMember(dest => dest.EventTitle, opt => opt.MapFrom(src => src.Event.Title))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.ReservationDate, opt => opt.MapFrom(src => src.ReservationDate));

@@ -9,5 +9,6 @@
         public int NumberOfTickets { get; set; }
         public decimal Amount { get; set; }
         public int ReservationId { get; set; }
+        public Guid ReservationToken { get; set; } = Guid.NewGuid();
     }
 }

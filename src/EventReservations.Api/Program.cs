@@ -40,12 +40,8 @@ try
     var resendSection = builder.Configuration.GetSection("Resend");
     // Intentamos leer del JSON, si viene nulo, usamos la cadena de texto directo
     var apiKey = resendSection["ApiToken"]
-                 ?? resendSection["ApiKey"]
-                 ?? "re_GfaVrW9b_FRNTePcpM7nuSXHj5mYnyWiM"; // Tu Key acá
+                 ?? resendSection["ApiKey"];
     Console.WriteLine($"[DEBUG] Intentando cargar Resend con Key: {(string.IsNullOrEmpty(apiKey) ? "VACÍA ❌" : "OK ✅")}");
-    Console.WriteLine($"ENV: {builder.Environment.EnvironmentName}");
-    Console.WriteLine(builder.Configuration["Resend:ApiKey"]);
-
 
     builder.Services.Configure<ResendClientOptions>(options => {
         options.ApiToken = apiKey;

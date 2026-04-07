@@ -5,6 +5,7 @@ using EventReservations.Repositories;
 using EventReservations.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using QRCoder;
 using Stripe;
 using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ namespace EventReservations.Services
         Task<Reservation> GetReservationAsync(int id);
         Task<IEnumerable<Reservation>> GetAllReservationsAsync(string? status = null, int? eventId = null);
         Task<IEnumerable<Reservation>> GetReservationsByUserAndEventAsync(int userId, int eventId);
+        Task<byte[]> GenerateQrCodeBytesByTokenAsync(Guid token);
         Task ConfirmPaymentAndDecrementTicketsAsync(int reservationId, string StripePaymentIntentId);
         /// <summary>
         /// Obtiene una lista paginada de reservas con filtros opcionales para uso administrativo.
@@ -312,6 +314,23 @@ namespace EventReservations.Services
                 _logger.LogError(ex, "Error enviando mail tras pago Stripe para reserva {Id}", id);
             }
             return true;
+        }
+
+        public async Task<byte[]> GenerateQrCodeBytesByTokenAsync(Guid token)
+        {
+            var reservation = await _context.Reservations
+                .FirstOrDefaultAsync(r => r.ReservationToken == token);
+
+            if (reservation == null)
+                throw new KeyNotFoundException("Reserva no válida.");
+
+            var qrContent = $"https://tu-frontend.vercel.app/validate/{token}";
+
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrCodeData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new PngByteQRCode(qrCodeData);
+
+            return qrCode.GetGraphic(8);
         }
 
         public async Task<Reservation> GetReservationAsync(int id) 
