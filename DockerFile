@@ -1,25 +1,18 @@
-# ETAPA 1: Compilación (SDK)
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY ["src/EventReservations/EventReservations.csproj", "EventReservations/"]
+COPY ["src/EventReservations.Api/EventReservations.csproj", "src/EventReservations.Api/"]
+RUN dotnet restore "src/EventReservations.Api/EventReservations.csproj"
 
-RUN dotnet restore "EventReservations/EventReservations.csproj"
-
-# 3. Copiam todo el contenido de la raíz (incluyendo src y tests)
 COPY . .
-
 WORKDIR "/src/src/EventReservations.Api"
-RUN dotnet build "EventReservations.csproj" -c Release -o /app/build
+RUN dotnet publish "EventReservations.csproj" -c Release -o /app/publish
 
-# ETAPA 2: Publicación
-FROM build AS publish
-RUN dotnet publish "EventReservations.csproj" -c Release -o /app/publish /p:UseAppHost=false
-
-# ETAPA 3: Imagen Final (Runtime)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
 
 ENV ASPNETCORE_URLS=http://+:10000
 EXPOSE 10000
