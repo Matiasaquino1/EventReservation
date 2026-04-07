@@ -60,5 +60,5 @@ export const routes: Routes = [
     ]
   },
   
-  { path: '**', redirectTo: '' } // Catch-all para rutas inexistentess
+  { path: '**', redirectTo: '' } // Catch-all para rutas inexistentes
 ];
