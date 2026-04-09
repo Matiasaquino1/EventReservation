@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 import { User } from '../models/user.model';
 import { Reservation } from '../models/reservation.model';
 import { DashboardStats } from '../models/admin-stats.model';

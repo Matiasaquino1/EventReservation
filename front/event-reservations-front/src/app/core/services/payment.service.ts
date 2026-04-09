@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 import { Payment } from '../models/payment.model';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
   private readonly apiUrl = `${environment.apiUrl}/api/Payments`;
   constructor(private http: HttpClient) {}
-  
+
   processPayment(paymentData: { reservationId: number; amount: number; stripeToken: string }): Observable<Payment> {
     return this.http.post<Payment>(`${this.apiUrl}/process`, paymentData);
   }
