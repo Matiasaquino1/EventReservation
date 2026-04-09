@@ -1,6 +1,7 @@
 // ============================================================
 //  Admin Dashboard — Glassmorphism Light Theme
 // ============================================================
+@use 'sass:color';
 
 // --- Tokens ---
 $violet:   #7c3aed;
@@ -259,10 +260,9 @@ $border:   rgba(255, 255, 255, 0.65);
   height: 100%;
   border-radius: 999px;
   transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
-
-  .card-users    & { background: linear-gradient(90deg, $violet, lighten($violet, 20%)); }
-  .card-reservations & { background: linear-gradient(90deg, $blue, lighten($blue, 20%)); }
-  .card-revenue  & { background: linear-gradient(90deg, $emerald, lighten($emerald, 20%)); }
+  .card-users    & { background: linear-gradient(90deg, $violet, color.adjust($violet, $lightness: 20%)); }
+  .card-reservations & { background: linear-gradient(90deg, $blue, color.adjust($blue, $lightness: 20%)); }
+  .card-revenue  & { background: linear-gradient(90deg, $emerald, color.adjust($emerald, $lightness: 20%)); }
 }
 
 // ============================================================

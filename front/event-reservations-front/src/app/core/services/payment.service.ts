@@ -8,6 +8,7 @@ import { Payment } from '../models/payment.model';
 export class PaymentService {
   private readonly apiUrl = `${environment.apiUrl}/api/Payments`;
   constructor(private http: HttpClient) {}
+  
   processPayment(paymentData: { reservationId: number; amount: number; stripeToken: string }): Observable<Payment> {
     return this.http.post<Payment>(`${this.apiUrl}/process`, paymentData);
   }
