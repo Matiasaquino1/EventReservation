@@ -82,7 +82,10 @@ try
         options.AddPolicy("AllowFrontend", policy =>
         {
             policy
-            .WithOrigins("http://localhost:4200", "http://localhost:5173")
+            .SetIsOriginAllowed(origin =>
+            origin.StartsWith("http://localhost") ||
+            origin.Contains("vercel.app")
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
