@@ -161,13 +161,17 @@ try
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        context.Database.Migrate(); 
+        context.Database.Migrate();
 
-        // Verificamos si ya existe un admin
         if (!context.Users.Any(u => u.Role == "Admin"))
         {
-            var adminEmail = builder.Configuration["Admin:Email"] ?? "admin@gmail.com";
-            var adminPassword = builder.Configuration["Admin:Password"] ?? "123456";
+            var adminEmail = builder.Configuration["Admin:Email"];
+            var adminPassword = builder.Configuration["Admin:Password"];
+
+            if (string.IsNullOrEmpty(adminEmail) || string.IsNullOrEmpty(adminPassword))
+            {
+                throw new Exception("Credenciales de Admin no configuradas");
+            }
 
             var adminUser = new User
             {
